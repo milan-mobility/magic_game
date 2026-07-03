@@ -1,0 +1,72 @@
+import 'dart:ui';
+
+class AppColors {
+  static const Color white = Color(0xFFFFFFFF);
+  static const Color black = Color(0xFF000000);
+  static const Color themeColor = Color(0xFF1F4B82);
+  static const Color color242424 = Color(0xFF242424);
+  static const Color color787878 = Color(0xFF787878);
+  static const Color color797979 = Color(0xFF797979);
+  static const Color colorF6F6F6 = Color(0xFFF6F6F6);
+  static const Color colorF3F3F3 = Color(0xFFF3F3F3);
+  static const Color color858585 = Color(0xFF858585);
+  static const Color colorF9F9F9 = Color(0xFFF9F9F9);
+  static const Color color719B4D = Color(0xFF719B4D);
+  static const Color color2FD820 = Color(0xFF2FD820);
+  static const Color color25D366 = Color(0xFF25D366);
+  static const Color colorFF0000 = Color(0xFFFF0000);
+  static const Color color444444 = Color(0xFF444444);
+  static const Color colorF2F2F6 = Color(0xFFF2F2F6);
+  static const Color colorE9E9EA = Color(0xFFE9E9EA);
+  static const Color color18396B = Color(0xFF18396B);
+  static const Color color262626 = Color(0xFF262626);
+  static const Color colorFF2566 = Color(0xFFFF2566);
+  static const Color colorFF7A66 = Color(0xFFFF7A66);
+  static const Color color1F4B82 = Color(0xFF1F4B82);
+  static const Color colorFF8D28 = Color(0xFFFF8D28);
+  static const Color colorFAFAFA = Color(0xFFFAFAFA);
+  static const Color colorC4C4C4 = Color(0xFFC4C4C4);
+  static const Color color155D8E = Color(0xFF155D8E);
+  static const Color color2E7D32 = Color(0xFF2E7D32);
+  static const Color colorE0E0E0 = Color(0xFFE0E0E0);
+  static const Color colorF8F8F8 = Color(0xFFF8F8F8);
+  static const Color colorFF383C = Color(0xFFFF383C);
+  static const Color colorE75A5A = Color(0xFFE75A5A);
+  static const Color colorE4E9F0 = Color(0xFFE4E9F0);
+  static const Color color12110D = Color(0xFF12110D);
+  static const Color colorFBFBFB = Color(0xFFFBFBFB);
+  static const Color colorE9605A = Color(0xFFE9605A);
+  static const Color colorA0A0A0 = Color(0xFFA0A0A0);
+  static const Color colorF7ECFF = Color(0xFFF7ECFF);
+  static const Color colorD9D9D9 = Color(0xFFD9D9D9);
+  static const Color colorF6F7F9 = Color(0xFFF6F7F9);
+
+  //New
+  static const Color colorF3F9FF = Color(0xFFF3F9FF);
+  static const Color colorEFF8FF = Color(0xFFEFF8FF);
+  static const Color colorDBEFFF = Color(0xFFDBEFFF);
+
+  static const Color colorFF8A04 = Color(0xFFFF8A04);
+  static const Color colorFFFBFB = Color(0xFFFFFBFB);
+  static const Color colorFF8306 = Color(0xFFFF8306);
+  static const Color colorF3F7FB = Color(0xFFF3F7FB);
+  static const Color color4A3AFF = Color(0xFF4A3AFF);
+  static const Color colorC893FD = Color(0xFFC893FD);
+  static const Color colorE5E5EF = Color(0xFFE5E5EF);
+  static const Color color0A2C14 = Color(0xFF0A2C14);
+  static const Color colorF4DEDE = Color(0xFFF4DEDE);
+  static const Color colorEDFBE0 = Color(0xFFEDFBE0);
+  static const Color colorF1EDFF = Color(0xFFF1EDFF);
+  static const Color colorFFF9D9 = Color(0xFFFFF9D9);
+  static const Color color0D0A2C = Color(0xFF0D0A2C);
+  static const Color colorF8F8FF = Color(0xFFF8F8FF);
+  static const Color color2BB762 = Color(0xFF2BB762);
+  static const Color colorED4943 = Color(0xFFED4943);
+  static const Color colorFAC00C = Color(0xFFFAC00C);
+  static const Color colorC6D2FD = Color(0xFFC6D2FD);
+  static const Color colorF7FEF6 = Color(0xFFF7FEF6);
+  static const Color color09132C = Color(0xFF09132C);
+  static const Color color3C434D = Color(0xFF3C434D);
+  static const Color color0C0D0D = Color(0xFF0C0D0D);
+  static const Color color0C0C0D = Color(0xFF0C0C0D);
+}
