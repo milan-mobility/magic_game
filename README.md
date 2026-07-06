@@ -16,4 +16,16 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
-dart run build_runner build --delete-conflicting-outputs
+ - dart run build_runner build --delete-conflicting-outputs
+
+| Design Label | Flutter Constant  | Numeric Weight |
+  | ------------ | ----------------- | -------------- |
+| Thin         | `FontWeight.w100` | 100            |
+| ExtraLight   | `FontWeight.w200` | 200            |
+| Light        | `FontWeight.w300` | 300            |
+| **Regular**  | `FontWeight.w400` | 400 (default)  |
+| Medium       | `FontWeight.w500` | 500            |
+| SemiBold     | `FontWeight.w600` | 600            |
+| Bold         | `FontWeight.w700` | 700            |
+| ExtraBold    | `FontWeight.w800` | 800            |
+| Black        | `FontWeight.w900` | 900            |

@@ -72,32 +72,32 @@ class GameDetailController extends GetxController {
       case 'showInterstitial':
         if (_isShowingInterstitial) return;
         _isShowingInterstitial = true;
-        _sendCallbackToJs('gamePause');
+        _sendCallbackToJs('GamePause');
         final shownI = AdService.showInterstitial(
           onDismissed: () {
             _isShowingInterstitial = false;
-            _sendCallbackToJs('gameResume');
+            _sendCallbackToJs('GameResume');
             _sendCallbackToJs('interstitialClosed');
           },
         );
         if (!shownI) {
           _isShowingInterstitial = false;
-          _sendCallbackToJs('gameResume');
+          _sendCallbackToJs('GameResume');
         }
       case 'showRewardedPlus':
         if (_isShowingRewarded) return;
         _isShowingRewarded = true;
-        _sendCallbackToJs('gamePause');
+        _sendCallbackToJs('GamePause');
         final shownR = AdService.showRewardedAd(
           onDismissed: () {
             _isShowingRewarded = false;
-            _sendCallbackToJs('gameResume');
+            _sendCallbackToJs('GameResume');
             _sendCallbackToJs('rewardEarned');
           },
         );
         if (!shownR) {
           _isShowingRewarded = false;
-          _sendCallbackToJs('gameResume');
+          _sendCallbackToJs('GameResume');
         }
       default:
         debugPrint('Unknown message from JS: $message');
