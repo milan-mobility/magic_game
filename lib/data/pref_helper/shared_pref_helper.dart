@@ -13,6 +13,14 @@ class SharedPreferenceHelper {
     return _sharedPreference.getBool(PrefKeys.isLoggedIn) ?? false;
   }
 
+  Future<void> saveIntroDone(final bool value) async {
+    await _sharedPreference.setBool(PrefKeys.hasIntroDone, value);
+  }
+
+  bool get isIntroDone {
+    return _sharedPreference.getBool(PrefKeys.hasIntroDone) ?? false;
+  }
+
   Future<void> clear() async {
     final List<String> arrKeysToKeep = <String>[
       // PrefKeys.addTransactionGuide,

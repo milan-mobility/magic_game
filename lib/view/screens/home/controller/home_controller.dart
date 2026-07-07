@@ -126,7 +126,9 @@ class HomeController extends GetxController {
   }
 
   void selectCategory(final String categoryId) {
-    selectedCategoryId.value = categoryId;
+    selectedCategoryId.value = selectedCategoryId.value == categoryId
+        ? ''
+        : categoryId;
   }
 
   Future<void> openStoreForGame(final Games game) async {

@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.white,
         brightness: Brightness.light,
       ),
-      initialRoute: RouteHelper.home,
+      initialRoute: RouteHelper.splash,
       getPages: RouteHelper.routes,
       defaultTransition: Transition.noTransition,
       // builder: (context, child) {
