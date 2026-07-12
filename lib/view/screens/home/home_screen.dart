@@ -5,6 +5,7 @@ import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
 import 'package:magic_games/routes/route_helper.dart';
+import 'package:magic_games/view/base/bottom_navigation_bar.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 import 'package:magic_games/view/screens/home/widgets/banner/featured_banner_widget.dart';
 import 'package:magic_games/view/screens/home/widgets/category/home_category_list_widget.dart';
@@ -20,6 +21,7 @@ class HomeScreen extends GetView<HomeController> {
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         backgroundColor: AppColors.screenGgColor,
+        bottomNavigationBar: BottomNavigation(selectedIndex: 0),
         body: SafeArea(
           child: Obx(() {
             if (controller.isLoading.value &&
@@ -34,7 +36,17 @@ class HomeScreen extends GetView<HomeController> {
             return Column(
               children: [
                 const SizedBox(height: 12),
-                const HomeHeader(),
+                HomeHeader(
+                  onSearchTap: () {
+                    Get.toNamed(
+                      RouteHelper.searchGames,
+                      arguments: {
+                        'categories': categories,
+                        'games': controller.allGames,
+                      },
+                    );
+                  },
+                ),
                 if (categories.isNotEmpty) ...[
                   const SizedBox(height: 20),
                   HomeCategoryListWidget(

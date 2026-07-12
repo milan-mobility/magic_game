@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:magic_games/data/api/api_end_points.dart';
 import 'package:magic_games/helpers/extensions/date_time_ext.dart';
+import 'package:magic_games/helpers/services/remote_config.dart';
 
 extension StringExt on String? {
   bool isNotNullAndEmpty() {
@@ -20,7 +21,10 @@ extension StringExt on String? {
 
   String imageUrl() {
     if (this == null) return '';
-    return '${Endpoints.baseUrl}$this';
+    final String baseUrl = Get.isRegistered<RemoteConfigService>()
+        ? Get.find<RemoteConfigService>().baseUrl
+        : Endpoints.defaultBaseUrl;
+    return '$baseUrl$this';
   }
 
   String convertddMMMyyyy({String format = 'yyyy-MM-dd HH:mm:ss'}) {

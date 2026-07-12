@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
@@ -18,8 +20,8 @@ class GameIconWithIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double cardWidth = AppResponsive.value(180, tablet: 210);
-    final double cardHeight = AppResponsive.value(230, tablet: 278);
+    final double cardWidth = AppResponsive.value(120, tablet: 214);
+    final double cardHeight = AppResponsive.value(150, tablet: 290);
 
     return GestureDetector(
       onTap: onTap,
@@ -27,7 +29,7 @@ class GameIconWithIcon extends StatelessWidget {
         width: cardWidth,
         height: cardHeight,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(5),
           border: Border.all(color: AppColors.color1C153F, width: 1.0),
         ),
         child: Stack(
@@ -38,10 +40,10 @@ class GameIconWithIcon extends StatelessWidget {
               left: 0,
               right: 0,
               bottom: 0,
-              height: cardHeight * 0.7,
+              height: cardHeight * 1.2,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(5),
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -56,7 +58,7 @@ class GameIconWithIcon extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(AppResponsive.space(12)),
+              padding: EdgeInsets.all(AppResponsive.space(8)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -96,7 +98,7 @@ class GameIconWithIcon extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: poppinsW600.copyWith(
-                                fontSize: AppResponsive.font(14),
+                                fontSize: AppResponsive.font(10),
                                 color: AppColors.white,
                               ),
                             ),
@@ -106,7 +108,7 @@ class GameIconWithIcon extends StatelessWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: poppinsW500.copyWith(
-                                  fontSize: AppResponsive.font(12),
+                                  fontSize: AppResponsive.font(9),
                                   color: AppColors.white,
                                 ),
                               ),
@@ -115,15 +117,15 @@ class GameIconWithIcon extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: AppResponsive.space(10)),
+                  Gap(AppResponsive.space(5)),
                   CommonButton(
-                    height: AppResponsive.space(35),
-                    btnText: 'Play Now',
+                    height: AppResponsive.space(25),
+                    btnText: 'Play Now'.tr,
                     onPressed: onTap,
                     icon: Assets.svg.icPlay,
-                    borderRadius: 10,
+                    borderRadius: 5,
                     style: poppinsW500.copyWith(
-                      fontSize: AppResponsive.font(14),
+                      fontSize: AppResponsive.font(8),
                       color: AppColors.white,
                     ),
                   ),
@@ -142,7 +144,7 @@ class GameIconWithIcon extends StatelessWidget {
       return HomeImagePlaceholderWidget(
         width: cardWidth,
         height: cardHeight,
-        borderRadius: 15,
+        borderRadius: 5,
         iconSize: AppResponsive.space(34),
       );
     }
@@ -155,14 +157,14 @@ class GameIconWithIcon extends StatelessWidget {
                 width: cardWidth,
                 height: cardHeight,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(5),
                   image: DecorationImage(image: image, fit: BoxFit.cover),
                 ),
               ),
       errorWidget: (_, _, _) => HomeImagePlaceholderWidget(
         width: cardWidth,
         height: cardHeight,
-        borderRadius: 15,
+        borderRadius: 5,
         iconSize: AppResponsive.space(34),
       ),
     );
@@ -194,9 +196,9 @@ class _GameThumb extends StatelessWidget {
 
     if (imageUrl == null) {
       return HomeImagePlaceholderWidget(
-        width: AppResponsive.space(40),
-        height: AppResponsive.space(40),
-        borderRadius: 15,
+        width: AppResponsive.space(20),
+        height: AppResponsive.space(20),
+        borderRadius: 5,
         iconSize: AppResponsive.space(18),
       );
     }
@@ -206,18 +208,18 @@ class _GameThumb extends StatelessWidget {
       imageBuilder:
           (final BuildContext context, final ImageProvider<Object> image) =>
               Container(
-                width: AppResponsive.space(40),
-                height: AppResponsive.space(40),
+                width: AppResponsive.space(20),
+                height: AppResponsive.space(20),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(5),
                   image: DecorationImage(image: image, fit: BoxFit.cover),
                 ),
               ),
       errorWidget: (_, _, _) => HomeImagePlaceholderWidget(
-        width: AppResponsive.space(40),
-        height: AppResponsive.space(40),
-        borderRadius: 15,
-        iconSize: AppResponsive.space(18),
+        width: AppResponsive.space(20),
+        height: AppResponsive.space(20),
+        borderRadius: 5,
+        iconSize: AppResponsive.space(20),
       ),
     );
   }

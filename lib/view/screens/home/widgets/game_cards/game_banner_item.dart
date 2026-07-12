@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
@@ -19,8 +20,8 @@ class GameBannerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double cardWidth = AppResponsive.value(184, tablet: 214);
-    final double cardHeight = AppResponsive.value(246, tablet: 290);
+    final double cardWidth = AppResponsive.value(120, tablet: 214);
+    final double cardHeight = AppResponsive.value(150, tablet: 290);
 
     return GestureDetector(
       onTap: onTap,
@@ -28,7 +29,7 @@ class GameBannerItem extends StatelessWidget {
         width: cardWidth,
         height: cardHeight,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(5),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -37,7 +38,7 @@ class GameBannerItem extends StatelessWidget {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                height: cardHeight * 0.7,
+                height: cardHeight * 1.2,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -46,7 +47,7 @@ class GameBannerItem extends StatelessWidget {
                       stops: const <double>[0.0, 0.5, 1.0],
                       colors: [
                         AppColors.color5543AE.withValues(alpha: 0),
-                        AppColors.color0D0630.withValues(alpha: 0.38),
+                        AppColors.color0D0630.withValues(alpha: 0.5),
                         AppColors.color0D0630.withValues(alpha: 1.0),
                       ],
                     ),
@@ -54,7 +55,7 @@ class GameBannerItem extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(AppResponsive.space(12)),
+                padding: EdgeInsets.all(AppResponsive.space(8)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -85,14 +86,14 @@ class GameBannerItem extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: poppinsW600.copyWith(
-                        fontSize: AppResponsive.font(15),
+                        fontSize: AppResponsive.font(11),
                         color: AppColors.white,
                       ),
                     ),
                     Text(
                       game.categoryName ?? '',
                       style: poppinsW500.copyWith(
-                        fontSize: AppResponsive.font(12),
+                        fontSize: AppResponsive.font(9),
                         color: AppColors.white,
                       ),
                     ),
@@ -101,14 +102,14 @@ class GameBannerItem extends StatelessWidget {
                         children: [
                           Icon(
                             Icons.star,
-                            size: AppResponsive.space(16),
+                            size: AppResponsive.space(10),
                             color: AppColors.colorFFCC33,
                           ),
-                          Gap(AppResponsive.space(4)),
+                          Gap(AppResponsive.space(2)),
                           Text(
                             game.rating!.trim(),
                             style: poppinsW500.copyWith(
-                              fontSize: AppResponsive.font(12),
+                              fontSize: AppResponsive.font(10),
                               color: AppColors.white,
                             ),
                           ),
@@ -117,13 +118,13 @@ class GameBannerItem extends StatelessWidget {
                     ],
                     Gap(AppResponsive.space(5)),
                     CommonButton(
-                      height: AppResponsive.space(35),
-                      btnText: 'Play Now',
+                      height: AppResponsive.space(25),
+                      btnText: 'Play Now'.tr,
                       onPressed: onTap,
                       icon: Assets.svg.icPlay,
-                      borderRadius: 10,
+                      borderRadius: 5,
                       style: poppinsW500.copyWith(
-                        fontSize: AppResponsive.font(14),
+                        fontSize: AppResponsive.font(8),
                         color: AppColors.white,
                       ),
                     ),
@@ -143,7 +144,7 @@ class GameBannerItem extends StatelessWidget {
       return HomeImagePlaceholderWidget(
         width: cardWidth,
         height: cardHeight,
-        borderRadius: 15,
+        borderRadius: 5,
         iconSize: AppResponsive.space(34),
       );
     }
@@ -156,14 +157,14 @@ class GameBannerItem extends StatelessWidget {
                 width: cardWidth,
                 height: cardHeight,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(5),
                   image: DecorationImage(image: image, fit: BoxFit.cover),
                 ),
               ),
       errorWidget: (_, _, _) => HomeImagePlaceholderWidget(
         width: cardWidth,
         height: cardHeight,
-        borderRadius: 15,
+        borderRadius: 5,
         iconSize: AppResponsive.space(34),
       ),
     );

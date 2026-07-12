@@ -23,8 +23,8 @@ class GameIconItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double tileWidth = AppResponsive.value(120, tablet: 140);
-    final double imageSize = AppResponsive.value(120, tablet: 140);
+    final double tileWidth = AppResponsive.value(100, tablet: 140);
+    final double imageSize = AppResponsive.value(90, tablet: 140);
 
     return GestureDetector(
       onTap: onTap,
@@ -52,14 +52,14 @@ class GameIconItem extends StatelessWidget {
                         decoration: const BoxDecoration(
                           color: AppColors.colorFFCC33,
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(15),
+                            topLeft: Radius.circular(5),
                             bottomRight: Radius.circular(12),
                           ),
                         ),
                         child: Text(
                           '$rank',
-                          style: poppinsW700.copyWith(
-                            fontSize: AppResponsive.font(16),
+                          style: poppinsW600.copyWith(
+                            fontSize: AppResponsive.font(12),
                             color: AppColors.black,
                           ),
                         ),
@@ -75,20 +75,10 @@ class GameIconItem extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: poppinsW600.copyWith(
-                fontSize: AppResponsive.font(13),
+                fontSize: AppResponsive.font(10),
                 color: AppColors.white,
               ),
             ),
-            // if (_hasText(game.categoryName))
-            //   Text(
-            //     game.categoryName!.trim(),
-            //     maxLines: 1,
-            //     overflow: TextOverflow.ellipsis,
-            //     style: poppinsW500.copyWith(
-            //       fontSize: AppResponsive.font(12),
-            //       color: AppColors.white,
-            //     ),
-            //   ),
           ],
         ),
       ),
@@ -101,7 +91,7 @@ class GameIconItem extends StatelessWidget {
       return HomeImagePlaceholderWidget(
         width: imageSize,
         height: imageSize,
-        borderRadius: 15,
+        borderRadius: 5,
         iconSize: AppResponsive.space(26),
       );
     }
@@ -114,14 +104,14 @@ class GameIconItem extends StatelessWidget {
                 width: imageSize,
                 height: imageSize,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(5),
                   image: DecorationImage(image: image, fit: BoxFit.cover),
                 ),
               ),
       errorWidget: (_, _, _) => HomeImagePlaceholderWidget(
         width: imageSize,
         height: imageSize,
-        borderRadius: 15,
+        borderRadius: 5,
         iconSize: AppResponsive.space(26),
       ),
     );
@@ -133,9 +123,5 @@ class GameIconItem extends StatelessWidget {
     }
 
     return value.imageUrl();
-  }
-
-  bool _hasText(final String? value) {
-    return value != null && value.trim().isNotEmpty;
   }
 }

@@ -34,10 +34,10 @@ class FeaturedBannerBadgeWidget extends StatelessWidget {
                   final BuildContext context,
                   final ImageProvider<Object> imageProvider,
                 ) => Container(
-                  width: AppResponsive.space(40),
-                  height: (40),
+                  width: AppResponsive.space(25),
+                  height: AppResponsive.space(25),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(3),
                     image: DecorationImage(
                       image: imageProvider,
                       fit: BoxFit.contain,
@@ -45,18 +45,18 @@ class FeaturedBannerBadgeWidget extends StatelessWidget {
                   ),
                 ),
             errorWidget: (_, __, ___) => HomeImagePlaceholderWidget(
-              width: AppResponsive.space(40),
-              height: AppResponsive.space(40),
+              width: AppResponsive.space(25),
+              height: AppResponsive.space(25),
               borderRadius: 10,
-              iconSize: AppResponsive.space(18),
+              iconSize: AppResponsive.space(25),
             ),
           ),
         if (badge?.url == null || badge!.url!.trim().isEmpty)
           HomeImagePlaceholderWidget(
-            width: AppResponsive.space(40),
-            height: AppResponsive.space(40),
+            width: AppResponsive.space(25),
+            height: AppResponsive.space(25),
             borderRadius: 10,
-            iconSize: AppResponsive.space(18),
+            iconSize: AppResponsive.space(25),
           ),
         Gap(AppResponsive.space(10)),
         Expanded(
@@ -69,7 +69,7 @@ class FeaturedBannerBadgeWidget extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: poppinsW600.copyWith(
-                  fontSize: AppResponsive.font(13),
+                  fontSize: AppResponsive.font(10),
                   color: AppColors.white,
                 ),
               ),
@@ -79,7 +79,7 @@ class FeaturedBannerBadgeWidget extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: poppinsW400.copyWith(
-                    fontSize: AppResponsive.font(12),
+                    fontSize: AppResponsive.font(8),
                     color: AppColors.colorD5CCF2,
                   ),
                 ),

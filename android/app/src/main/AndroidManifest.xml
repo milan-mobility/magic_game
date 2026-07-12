@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:label="Magic Game Plus"
+        android:label="OneGame+"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
@@ -33,6 +33,7 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3940256099942544~3347511713"/>
+<!--        ca-app-pub-7707412763556101~6167130703-->
     </application>
     <queries>
         <intent>

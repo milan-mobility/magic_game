@@ -43,7 +43,7 @@ class CommonButton extends StatelessWidget {
       child: icon != null
           ? ElevatedButton.icon(
               onPressed: onPressed,
-              icon: SvgPicture.asset(icon ?? '', height: 20, width: 20),
+              icon: SvgPicture.asset(icon ?? '', height: 12, width: 12),
               label: Text(
                 btnText,
                 textAlign: TextAlign.center,
@@ -51,7 +51,7 @@ class CommonButton extends StatelessWidget {
                     style ??
                     poppinsW500.copyWith(
                       fontSize: fontSize ?? 16,
-                      color: Colors.white,
+                      color: btnTxtColor ?? Colors.white,
                     ),
               ),
               style: ElevatedButton.styleFrom(
@@ -88,7 +88,7 @@ class CommonButton extends StatelessWidget {
                     style ??
                     poppinsW500.copyWith(
                       fontSize: fontSize ?? 16,
-                      color: Colors.white,
+                      color: btnTxtColor ?? Colors.white,
                     ),
               ),
             ),

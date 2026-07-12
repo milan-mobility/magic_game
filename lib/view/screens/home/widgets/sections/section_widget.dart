@@ -46,7 +46,7 @@ class SectionWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -75,7 +75,7 @@ class SectionWidget extends StatelessWidget {
             height: _sectionHeight(),
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               itemCount: layoutType == HomeSectionLayoutType.collection
                   ? collections.length
                   : games.length,
@@ -91,15 +91,15 @@ class SectionWidget extends StatelessWidget {
   double _sectionHeight() {
     switch (layoutType) {
       case HomeSectionLayoutType.banner:
-        return AppResponsive.value(246, tablet: 290);
+        return AppResponsive.value(150, tablet: 290);
       case HomeSectionLayoutType.iconWithIcon:
-        return AppResponsive.value(230, tablet: 278);
+        return AppResponsive.value(150, tablet: 290);
       case HomeSectionLayoutType.iconWithBanner:
-        return AppResponsive.value(190, tablet: 225);
+        return AppResponsive.value(165, tablet: 225);
       case HomeSectionLayoutType.icon:
-        return AppResponsive.value(168, tablet: 200);
+        return AppResponsive.value(130, tablet: 200);
       case HomeSectionLayoutType.collection:
-        return AppResponsive.value(152, tablet: 200);
+        return AppResponsive.value(100, tablet: 200);
     }
   }
 

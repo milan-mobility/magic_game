@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
@@ -25,8 +26,8 @@ class GameIconWithBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double cardWidth = AppResponsive.value(250, tablet: 300);
-    final double cardHeight = AppResponsive.value(250, tablet: 340);
+    final double cardWidth = AppResponsive.value(155, tablet: 300);
+    final double cardHeight = AppResponsive.value(165, tablet: 340);
 
     return GestureDetector(
       onTap: onTap,
@@ -34,7 +35,7 @@ class GameIconWithBanner extends StatelessWidget {
         width: cardWidth,
         height: cardHeight,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(5),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -43,7 +44,7 @@ class GameIconWithBanner extends StatelessWidget {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                height: cardHeight * 0.7,
+                height: cardHeight * 1.0,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -52,7 +53,7 @@ class GameIconWithBanner extends StatelessWidget {
                       stops: const <double>[0.0, 0.5, 1.0],
                       colors: [
                         AppColors.color5543AE.withValues(alpha: 0),
-                        AppColors.color0D0630.withValues(alpha: 0.38),
+                        AppColors.color5543AE.withValues(alpha: 0.38),
                         AppColors.color0D0630.withValues(alpha: 1.0),
                       ],
                     ),
@@ -60,7 +61,7 @@ class GameIconWithBanner extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(AppResponsive.space(14)),
+                padding: EdgeInsets.all(AppResponsive.space(8)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -80,14 +81,14 @@ class GameIconWithBanner extends StatelessWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: poppinsW600.copyWith(
-                                  fontSize: AppResponsive.font(14),
+                                  fontSize: AppResponsive.font(10),
                                   color: AppColors.white,
                                 ),
                               ),
                               Text(
                                 game.categoryName ?? '',
                                 style: poppinsW500.copyWith(
-                                  fontSize: AppResponsive.font(12),
+                                  fontSize: AppResponsive.font(9),
                                   color: AppColors.white,
                                 ),
                               ),
@@ -101,20 +102,19 @@ class GameIconWithBanner extends StatelessWidget {
                       children: [
                         Expanded(
                           child: CommonButton(
-                            height: AppResponsive.space(35),
-                            btnText: 'Play Now',
+                            height: AppResponsive.space(25),
+                            btnText: 'Play Now'.tr,
                             onPressed: onTap,
                             icon: Assets.svg.icPlay,
-                            borderRadius: 10,
-                            btnBgColor: AppColors.color5820CB,
+                            borderRadius: 5,
                             style: poppinsW500.copyWith(
-                              fontSize: AppResponsive.font(14),
+                              fontSize: AppResponsive.font(8),
                               color: AppColors.white,
                             ),
                           ),
                         ),
-                        Gap(AppResponsive.space(10)),
-                        _SecondaryActionButton(onTap: onSecondaryTap ?? onTap),
+                        // Gap(AppResponsive.space(10)),
+                        // _SecondaryActionButton(onTap: onSecondaryTap ?? onTap),
                       ],
                     ),
                   ],
@@ -185,8 +185,8 @@ class _GameMiniThumb extends StatelessWidget {
 
     if (imageUrl == null) {
       return HomeImagePlaceholderWidget(
-        width: AppResponsive.space(44),
-        height: AppResponsive.space(44),
+        width: AppResponsive.space(23),
+        height: AppResponsive.space(23),
         borderRadius: 12,
         iconSize: AppResponsive.space(18),
       );
@@ -197,18 +197,18 @@ class _GameMiniThumb extends StatelessWidget {
       imageBuilder:
           (final BuildContext context, final ImageProvider<Object> image) =>
               Container(
-                width: AppResponsive.space(44),
-                height: AppResponsive.space(44),
+                width: AppResponsive.space(23),
+                height: AppResponsive.space(23),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(3),
                   image: DecorationImage(image: image, fit: BoxFit.cover),
                 ),
               ),
       errorWidget: (_, _, _) => HomeImagePlaceholderWidget(
-        width: AppResponsive.space(44),
-        height: AppResponsive.space(44),
-        borderRadius: 12,
-        iconSize: AppResponsive.space(18),
+        width: AppResponsive.space(23),
+        height: AppResponsive.space(23),
+        borderRadius: 5,
+        iconSize: AppResponsive.space(23),
       ),
     );
   }

@@ -31,7 +31,7 @@ class FeaturedBannerItemWidget extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.color1C153F,
-          borderRadius: BorderRadius.circular(AppResponsive.space(20)),
+          borderRadius: BorderRadius.circular(AppResponsive.space(8)),
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(
@@ -40,7 +40,24 @@ class FeaturedBannerItemWidget extends StatelessWidget {
             if (banner.banner != null && banner.banner!.trim().isNotEmpty)
               CachedNetworkImage(
                 imageUrl: banner.banner!.imageUrl(),
-                fit: BoxFit.cover,
+
+                imageBuilder:
+                    (
+                      final BuildContext context,
+                      final ImageProvider<Object> image,
+                    ) => Container(
+                      width: double.infinity,
+                      height: AppResponsive.value(255, tablet: 350),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        image: DecorationImage(
+                          image: image,
+                          fit: AppResponsive.isPhone
+                              ? BoxFit.contain
+                              : BoxFit.cover,
+                        ),
+                      ),
+                    ),
                 errorWidget: (_, __, ___) => _bannerFallback(),
               )
             else
@@ -49,7 +66,7 @@ class FeaturedBannerItemWidget extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: RadialGradient(
                   center: const Alignment(1.0, 0.0),
-                  radius: AppResponsive.isPhone ? 1.0 : 2.15,
+                  radius: AppResponsive.isPhone ? 1.15 : 2.15,
                   stops: const <double>[0.5, 0.81],
                   colors: [
                     AppColors.white.withValues(alpha: 0),
@@ -82,13 +99,13 @@ class FeaturedBannerItemWidget extends StatelessWidget {
                       ),
                       child: Text(
                         banner.tag!.trim(),
-                        style: poppinsW700.copyWith(
-                          fontSize: AppResponsive.font(11),
+                        style: poppinsW600.copyWith(
+                          fontSize: AppResponsive.font(10),
                           color: AppColors.white,
                         ),
                       ),
                     ),
-                  Gap(AppResponsive.space(12)),
+                  Gap(AppResponsive.space(5)),
                   ConstrainedBox(
                     constraints: BoxConstraints(
                       maxWidth: AppResponsive.space(210),
@@ -100,41 +117,39 @@ class FeaturedBannerItemWidget extends StatelessWidget {
                           banner.name ?? '',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: poppinsW700.copyWith(
-                            fontSize: AppResponsive.font(22),
+                          style: poppinsW600.copyWith(
+                            fontSize: AppResponsive.font(14),
                             color: AppColors.white,
-                            height: 1.05,
                           ),
                         ),
-                        Gap(AppResponsive.space(6)),
-                        if (_hasText(banner.categoryName) ||
-                            _hasText(banner.category))
-                          Text(
-                            (banner.categoryName ?? banner.category ?? '')
-                                .trim(),
-                            style: poppinsW600.copyWith(
-                              fontSize: AppResponsive.font(18),
-                              color: AppColors.colorFF5C8A,
-                            ),
-                          ),
+                        // if (_hasText(banner.categoryName) ||
+                        //     _hasText(banner.category))
+                        //   Text(
+                        //     (banner.categoryName ?? banner.category ?? '')
+                        //         .trim(),
+                        //     style: poppinsW600.copyWith(
+                        //       fontSize: AppResponsive.font(12),
+                        //       color: AppColors.colorFF5C8A,
+                        //     ),
+                        //   ),
                         if (_hasText(banner.desc)) ...[
-                          Gap(AppResponsive.space(6)),
                           Text(
-                            banner.desc!.trim(),
-                            maxLines: 3,
+                            (banner.desc ?? ''),
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: poppinsW400.copyWith(
-                              fontSize: AppResponsive.font(14),
+                            style: poppinsW500.copyWith(
+                              fontSize: AppResponsive.font(10),
                               color: AppColors.colorD5CCF2,
                             ),
                           ),
                         ],
-                        Gap(AppResponsive.space(12)),
+                        Gap(AppResponsive.space(8)),
                         CommonButton(
-                          height: AppResponsive.space(45),
-                          width: AppResponsive.space(150),
+                          height: AppResponsive.space(30),
+                          width: AppResponsive.space(120),
                           btnText: 'Play Now',
                           onPressed: onTap,
+                          fontSize: 12,
                           icon: Assets.svg.icPlay,
                         ),
                       ],
@@ -157,7 +172,7 @@ class FeaturedBannerItemWidget extends StatelessWidget {
                         margin: EdgeInsets.symmetric(
                           horizontal: AppResponsive.space(12),
                         ),
-                        color: AppColors.white.withOpacity(0.16),
+                        color: AppColors.white.withValues(alpha: 0.16),
                       ),
                       Expanded(
                         child: FeaturedBannerBadgeWidget(
@@ -193,28 +208,39 @@ class _BannerGameThumb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: SizedBox(
-        width: AppResponsive.space(40),
-        height: AppResponsive.space(40),
-        child: iconUrl == null || iconUrl!.trim().isEmpty
-            ? HomeImagePlaceholderWidget(
-                width: AppResponsive.space(40),
-                height: AppResponsive.space(40),
-                borderRadius: 12,
-                iconSize: AppResponsive.space(18),
-              )
-            : CachedNetworkImage(
-                imageUrl: iconUrl!,
-                fit: BoxFit.cover,
-                errorWidget: (_, __, ___) => HomeImagePlaceholderWidget(
-                  width: AppResponsive.space(40),
-                  height: AppResponsive.space(40),
-                  borderRadius: 12,
-                  iconSize: AppResponsive.space(18),
-                ),
+      borderRadius: BorderRadius.circular(3),
+      child: iconUrl == null || iconUrl!.trim().isEmpty
+          ? HomeImagePlaceholderWidget(
+              width: AppResponsive.space(25),
+              height: AppResponsive.space(25),
+              borderRadius: 3,
+              iconSize: AppResponsive.space(18),
+            )
+          : CachedNetworkImage(
+              imageUrl: iconUrl ?? '',
+              imageBuilder:
+                  (
+                    final BuildContext context,
+                    final ImageProvider<Object> imageProvider,
+                  ) => Container(
+                    width: AppResponsive.space(25),
+                    height: AppResponsive.space(25),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3),
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+              fit: BoxFit.cover,
+              errorWidget: (_, __, ___) => HomeImagePlaceholderWidget(
+                width: AppResponsive.space(25),
+                height: AppResponsive.space(25),
+                borderRadius: 3,
+                iconSize: AppResponsive.space(25),
               ),
-      ),
+            ),
     );
   }
 }
@@ -236,8 +262,8 @@ class _BannerMetric extends StatelessWidget {
       children: [
         SvgPicture.asset(
           icon,
-          width: AppResponsive.space(18),
-          height: (18),
+          width: AppResponsive.space(12),
+          height: AppResponsive.space(12),
           colorFilter: const ColorFilter.mode(
             AppColors.colorFFCC33,
             BlendMode.srcIn,
@@ -250,14 +276,14 @@ class _BannerMetric extends StatelessWidget {
             Text(
               title,
               style: poppinsW600.copyWith(
-                fontSize: AppResponsive.font(15),
+                fontSize: AppResponsive.font(10),
                 color: AppColors.white,
               ),
             ),
             Text(
               subtitle,
               style: poppinsW400.copyWith(
-                fontSize: AppResponsive.font(12),
+                fontSize: AppResponsive.font(8),
                 color: AppColors.colorD5CCF2,
               ),
             ),

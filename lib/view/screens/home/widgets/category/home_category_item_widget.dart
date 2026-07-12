@@ -25,8 +25,8 @@ class HomeCategoryItemWidget extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: EdgeInsets.symmetric(
-          horizontal: AppResponsive.space(14),
-          vertical: AppResponsive.space(12),
+          horizontal: AppResponsive.value(10, tablet: 14),
+          vertical: AppResponsive.value(5, tablet: 9),
         ),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.color6B35F5 : AppColors.color1C153F,
@@ -46,7 +46,7 @@ class HomeCategoryItemWidget extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: poppinsW500.copyWith(
-                  fontSize: AppResponsive.font(14),
+                  fontSize: AppResponsive.font(12),
                   color: AppColors.white,
                 ),
               ),
@@ -69,10 +69,6 @@ class _CategoryIcon extends StatelessWidget {
       width: AppResponsive.space(28),
       height: AppResponsive.space(28),
       alignment: Alignment.center,
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        shape: BoxShape.circle,
-      ),
       child: iconUrl == null || iconUrl!.trim().isEmpty
           ? HomeImagePlaceholderWidget(
               width: AppResponsive.space(20),

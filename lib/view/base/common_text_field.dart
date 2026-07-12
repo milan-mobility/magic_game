@@ -136,7 +136,7 @@ class CommonTextField extends StatelessWidget {
             contentPadding: EdgeInsets.only(
               left: AppResponsive.space(15),
               top: AppResponsive.space(12),
-              bottom: AppResponsive.value(9, tablet: 9),
+              bottom: AppResponsive.value(2, tablet: 4),
             ),
             label: null,
             hintText: hintText ?? '',

@@ -28,15 +28,15 @@ class GameCollectionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double cardWidth = AppResponsive.value(286, tablet: 420);
-    final double cardHeight = AppResponsive.value(152, tablet: 200);
+    final double cardWidth = AppResponsive.value(200, tablet: 420);
+    final double cardHeight = AppResponsive.value(100, tablet: 200);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: cardWidth,
         height: cardHeight,
-        // decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -44,15 +44,15 @@ class GameCollectionItem extends StatelessWidget {
 
             DecoratedBox(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(5),
                 gradient: LinearGradient(
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
-                  stops: const <double>[0.0, 0.1, 1.0],
+                  stops: const <double>[0.0, 0.9, 1.0],
                   colors: [
-                    AppColors.white.withValues(alpha: 0.0),
-                    AppColors.colorBC9F84.withValues(alpha: 0.02),
                     AppColors.color7A3F09,
+                    AppColors.colorBC9F84.withValues(alpha: 0.02),
+                    AppColors.white.withValues(alpha: 0.0),
                   ],
                 ),
               ),
@@ -63,31 +63,21 @@ class GameCollectionItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (_hasText(leadingLabel))
+                  if (_hasText(title))
                     Text(
-                      leadingLabel!.trim(),
-                      style: poppinsW600.copyWith(
+                      title!.trim(),
+                      style: poppinsW700.copyWith(
                         fontSize: AppResponsive.font(14),
                         color: AppColors.white,
                       ),
                     ),
-                  if (_hasText(leadingLabel)) Gap(AppResponsive.space(2)),
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: poppinsW700.copyWith(
-                      fontSize: AppResponsive.font(18),
-                      color: AppColors.white,
-                    ),
-                  ),
                   Gap(AppResponsive.space(8)),
                   Text(
                     subtitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: poppinsW400.copyWith(
-                      fontSize: AppResponsive.font(14),
+                      fontSize: AppResponsive.font(10),
                       color: AppColors.white,
                     ),
                   ),
@@ -103,25 +93,25 @@ class GameCollectionItem extends StatelessWidget {
   }
 
   Widget _buildBackground(final double cardWidth, final double cardHeight) {
-    final String? resolvedUrl = _normalizedUrl(imageUrl.imageUrl());
-    // if (resolvedUrl == null) {
-    //   return HomeImagePlaceholderWidget(
-    //     width: cardWidth,
-    //     height: cardHeight,
-    //     borderRadius: 15,
-    //     iconSize: AppResponsive.space(30),
-    //   );
-    // }
+    final String? resolvedUrl = _normalizedUrl(imageUrl);
+    if (resolvedUrl == null) {
+      return HomeImagePlaceholderWidget(
+        width: cardWidth,
+        height: cardHeight,
+        borderRadius: 5,
+        iconSize: AppResponsive.space(30),
+      );
+    }
 
     return CachedNetworkImage(
-      imageUrl: resolvedUrl ?? '',
+      imageUrl: resolvedUrl,
       imageBuilder:
           (final BuildContext context, final ImageProvider<Object> image) =>
               Container(
                 width: cardWidth,
                 height: cardHeight,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(5),
                   image: DecorationImage(image: image, fit: BoxFit.cover),
                 ),
               ),

@@ -9,12 +9,10 @@ import 'package:magic_games/view/base/custom_snack_bar.dart';
 import 'package:magic_games/view/screens/home/widgets/sections/home_section_config.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class HomeController extends GetxController {
+class HomeController extends GetxController implements GetxService {
   HomeController(this.apiRepo);
 
   final ApiRepo apiRepo;
-
-  final TextEditingController txtSearch = TextEditingController();
 
   final Rx<GameModel?> gameModel = Rx<GameModel?>(null);
   final RxBool isLoading = false.obs;
@@ -75,14 +73,7 @@ class HomeController extends GetxController {
       return const <HomeFeaturedBannerData>[];
     }
 
-    final Map<String, String> categoryNamesById = _categoryNamesById(
-      model.gamecategory,
-    );
-    final Map<int, Games> gamesById = <int, Games>{
-      for (final Games game in model.games ?? <Games>[])
-        if (game.id != null)
-          game.id!: _gameWithResolvedCategoryName(game, categoryNamesById),
-    };
+    final Map<int, Games> gamesById = _gamesById(model);
 
     return (model.featuredbanner ?? <Featuredbanner>[])
         .map(
@@ -90,11 +81,19 @@ class HomeController extends GetxController {
             banner: banner,
             badge: _findBannerBadge(banner.badgeid, model.featurebannerbagde),
             game:
-                gamesById[banner.id] ??
-                _mapFeaturedBannerToGame(banner, categoryNamesById),
+                gamesById[banner.id] ?? _mapFeaturedBannerToGame(banner, model),
           ),
         )
         .toList();
+  }
+
+  List<Games> get allGames {
+    final GameModel? model = gameModel.value;
+    if (model == null) {
+      return const <Games>[];
+    }
+
+    return _gamesById(model).values.toList();
   }
 
   List<HomeSectionData> get homeSections {
@@ -103,14 +102,7 @@ class HomeController extends GetxController {
       return const <HomeSectionData>[];
     }
 
-    final Map<String, String> categoryNamesById = _categoryNamesById(
-      model.gamecategory,
-    );
-    final Map<int, Games> gamesById = <int, Games>{
-      for (final Games game in model.games ?? <Games>[])
-        if (game.id != null)
-          game.id!: _gameWithResolvedCategoryName(game, categoryNamesById),
-    };
+    final Map<int, Games> gamesById = _gamesById(model);
 
     return (model.sections ?? <Sections>[])
         .map(
@@ -157,6 +149,10 @@ class HomeController extends GetxController {
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
+  void openGame(final Games game) {
+    Get.toNamed('/gameDetail', arguments: <String, dynamic>{'game': game});
+  }
+
   MapEntry<String, String>? _categoryEntry(final Gamecategory category) {
     final String? id = _normalizeText(category.id);
     final String? name = _normalizeText(category.name);
@@ -199,6 +195,18 @@ class HomeController extends GetxController {
     return values;
   }
 
+  Map<int, Games> _gamesById(final GameModel model) {
+    final Map<String, String> categoryNamesById = _categoryNamesById(
+      model.gamecategory,
+    );
+
+    return <int, Games>{
+      for (final Games game in model.games ?? <Games>[])
+        if (game.id != null)
+          game.id!: _gameWithResolvedCategoryName(game, categoryNamesById),
+    };
+  }
+
   Games _gameWithResolvedCategoryName(
     final Games game,
     final Map<String, String> categoryNamesById,
@@ -232,8 +240,11 @@ class HomeController extends GetxController {
 
   Games _mapFeaturedBannerToGame(
     final Featuredbanner banner,
-    final Map<String, String> categoryNamesById,
+    final GameModel model,
   ) {
+    final Map<String, String> categoryNamesById = _categoryNamesById(
+      model.gamecategory,
+    );
     return Games(
       id: banner.id,
       name: banner.name,

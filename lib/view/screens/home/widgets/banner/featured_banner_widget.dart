@@ -76,7 +76,7 @@ class _FeaturedBannerWidgetState extends State<FeaturedBannerWidget> {
     }
 
     return SizedBox(
-      height: AppResponsive.value(335, tablet: 430),
+      height: AppResponsive.value(255, tablet: 350),
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [
@@ -97,7 +97,7 @@ class _FeaturedBannerWidgetState extends State<FeaturedBannerWidget> {
             },
           ),
           Positioned(
-            bottom: AppResponsive.space(18),
+            bottom: AppResponsive.space(10),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: List<Widget>.generate(widget.banners.length, (index) {
@@ -108,15 +108,15 @@ class _FeaturedBannerWidgetState extends State<FeaturedBannerWidget> {
                     horizontal: AppResponsive.space(3),
                   ),
                   width: isActive
-                      ? AppResponsive.space(18)
-                      : AppResponsive.space(8),
-                  height: AppResponsive.space(8),
+                      ? AppResponsive.space(14)
+                      : AppResponsive.space(5),
+                  height: AppResponsive.space(5),
                   decoration: BoxDecoration(
                     color: isActive
                         ? AppColors.color6B35F5
                         : AppColors.white.withValues(alpha: 0.45),
                     borderRadius: BorderRadius.circular(
-                      AppResponsive.space(99),
+                      AppResponsive.space(10),
                     ),
                   ),
                 );

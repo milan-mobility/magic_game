@@ -18,9 +18,8 @@ class HomeCategoryListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: AppResponsive.value(50, tablet: 58),
+      height: AppResponsive.value(35, tablet: 45),
       child: ListView.separated(
-        padding: EdgeInsets.symmetric(horizontal: AppResponsive.space(16)),
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
         separatorBuilder: (_, _) => SizedBox(width: AppResponsive.space(10)),

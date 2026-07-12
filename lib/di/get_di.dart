@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:magic_games/data/api/dio_client.dart';
 import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 import 'package:magic_games/data/repositories/api_repo.dart';
+import 'package:magic_games/helpers/services/analytics_service.dart';
+import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,9 +16,19 @@ Future<void> init() async {
 
   Get.put(sharedPreferences);
   Get.put(SharedPreferenceHelper());
-  Get.lazyPut(() => DioClient(Dio()));
+  final AnalyticsService analyticsService = Get.put(
+    AnalyticsService(),
+    permanent: true,
+  );
+  await analyticsService.initialize();
+  final RemoteConfigService remoteConfigService = Get.put(
+    RemoteConfigService(),
+    permanent: true,
+  );
+  await remoteConfigService.initialize();
+  Get.lazyPut(() => DioClient(Dio(), Get.find()));
 
-  Get.lazyPut(() => ApiRepo(Get.find()), fenix: true);
+  Get.lazyPut(() => ApiRepo(Get.find(), Get.find()), fenix: true);
 
   /*Get.put(
     NetworkController(),

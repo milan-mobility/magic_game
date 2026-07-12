@@ -27,6 +27,13 @@ dependencies:
   cached_network_image: ^3.4.1
   url_launcher: ^6.3.1
   in_app_review: ^2.0.11
+  flutter_native_splash: ^2.4.7
+  firebase_remote_config: ^6.5.3
+  firebase_messaging: ^16.4.1
+  flutter_local_notifications: ^22.0.1
+  firebase_crashlytics: ^5.2.4
+  firebase_core: ^4.11.0
+  firebase_analytics: ^12.0.2
 
 
 dev_dependencies:
@@ -36,6 +43,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   build_runner: ^2.4.11
   flutter_gen_runner: ^5.7.0
+  change_app_package_name: ^1.5.0
 
 flutter:
 
@@ -55,3 +63,15 @@ flutter:
         - asset: assets/fonts/Poppins-Regular.ttf
         - asset: assets/fonts/Poppins-SemiBold.ttf
         - asset: assets/fonts/Poppins-Thin.ttf
+
+
+flutter_native_splash:
+  color: "#040021"
+  image: "assets/png/ic_splash_logo.png"
+  android: true
+  ios: true
+
+  android_12:
+    image: "assets/png/ic_splash_12.png"
+    color: "#040021"
+  web: false
