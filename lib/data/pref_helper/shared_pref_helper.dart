@@ -21,6 +21,22 @@ class SharedPreferenceHelper {
     return _sharedPreference.getBool(PrefKeys.hasIntroDone) ?? false;
   }
 
+  Future<void> saveFcmToken(final String fcmToken) async {
+    await _sharedPreference.setString(PrefKeys.fcmToken, fcmToken);
+  }
+
+  String? get fcmToken {
+    return _sharedPreference.getString(PrefKeys.fcmToken);
+  }
+
+  Future<void> saveBadge(final int value) async {
+    await _sharedPreference.setInt(PrefKeys.badgeCount, value);
+  }
+
+  int get getBadge {
+    return _sharedPreference.getInt(PrefKeys.badgeCount) ?? 0;
+  }
+
   Future<void> clear() async {
     final List<String> arrKeysToKeep = <String>[
       // PrefKeys.addTransactionGuide,

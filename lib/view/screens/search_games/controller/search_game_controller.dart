@@ -8,15 +8,13 @@ import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 class SearchGameController extends GetxController {
   SearchGameController();
 
-  static const String allCategoryId = 'all';
-
   final TextEditingController txtSearch = TextEditingController();
 
   List<HomeCategoryData> categories = <HomeCategoryData>[];
   List<Games> allGames = <Games>[];
   List<Games> filteredGames = <Games>[];
 
-  String selectedCategoryId = allCategoryId;
+  String selectedCategoryId = '';
 
   @override
   void onInit() {
@@ -26,23 +24,20 @@ class SearchGameController extends GetxController {
       final dynamic rawCategories = Get.arguments['categories'];
       final dynamic rawGames = Get.arguments['games'];
 
-      categories = <HomeCategoryData>[
-        const HomeCategoryData(id: allCategoryId, title: 'All', iconUrl: null),
-        ...(rawCategories is List
-            ? rawCategories.cast<HomeCategoryData>()
-            : []),
-      ];
+      categories = rawCategories is List
+          ? rawCategories.cast<HomeCategoryData>()
+          : <HomeCategoryData>[];
       allGames = rawGames is List ? rawGames.cast<Games>() : <Games>[];
     }
+
+    selectedCategoryId = _defaultCategoryId;
 
     txtSearch.addListener(_applyFilters);
     _applyFilters();
   }
 
   void selectCategory(final String categoryId) {
-    selectedCategoryId = selectedCategoryId == categoryId
-        ? allCategoryId
-        : categoryId;
+    selectedCategoryId = categoryId;
     _applyFilters();
   }
 
@@ -121,7 +116,7 @@ class SearchGameController extends GetxController {
     required final String selectedCategoryId,
     final String? selectedCategoryName,
   }) {
-    if (selectedCategoryId == allCategoryId) {
+    if (!_hasText(selectedCategoryId) || selectedCategoryId == _defaultCategoryId) {
       return true;
     }
 
@@ -177,6 +172,14 @@ class SearchGameController extends GetxController {
 
   bool _hasText(final String? value) {
     return value != null && value.trim().isNotEmpty;
+  }
+
+  String get _defaultCategoryId {
+    if (categories.isEmpty) {
+      return '';
+    }
+
+    return categories.first.id;
   }
 
   @override

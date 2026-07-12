@@ -46,7 +46,7 @@ class _FeaturedBannerWidgetState extends State<FeaturedBannerWidget> {
       return;
     }
 
-    _autoSlideTimer = Timer.periodic(const Duration(seconds: 20), (_) {
+    _autoSlideTimer = Timer.periodic(const Duration(seconds: 5), (_) {
       if (!_pageController.hasClients || widget.banners.isEmpty) {
         return;
       }

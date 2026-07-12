@@ -6,6 +6,7 @@ import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/view/base/bottom_navigation_bar.dart';
 import 'package:magic_games/view/screens/profile/controller/profile_controller.dart';
+import 'package:magic_games/view/screens/profile/widgets/profile_option_section_widget.dart';
 import 'package:magic_games/view/screens/profile/widgets/profile_summary_card_widget.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -37,6 +38,13 @@ class ProfileScreen extends StatelessWidget {
                       stats: controller.stats,
                       onEditTap: controller.onEditTap,
                       onLogoutTap: controller.onLogoutTap,
+                    ),
+                    Gap(AppResponsive.space(24)),
+                    ...controller.optionSections.expand(
+                      (final section) => <Widget>[
+                        ProfileOptionSectionWidget(section: section),
+                        Gap(AppResponsive.space(22)),
+                      ],
                     ),
                   ],
                 ),

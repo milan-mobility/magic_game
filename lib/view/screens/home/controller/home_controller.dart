@@ -37,6 +37,12 @@ class HomeController extends GetxController implements GetxService {
     try {
       isLoading.value = true;
       gameModel.value = await apiRepo.getGames();
+      final String? defaultCategoryId = _defaultCategoryIdFromModel(
+        gameModel.value,
+      );
+      if (_hasText(defaultCategoryId)) {
+        selectedCategoryId.value = defaultCategoryId!;
+      }
     } catch (e) {
       debugPrint('EXCEPTION=>${e.toString()}');
     } finally {
@@ -118,9 +124,7 @@ class HomeController extends GetxController implements GetxService {
   }
 
   void selectCategory(final String categoryId) {
-    selectedCategoryId.value = selectedCategoryId.value == categoryId
-        ? ''
-        : categoryId;
+    selectedCategoryId.value = categoryId;
   }
 
   Future<void> openStoreForGame(final Games game) async {
@@ -162,6 +166,18 @@ class HomeController extends GetxController implements GetxService {
     }
 
     return MapEntry<String, String>(id, name);
+  }
+
+  String? _defaultCategoryIdFromModel(final GameModel? model) {
+    for (final Gamecategory category
+        in model?.gamecategory ?? <Gamecategory>[]) {
+      final MapEntry<String, String>? entry = _categoryEntry(category);
+      if (entry != null) {
+        return entry.key;
+      }
+    }
+
+    return null;
   }
 
   Featurebannerbagde? _findBannerBadge(
@@ -442,7 +458,8 @@ class HomeController extends GetxController implements GetxService {
     final String? gameCategoryId,
     final String? gameCategoryName,
   }) {
-    if (!_hasText(selectedCategoryId)) {
+    if (!_hasText(selectedCategoryId) ||
+        selectedCategoryId == _defaultCategoryIdFromModel(gameModel.value)) {
       return true;
     }
 

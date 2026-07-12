@@ -40,7 +40,6 @@ class FeaturedBannerItemWidget extends StatelessWidget {
             if (banner.banner != null && banner.banner!.trim().isNotEmpty)
               CachedNetworkImage(
                 imageUrl: banner.banner!.imageUrl(),
-
                 imageBuilder:
                     (
                       final BuildContext context,
@@ -53,7 +52,7 @@ class FeaturedBannerItemWidget extends StatelessWidget {
                         image: DecorationImage(
                           image: image,
                           fit: AppResponsive.isPhone
-                              ? BoxFit.contain
+                              ? BoxFit.cover
                               : BoxFit.cover,
                         ),
                       ),
