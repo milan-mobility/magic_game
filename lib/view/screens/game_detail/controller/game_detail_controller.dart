@@ -139,8 +139,7 @@ class GameDetailController extends GetxController {
         break;
 
       case 'openMailComposer':
-        // game name,and send email on composer with text will be send by Tusar
-        Utility.sendEmail(email: 'email');
+        Utility.sendFeedbackEmail();
         break;
 
       case 'moreGames':

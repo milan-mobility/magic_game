@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:magic_games/routes/route_helper.dart';
+import 'package:magic_games/utils/utility.dart';
 import 'package:magic_games/view/base/custom_snack_bar.dart';
 
 class ProfileController extends GetxController {
@@ -9,7 +11,13 @@ class ProfileController extends GetxController {
       'Play games, ear achievement and\nsave your progress';
   String appearanceLabel = 'Dark';
   String languageLabel = 'English';
-  final String appVersionLabel = '1.0.0';
+  String appVersionLabel = '1.0.0';
+
+  @override
+  void onInit() {
+    super.onInit();
+    _loadAppVersion();
+  }
 
   final List<ProfileStatData> stats = const <ProfileStatData>[
     ProfileStatData(
@@ -34,14 +42,14 @@ class ProfileController extends GetxController {
         ProfileOptionSectionData(
           title: 'Preferences',
           items: <ProfileOptionItemData>[
-            ProfileOptionItemData(
-              title: 'Appearance',
-              subtitle: 'Choose your theme',
-              iconAsset: 'assets/svg/ic_star.svg',
-              valueText: appearanceLabel,
-              valueStyle: ProfileOptionValueStyle.badge,
-              onTap: onAppearanceTap,
-            ),
+            // ProfileOptionItemData(
+            //   title: 'Appearance',
+            //   subtitle: 'Choose your theme',
+            //   iconAsset: 'assets/svg/ic_star.svg',
+            //   valueText: appearanceLabel,
+            //   valueStyle: ProfileOptionValueStyle.badge,
+            //   onTap: onAppearanceTap,
+            // ),
             ProfileOptionItemData(
               title: 'Language',
               subtitle: 'Change app language',
@@ -88,7 +96,6 @@ class ProfileController extends GetxController {
               subtitle: 'Current installed release',
               iconAsset: 'assets/svg/ic_app_version.svg',
               valueText: appVersionLabel,
-              onTap: onVersionTap,
             ),
           ],
         ),
@@ -111,27 +118,40 @@ class ProfileController extends GetxController {
   }
 
   void onHelpTap() {
-    showSuccessSnackBar(
-      message: 'Help & support options will be connected here.',
-    );
+    Utility.sendHelpSupportEmail();
   }
 
   void onFeedbackTap() {
-    showSuccessSnackBar(
-      message: 'Thanks for sharing feedback. Feedback flow comes next.',
-    );
+    Utility.sendFeedbackEmail();
   }
 
   void onTermsTap() {
-    showSuccessSnackBar(message: 'Terms of service page will open from here.');
+    Get.toNamed(
+      RouteHelper.commonWebView,
+      arguments: <String, String>{
+        'title': 'Terms of service'.tr,
+        'url':
+            'https://oneupapps.oneupitsolution.com/onegameplus/privacy-policy.html',
+      },
+    );
   }
 
   void onPrivacyTap() {
-    showSuccessSnackBar(message: 'Privacy policy page will open from here.');
+    Get.toNamed(
+      RouteHelper.commonWebView,
+      arguments: <String, String>{
+        'title': 'Privacy Policy'.tr,
+        'url':
+            'https://oneupapps.oneupitsolution.com/onegameplus/privacy-policy.html',
+      },
+    );
   }
 
-  void onVersionTap() {
-    showSuccessSnackBar(message: 'Current app version is $appVersionLabel.');
+  void onVersionTap() {}
+
+  Future<void> _loadAppVersion() async {
+    appVersionLabel = await Utility.getPackageInfo();
+    update();
   }
 }
 

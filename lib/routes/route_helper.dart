@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:magic_games/view/screens/common_webview/common_webview.dart';
 import 'package:magic_games/view/screens/game_detail/game_detail_screen.dart';
 import 'package:magic_games/view/screens/home/home_screen.dart';
 import 'package:magic_games/view/screens/profile/profile_screen.dart';
@@ -16,6 +17,7 @@ class RouteHelper {
   static const String searchGames = '/searchGames';
   static const String profile = '/profile';
   static const String vip = '/vip';
+  static const String commonWebView = '/commonWebView';
 
   static List<GetPage<dynamic>> routes = <GetPage<dynamic>>[
     GetPage<dynamic>(name: splash, page: () => getRoute(SplashScreen())),
@@ -34,6 +36,10 @@ class RouteHelper {
     ),
     GetPage<dynamic>(name: profile, page: () => getRoute(ProfileScreen())),
     GetPage<dynamic>(name: vip, page: () => getRoute(VipScreen())),
+    GetPage<dynamic>(
+      name: commonWebView,
+      page: () => getRoute(CommonWebview()),
+    ),
   ];
 
   static Widget getRoute(final Widget navigateTo) {

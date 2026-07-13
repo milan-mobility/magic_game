@@ -2,13 +2,17 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:magic_games/utils/app_constants.dart';
 import 'package:magic_games/view/base/custom_snack_bar.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Utility {
+  static const String feedbackSupportEmail = 'support@oneupitsolution.com';
+
   static bool checkIsNetworkUrl(final String url) {
     if (url.contains('http') || url.contains('https')) {
       return true;
@@ -65,7 +69,46 @@ class Utility {
     return info.version;
   }
 
-  static void moreGames({required final String androidUrl,required final String iOSUrl}) {
+  static Future<String> getDeviceModel() async {
+    try {
+      final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        final AndroidDeviceInfo androidInfo =
+            await deviceInfoPlugin.androidInfo;
+        return androidInfo.model;
+      }
+      if (Platform.isIOS) {
+        final IosDeviceInfo iosInfo = await deviceInfoPlugin.iosInfo;
+        return iosInfo.utsname.machine;
+      }
+    } catch (e) {
+      debugPrint("EXCEPTION=>${e.toString()}");
+    }
+    return '';
+  }
+
+  static Future<String> getOperatingSystemVersion() async {
+    try {
+      final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        final AndroidDeviceInfo androidInfo =
+            await deviceInfoPlugin.androidInfo;
+        return 'Android ${androidInfo.version.release}'.trim();
+      }
+      if (Platform.isIOS) {
+        final IosDeviceInfo iosInfo = await deviceInfoPlugin.iosInfo;
+        return 'iOS ${iosInfo.systemVersion}'.trim();
+      }
+    } catch (e) {
+      debugPrint("EXCEPTION=>${e.toString()}");
+    }
+    return Platform.operatingSystem;
+  }
+
+  static void moreGames({
+    required final String androidUrl,
+    required final String iOSUrl,
+  }) {
     try {
       String appUrl = '';
       if (Platform.isAndroid) {
@@ -74,9 +117,8 @@ class Utility {
         appUrl = iOSUrl;
       }
       final ShareParams params = ShareParams(
-        title: 'Take control of your money with AccountPundit!',
-        text:
-            'Take control of your money with AccountPundit! Track income, expenses & budgets — all in one place. Download it free: $appUrl',
+        title: 'Game',
+        text: 'Game: $appUrl',
       );
       SharePlus.instance.share(params);
     } catch (e) {
@@ -89,9 +131,9 @@ class Utility {
       String appUrl = '';
       if (Platform.isAndroid) {
         appUrl =
-            'https://play.google.com/store/apps/details?id=com.zealouscommerce.accountpundit';
+            'https://play.google.com/store/apps/details?id=com.oneup.onegameplus&hl=en_IN';
       } else if (Platform.isIOS) {
-        appUrl = 'https://apps.apple.com/app/id6783215345';
+        appUrl = 'https://apps.apple.com/app/id';
       }
       final ShareParams params = ShareParams(
         title: 'Take control of your money with AccountPundit!',
@@ -107,10 +149,10 @@ class Utility {
   static Future<void> reviewApp() async {
     if (Platform.isAndroid) {
       await InAppReview.instance.openStoreListing(
-        appStoreId: 'com.zealouscommerce.accountpundit',
+        appStoreId: 'com.oneup.onegameplus',
       );
     } else if (Platform.isIOS) {
-      await InAppReview.instance.openStoreListing(appStoreId: '6783215345');
+      await InAppReview.instance.openStoreListing(appStoreId: '');
     }
   }
 
@@ -120,7 +162,7 @@ class Utility {
     String body = '',
   }) async {
     if (email.isEmpty) {
-      showErrorSnackBar(message: 'Email address is not available');
+      showErrorSnackBar(message: 'Email address is not available'.tr);
       return;
     }
 
@@ -137,10 +179,147 @@ class Utility {
       );
 
       if (!launched) {
-        showErrorSnackBar(message: 'No email app found');
+        showErrorSnackBar(message: 'No email app found'.tr);
       }
     } catch (e) {
-      showErrorSnackBar(message: 'No email app found');
+      showErrorSnackBar(message: 'No email app found'.tr);
     }
+  }
+
+  static Future<void> sendFeedbackEmail({
+    String? gameName,
+    String userId = '',
+    String userEmail = '',
+    String userName = '',
+  }) async {
+    final Locale locale =
+        Get.deviceLocale ?? WidgetsBinding.instance.platformDispatcher.locale;
+    final String appVersion = await getPackageInfo();
+
+    await sendEmail(
+      email: feedbackSupportEmail,
+      subject: '${AppConstants.appName} Feedback'.tr,
+      body: buildFeedbackEmailTemplate(
+        gameName: gameName ?? AppConstants.appName,
+        appVersion: appVersion,
+        country: locale.countryCode ?? '',
+        userId: userId,
+        userEmail: userEmail,
+        userName: userName,
+      ),
+    );
+  }
+
+  static Future<void> sendHelpSupportEmail({
+    String userId = '',
+    String userEmail = '',
+    String userName = '',
+  }) async {
+    final Locale locale =
+        Get.deviceLocale ?? WidgetsBinding.instance.platformDispatcher.locale;
+    final String deviceModel = await getDeviceModel();
+    final String operatingSystem = await getOperatingSystemVersion();
+
+    await sendEmail(
+      email: feedbackSupportEmail,
+      subject: '${AppConstants.appName} Help & Support'.tr,
+      body: buildHelpSupportEmailTemplate(
+        deviceModel: deviceModel,
+        operatingSystem: operatingSystem,
+        country: locale.countryCode ?? '',
+        userId: userId,
+        userEmail: userEmail,
+        userName: userName,
+      ),
+    );
+  }
+
+  static String buildFeedbackEmailTemplate({
+    required String gameName,
+    required String appVersion,
+    required String country,
+    String userId = '',
+    String userEmail = '',
+    String userName = '',
+  }) {
+    final StringBuffer buffer = StringBuffer()
+      ..writeln('Hello OneGame+ Team,'.tr)
+      ..writeln()
+      ..writeln('Thank you for creating OneGame+!'.tr)
+      ..writeln()
+      ..writeln(
+        'I enjoy using your app and would like to share my feedback.'.tr,
+      )
+      ..writeln()
+      ..writeln('${'Game Name:'.tr} $gameName')
+      ..writeln('${'App Version:'.tr} $appVersion')
+      ..writeln()
+      ..writeln('My Feedback:'.tr)
+      ..writeln()
+      ..writeln('Please write your feedback, suggestions, or ideas here.'.tr)
+      ..writeln()
+      ..writeln('What I Like :'.tr)
+      ..writeln()
+      ..writeln()
+      ..writeln('Suggestions for Improvement:'.tr)
+      ..writeln()
+      ..writeln()
+      ..writeln('Feature Requests (Optional)'.tr)
+      ..writeln()
+      ..writeln()
+      ..writeln(
+        'Thank you for taking the time to read my feedback. I appreciate your efforts to improve OneGame+ and look forward to future updates.'
+            .tr,
+      )
+      ..writeln()
+      ..writeln('${'Country:'.tr} $country')
+      ..writeln('${'User ID:'.tr}${'(if available)'.tr} ${userId.trim()}')
+      ..writeln('${'Email:'.tr}${'(if available)'.tr} ${userEmail.trim()}')
+      ..writeln()
+      ..writeln('Best regards,'.tr)
+      ..writeln(userName.trim().isEmpty ? '</Your Name>'.tr : userName.trim());
+
+    return buffer.toString().trimRight();
+  }
+
+  static String buildHelpSupportEmailTemplate({
+    required String deviceModel,
+    required String operatingSystem,
+    required String country,
+    String userId = '',
+    String userEmail = '',
+    String userName = '',
+  }) {
+    final StringBuffer buffer = StringBuffer()
+      ..writeln('Hello OneGame+ Support Team,'.tr)
+      ..writeln()
+      ..writeln('Thank you for creating OneGame+!'.tr)
+      ..writeln()
+      ..writeln(
+        'I need assistance with an issue in the app. Please find my details below.'
+            .tr,
+      )
+      ..writeln()
+      ..writeln('Issue Description:'.tr)
+      ..writeln('<Please describe your issue here>'.tr)
+      ..writeln()
+      ..writeln(
+        'If possible, please attach screenshots or screen recordings.'.tr,
+      )
+      ..writeln()
+      ..writeln('${'Device Model:'.tr} $deviceModel')
+      ..writeln('${'Operating System:'.tr} $operatingSystem')
+      ..writeln('${'Country:'.tr} $country')
+      ..writeln('${'User ID:'.tr}${'(if available)'.tr} ${userId.trim()}')
+      ..writeln('${'Email:'.tr}${'(if available)'.tr} ${userEmail.trim()}')
+      ..writeln()
+      ..writeln('Thank you for your time and support.'.tr)
+      ..writeln()
+      ..writeln('Best regards,'.tr)
+      ..writeln(
+        userName.trim().isEmpty ? '</User Name if Login>'.tr : userName.trim(),
+      );
+
+    return buffer.toString().trimRight();
   }
 }
