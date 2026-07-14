@@ -131,7 +131,7 @@ class ProfileController extends GetxController {
       arguments: <String, String>{
         'title': 'Terms of service'.tr,
         'url':
-            'https://oneupapps.oneupitsolution.com/onegameplus/privacy-policy.html',
+            'https://oneupapps.oneupitsolution.com/onegameplus/terms-of-use.html',
       },
     );
   }

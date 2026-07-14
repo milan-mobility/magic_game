@@ -9,6 +9,7 @@ import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
 import 'package:magic_games/routes/route_helper.dart';
+import 'package:magic_games/view/base/privacy_consent_dialog.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -93,10 +94,14 @@ class WelcomeScreen extends StatelessWidget {
                             Gap(AppResponsive.value(48, tablet: 64)),
                             _WelcomeStartButton(
                               onTap: () {
-                                final sharedPref =
-                                    Get.find<SharedPreferenceHelper>();
-                                sharedPref.saveIntroDone(true);
-                                Get.offNamed(RouteHelper.home);
+                                showPrivacyConsentDialog(
+                                  onAccepted: () {
+                                    final sharedPref =
+                                        Get.find<SharedPreferenceHelper>();
+                                    sharedPref.saveIntroDone(true);
+                                    Get.offNamed(RouteHelper.home);
+                                  },
+                                );
                               },
                             ),
                           ],

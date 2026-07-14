@@ -4,7 +4,6 @@ import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/data/repositories/api_repo.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
 import 'package:magic_games/utils/connection.dart';
-import 'package:magic_games/utils/message_constant.dart';
 import 'package:magic_games/view/base/custom_snack_bar.dart';
 import 'package:magic_games/view/screens/home/widgets/sections/home_section_config.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -27,13 +26,13 @@ class HomeController extends GetxController implements GetxService {
   Future<void> fetchGames() async {
     final bool isInternetAvailable = await ConnectionUtils.isNetworkConnected();
     if (!isInternetAvailable) {
-      showErrorSnackBar(
-        title: MessageConstant.netWorkTitle,
-        message: MessageConstant.networkError,
-      );
       return;
     }
 
+    await _loadGames();
+  }
+
+  Future<void> _loadGames() async {
     try {
       isLoading.value = true;
       gameModel.value = await apiRepo.getGames();

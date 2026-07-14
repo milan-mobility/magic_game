@@ -5,6 +5,7 @@ import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 import 'package:magic_games/data/repositories/api_repo.dart';
 import 'package:magic_games/helpers/services/analytics_service.dart';
 import 'package:magic_games/helpers/services/remote_config.dart';
+import 'package:magic_games/view/base/controller/network_controller.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -30,9 +31,6 @@ Future<void> init() async {
 
   Get.lazyPut(() => ApiRepo(Get.find(), Get.find()), fenix: true);
 
-  /*Get.put(
-    NetworkController(),
-    permanent: true,
-  );*/
+  Get.put(NetworkController(), permanent: true);
   Get.lazyPut(() => HomeController(Get.find()));
 }
