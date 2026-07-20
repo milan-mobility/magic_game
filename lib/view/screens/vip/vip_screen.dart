@@ -213,11 +213,13 @@ class VipScreen extends StatelessWidget {
                         width: AppResponsive.space(15),
                       ),
                       Gap(AppResponsive.space(5)),
-                      Text(
-                        controller.selectedPlanNote,
-                        style: poppinsW400.copyWith(
-                          fontSize: AppResponsive.font(14),
-                          color: AppColors.color9794B0,
+                      Expanded(
+                        child: Text(
+                          controller.selectedPlanNote,
+                          style: poppinsW400.copyWith(
+                            fontSize: AppResponsive.font(14),
+                            color: AppColors.color9794B0,
+                          ),
                         ),
                       ),
                     ],
@@ -237,7 +239,7 @@ class VipScreen extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
+              ).paddingSymmetric(horizontal: 10),
             ),
           );
         },

@@ -1,26 +1,54 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/data/repositories/api_repo.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
 import 'package:magic_games/utils/connection.dart';
+import 'package:magic_games/view/base/app_update_dialog.dart';
+import 'package:magic_games/view/base/appupgrader/upgrader/upgrade_messages.dart';
+import 'package:magic_games/view/base/appupgrader/upgrader/upgrader.dart';
 import 'package:magic_games/view/base/custom_snack_bar.dart';
 import 'package:magic_games/view/screens/home/widgets/sections/home_section_config.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomeController extends GetxController implements GetxService {
-  HomeController(this.apiRepo);
+  HomeController(this.apiRepo)
+    : _upgrader = Upgrader(
+        canDismissDialog: false,
+        debugLogging: false,
+        showIgnore: false,
+        showLater: false,
+        showReleaseNotes: false,
+      );
 
   final ApiRepo apiRepo;
+  final Upgrader _upgrader;
 
   final Rx<GameModel?> gameModel = Rx<GameModel?>(null);
   final RxBool isLoading = false.obs;
   final RxString selectedCategoryId = ''.obs;
+  StreamSubscription<UpgraderEvaluateNeed>? _upgradeSubscription;
+  bool _isUpgradeDialogVisible = false;
 
   @override
   void onInit() {
     super.onInit();
     fetchGames();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    _initializeUpgradeCheck();
+  }
+
+  @override
+  void onClose() {
+    _upgradeSubscription?.cancel();
+    _upgrader.dispose();
+    super.onClose();
   }
 
   Future<void> fetchGames() async {
@@ -154,6 +182,66 @@ class HomeController extends GetxController implements GetxService {
 
   void openGame(final Games game) {
     Get.toNamed('/gameDetail', arguments: <String, dynamic>{'game': game});
+  }
+
+  Future<void> _initializeUpgradeCheck() async {
+    await _upgrader.initialize();
+    _upgradeSubscription ??= _upgrader.evaluationStream.listen((
+      final bool shouldEvaluate,
+    ) {
+      if (shouldEvaluate) {
+        _checkForUpgrade();
+      }
+    });
+    _checkForUpgrade();
+  }
+
+  Future<void> _checkForUpgrade() async {
+    if (_isUpgradeDialogVisible || (Get.isDialogOpen ?? false)) {
+      return;
+    }
+
+    if (!_upgrader.shouldDisplayUpgrade()) {
+      return;
+    }
+
+    await _upgrader.saveLastAlerted();
+
+    _isUpgradeDialogVisible = true;
+    await showAppUpdateDialog<void>(
+      onUpdate: () async {
+        final bool launched = await _launchUpgradeStoreListing();
+        if (launched && (Get.isDialogOpen ?? false)) {
+          Get.back<void>();
+        }
+      },
+      barrierDismissible: !_upgrader.blocked(),
+      title: _upgrader.messages.message(UpgraderMessage.title) ?? 'Update',
+      message: _upgrader.message(),
+      buttonLabel:
+          _upgrader.messages.message(UpgraderMessage.buttonTitleUpdate) ??
+          'Update',
+    );
+    _isUpgradeDialogVisible = false;
+  }
+
+  Future<bool> _launchUpgradeStoreListing() async {
+    final String? listingUrl = _upgrader.currentAppStoreListingURL();
+    if (listingUrl == null || listingUrl.isEmpty) {
+      return false;
+    }
+
+    final Uri? uri = Uri.tryParse(listingUrl);
+    if (uri == null) {
+      return false;
+    }
+
+    return launchUrl(
+      uri,
+      mode: GetPlatform.isAndroid
+          ? LaunchMode.externalNonBrowserApplication
+          : LaunchMode.platformDefault,
+    );
   }
 
   MapEntry<String, String>? _categoryEntry(final Gamecategory category) {
