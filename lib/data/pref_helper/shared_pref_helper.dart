@@ -37,6 +37,27 @@ class SharedPreferenceHelper {
     return _sharedPreference.getInt(PrefKeys.badgeCount) ?? 0;
   }
 
+  Future<void> savePremiumAccess(final bool value) async {
+    await _sharedPreference.setBool(PrefKeys.hasPremiumAccess, value);
+  }
+
+  bool get hasPremiumAccess {
+    return _sharedPreference.getBool(PrefKeys.hasPremiumAccess) ?? false;
+  }
+
+  Future<void> savePremiumProductId(final String? value) async {
+    if (value == null || value.isEmpty) {
+      await _sharedPreference.remove(PrefKeys.premiumProductId);
+      return;
+    }
+
+    await _sharedPreference.setString(PrefKeys.premiumProductId, value);
+  }
+
+  String? get premiumProductId {
+    return _sharedPreference.getString(PrefKeys.premiumProductId);
+  }
+
   Future<void> clear() async {
     final List<String> arrKeysToKeep = <String>[
       // PrefKeys.addTransactionGuide,

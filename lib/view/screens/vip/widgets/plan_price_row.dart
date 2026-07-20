@@ -11,113 +11,170 @@ class PlanPriceRow extends StatelessWidget {
     super.key,
     this.discount,
     this.badgeName,
+    this.trialLabel,
+    this.description,
+    this.isSelected = false,
+    this.onTap,
     required this.planDuration,
     required this.price,
+    required this.priceSuffix,
+    required this.billedLabel,
   });
 
   final String? badgeName;
   final String planDuration;
-  final double price;
+  final String price;
+  final String priceSuffix;
+  final String billedLabel;
   final String? discount;
+  final String? trialLabel;
+  final String? description;
+  final bool isSelected;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(AppResponsive.space(10)),
-      decoration: BoxDecoration(
-        color: AppColors.color0F0939,
-        borderRadius: BorderRadius.circular(AppResponsive.space(10)),
-        border: Border.all(width: 1, color: AppColors.color1F1653),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (badgeName != null)
-            Container(
-              padding: EdgeInsets.symmetric(
-                vertical: AppResponsive.space(2),
-                horizontal: AppResponsive.space(5),
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.colorFF4D7E,
-                borderRadius: BorderRadius.circular(AppResponsive.space(5)),
-              ),
-              child: Text(
-                badgeName ?? '',
-                style: poppinsW300.copyWith(
-                  fontSize: AppResponsive.font(12),
-                  color: AppColors.white,
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: EdgeInsets.all(AppResponsive.space(10)),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.color1A0B53 : AppColors.color0F0939,
+          borderRadius: BorderRadius.circular(AppResponsive.space(10)),
+          border: Border.all(
+            width: isSelected ? 1.5 : 1,
+            color: isSelected ? AppColors.colorED2EAA : AppColors.color1F1653,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (badgeName != null)
+              Container(
+                padding: EdgeInsets.symmetric(
+                  vertical: AppResponsive.space(2),
+                  horizontal: AppResponsive.space(5),
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.colorFF4D7E,
+                  borderRadius: BorderRadius.circular(AppResponsive.space(5)),
+                ),
+                child: Text(
+                  badgeName ?? '',
+                  style: poppinsW300.copyWith(
+                    fontSize: AppResponsive.font(12),
+                    color: AppColors.white,
+                  ),
                 ),
               ),
-            ),
-          if (badgeName != null) Gap(AppResponsive.space(5)),
-          Row(
-            children: [
-              Text(
-                planDuration,
-                style: poppinsW600.copyWith(
-                  fontSize: AppResponsive.font(18),
-                  color: AppColors.white,
-                ),
-              ),
-              const Spacer(),
-              if (discount != null)
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: AppResponsive.space(3),
-                    horizontal: AppResponsive.space(5),
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.color1A0B53,
-                    borderRadius: BorderRadius.circular(AppResponsive.space(5)),
-                  ),
+            if (badgeName != null) Gap(AppResponsive.space(5)),
+            Row(
+              children: [
+                Expanded(
                   child: Text(
-                    discount ?? '',
-                    style: poppinsW300.copyWith(
-                      fontSize: AppResponsive.font(12),
+                    planDuration,
+                    style: poppinsW600.copyWith(
+                      fontSize: AppResponsive.font(18),
                       color: AppColors.white,
                     ),
                   ),
                 ),
-            ],
-          ),
-          Row(
-            children: [
+                if (discount != null)
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: AppResponsive.space(3),
+                      horizontal: AppResponsive.space(5),
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.color211557,
+                      borderRadius: BorderRadius.circular(
+                        AppResponsive.space(5),
+                      ),
+                    ),
+                    child: Text(
+                      discount ?? '',
+                      style: poppinsW300.copyWith(
+                        fontSize: AppResponsive.font(12),
+                        color: AppColors.white,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            if (trialLabel != null) ...[
+              Gap(AppResponsive.space(4)),
               Text(
-                '$price',
-                style: poppinsW700.copyWith(
-                  fontSize: AppResponsive.font(25),
-                  color: AppColors.colorFF4D7E,
+                trialLabel ?? '',
+                style: poppinsW500.copyWith(
+                  fontSize: AppResponsive.font(12),
+                  color: AppColors.colorF5BD48,
                 ),
               ),
+            ],
+            Gap(AppResponsive.space(4)),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Flexible(
+                  child: Text(
+                    price,
+                    style: poppinsW700.copyWith(
+                      fontSize: AppResponsive.font(25),
+                      color: AppColors.colorFF4D7E,
+                    ),
+                  ),
+                ),
+                Gap(AppResponsive.space(4)),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: AppResponsive.space(3)),
+                    child: Text(
+                      priceSuffix,
+                      style: poppinsW300.copyWith(
+                        fontSize: AppResponsive.font(12),
+                        color: AppColors.colorA29DBD,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Gap(AppResponsive.space(10)),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SvgPicture.asset(
+                  Assets.svg.icTickRight,
+                  height: AppResponsive.space(20),
+                  width: AppResponsive.space(20),
+                ),
+                Gap(AppResponsive.space(5)),
+                Expanded(
+                  child: Text(
+                    billedLabel,
+                    style: poppinsW500.copyWith(
+                      fontSize: AppResponsive.font(14),
+                      color: AppColors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (description != null && description!.isNotEmpty) ...[
+              Gap(AppResponsive.space(8)),
               Text(
-                '/ $planDuration',
+                description!,
                 style: poppinsW300.copyWith(
                   fontSize: AppResponsive.font(12),
                   color: AppColors.colorA29DBD,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
-          ),
-          Gap(AppResponsive.space(10)),
-          Row(
-            children: [
-              SvgPicture.asset(
-                Assets.svg.icTickRight,
-                height: AppResponsive.space(20),
-                width: AppResponsive.space(20),
-              ),
-              Gap(AppResponsive.space(5)),
-              Text(
-                'Billed $planDuration',
-                style: poppinsW500.copyWith(
-                  fontSize: AppResponsive.font(14),
-                  color: AppColors.white,
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
@@ -21,7 +22,7 @@ class VipScreen extends StatelessWidget {
     return AnnotatedRegion(
       value: SystemUiOverlayStyle.light,
       child: GetBuilder<VipController>(
-        init: VipController(),
+        init: VipController(Get.find<SharedPreferenceHelper>()),
         builder: (final VipController controller) {
           return Scaffold(
             backgroundColor: AppColors.screenGgColor,
@@ -158,16 +159,46 @@ class VipScreen extends StatelessWidget {
                             ],
                           ),
                           Gap(AppResponsive.space(10)),
-                          PlanPriceWidget().paddingSymmetric(
+                          PlanPriceWidget(
+                            controller: controller,
+                          ).paddingSymmetric(
                             horizontal: AppResponsive.space(5),
                           ),
+                          if (controller.hasPremiumAccess) ...[
+                            Gap(AppResponsive.space(14)),
+                            Container(
+                              margin: EdgeInsets.symmetric(
+                                horizontal: AppResponsive.space(5),
+                              ),
+                              padding: EdgeInsets.all(AppResponsive.space(12)),
+                              decoration: BoxDecoration(
+                                color: AppColors.color0F0939,
+                                borderRadius: BorderRadius.circular(
+                                  AppResponsive.space(10),
+                                ),
+                                border: Border.all(
+                                  width: 1,
+                                  color: AppColors.colorF5BD48,
+                                ),
+                              ),
+                              child: Text(
+                                'Premium access is already active on this device.',
+                                style: poppinsW500.copyWith(
+                                  fontSize: AppResponsive.font(14),
+                                  color: AppColors.colorF5BD48,
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
                   ),
                   CommonButton(
-                    onPressed: () {},
-                    btnText: 'Start 7 Day Free Trial'.tr,
+                    onPressed: controller.canStartPurchase
+                        ? controller.startPurchase
+                        : null,
+                    btnText: controller.purchaseButtonLabel,
                     btnBgColor: AppColors.colorF5BD48,
                     btnTxtColor: AppColors.black,
                     height: AppResponsive.space(45),
@@ -183,13 +214,27 @@ class VipScreen extends StatelessWidget {
                       ),
                       Gap(AppResponsive.space(5)),
                       Text(
-                        '7 day free trial. cancel anytime.',
+                        controller.selectedPlanNote,
                         style: poppinsW400.copyWith(
                           fontSize: AppResponsive.font(14),
                           color: AppColors.color9794B0,
                         ),
                       ),
                     ],
+                  ),
+                  TextButton(
+                    onPressed: controller.isRestoring
+                        ? null
+                        : controller.restorePurchases,
+                    child: Text(
+                      controller.isRestoring
+                          ? 'Restoring purchases...'
+                          : 'Restore Purchases',
+                      style: poppinsW500.copyWith(
+                        fontSize: AppResponsive.font(14),
+                        color: AppColors.colorF5BD48,
+                      ),
+                    ),
                   ),
                 ],
               ),
