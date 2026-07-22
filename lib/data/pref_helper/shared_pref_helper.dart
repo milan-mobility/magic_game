@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:magic_games/data/pref_helper/pref_keys.dart';
+import 'package:magic_games/utils/app_enums.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferenceHelper {
@@ -57,6 +58,122 @@ class SharedPreferenceHelper {
   String? get premiumProductId {
     return _sharedPreference.getString(PrefKeys.premiumProductId);
   }
+
+  Future<void> saveSelectedLanguageCode(final String value) async {
+    await _sharedPreference.setString(PrefKeys.selectedLanguageCode, value);
+  }
+
+  String get selectedLanguageCode {
+    return _sharedPreference.getString(PrefKeys.selectedLanguageCode) ??
+        AppLanguages.english.languageCode;
+  }
+
+  AppLanguages get selectedLanguage {
+    return AppLanguages.fromLanguageCode(selectedLanguageCode);
+  }
+
+  Future<void> saveProfileName(final String? value) async {
+    if (value == null || value.trim().isEmpty) {
+      await _sharedPreference.remove(PrefKeys.profileName);
+      return;
+    }
+
+    await _sharedPreference.setString(PrefKeys.profileName, value.trim());
+  }
+
+  String? get profileName {
+    return _sharedPreference.getString(PrefKeys.profileName);
+  }
+
+  Future<void> saveProfileAvatarAssetPath(final String? value) async {
+    if (value == null || value.trim().isEmpty) {
+      await _sharedPreference.remove(PrefKeys.profileAvatarAssetPath);
+      return;
+    }
+
+    await _sharedPreference.setString(
+      PrefKeys.profileAvatarAssetPath,
+      value.trim(),
+    );
+  }
+
+  String? get profileAvatarAssetPath {
+    return _sharedPreference.getString(PrefKeys.profileAvatarAssetPath);
+  }
+
+  Future<void> saveProfileAvatarFilePath(final String? value) async {
+    if (value == null || value.trim().isEmpty) {
+      await _sharedPreference.remove(PrefKeys.profileAvatarFilePath);
+      return;
+    }
+
+    await _sharedPreference.setString(
+      PrefKeys.profileAvatarFilePath,
+      value.trim(),
+    );
+  }
+
+  String? get profileAvatarFilePath {
+    return _sharedPreference.getString(PrefKeys.profileAvatarFilePath);
+  }
+
+  Future<void> saveGoogleProfilePhotoUrl(final String? value) async {
+    if (value == null || value.trim().isEmpty) {
+      await _sharedPreference.remove(PrefKeys.googleProfilePhotoUrl);
+      return;
+    }
+
+    await _sharedPreference.setString(
+      PrefKeys.googleProfilePhotoUrl,
+      value.trim(),
+    );
+  }
+
+  String? get googleProfilePhotoUrl {
+    return _sharedPreference.getString(PrefKeys.googleProfilePhotoUrl);
+  }
+
+  Future<void> saveGoogleProfileDisplayName(final String? value) async {
+    if (value == null || value.trim().isEmpty) {
+      await _sharedPreference.remove(PrefKeys.googleProfileDisplayName);
+      return;
+    }
+
+    await _sharedPreference.setString(
+      PrefKeys.googleProfileDisplayName,
+      value.trim(),
+    );
+  }
+
+  String? get googleProfileDisplayName {
+    return _sharedPreference.getString(PrefKeys.googleProfileDisplayName);
+  }
+
+  Future<void> saveFavoriteGameKeys(final List<String> values) async {
+    await _sharedPreference.setStringList(
+      PrefKeys.favoriteGameKeys,
+      values.toSet().toList(),
+    );
+  }
+
+  List<String> get favoriteGameKeys {
+    return _sharedPreference.getStringList(PrefKeys.favoriteGameKeys) ??
+        <String>[];
+  }
+
+  Future<bool> addFavoriteGameKey(final String value) async {
+    final String trimmedValue = value.trim();
+    if (trimmedValue.isEmpty) {
+      return false;
+    }
+
+    final Set<String> updatedValues = favoriteGameKeys.toSet()
+      ..add(trimmedValue);
+    await saveFavoriteGameKeys(updatedValues.toList());
+    return true;
+  }
+
+  int get favoriteGamesCount => favoriteGameKeys.length;
 
   Future<void> clear() async {
     final List<String> arrKeysToKeep = <String>[

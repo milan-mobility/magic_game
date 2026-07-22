@@ -5,6 +5,7 @@ import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
+import 'package:magic_games/view/base/common_button.dart';
 import 'package:magic_games/view/screens/profile/controller/profile_controller.dart';
 import 'package:magic_games/view/screens/profile/widgets/profile_action_button.dart';
 import 'package:magic_games/view/screens/profile/widgets/profile_avatar_widget.dart';
@@ -17,7 +18,13 @@ class ProfileSummaryCardWidget extends StatelessWidget {
     required this.playerType,
     required this.description,
     required this.stats,
+    required this.isLoggedIn,
+    required this.actionLabel,
+    this.avatarAssetPath,
+    this.avatarFilePath,
+    this.avatarImageUrl,
     this.onEditTap,
+    this.onLoginTap,
     this.onLogoutTap,
   });
 
@@ -25,7 +32,13 @@ class ProfileSummaryCardWidget extends StatelessWidget {
   final String playerType;
   final String description;
   final List<ProfileStatData> stats;
+  final bool isLoggedIn;
+  final String actionLabel;
+  final String? avatarAssetPath;
+  final String? avatarFilePath;
+  final String? avatarImageUrl;
   final VoidCallback? onEditTap;
+  final VoidCallback? onLoginTap;
   final VoidCallback? onLogoutTap;
 
   @override
@@ -43,7 +56,12 @@ class ProfileSummaryCardWidget extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ProfileAvatarWidget(onEditTap: onEditTap),
+                ProfileAvatarWidget(
+                  onEditTap: onEditTap,
+                  assetPath: avatarAssetPath,
+                  filePath: avatarFilePath,
+                  imageUrl: avatarImageUrl,
+                ),
                 Gap(AppResponsive.space(16)),
                 Expanded(
                   child: Column(
@@ -106,13 +124,26 @@ class ProfileSummaryCardWidget extends StatelessWidget {
                       ConstrainedBox(
                         constraints: BoxConstraints(
                           maxWidth: AppResponsive.value(220, tablet: 260),
-                          maxHeight: AppResponsive.value(40, tablet: 55),
+                          maxHeight: AppResponsive.value(44, tablet: 55),
                         ),
-                        child: ProfileActionButton(
-                          label: 'Log out',
-                          iconAsset: Assets.svg.icLogout,
-                          onTap: onLogoutTap,
-                        ),
+                        child: isLoggedIn
+                            ? ProfileActionButton(
+                                label: actionLabel,
+                                iconAsset: Assets.svg.icLogout,
+                                onTap: onLogoutTap,
+                              )
+                            : CommonButton(
+                                btnText: actionLabel,
+                                onPressed: onLoginTap,
+                                height: AppResponsive.space(40),
+                                borderRadius: 12,
+                                btnBgColor: AppColors.white,
+                                btnTxtColor: AppColors.color040120,
+                                style: poppinsW600.copyWith(
+                                  fontSize: AppResponsive.font(14),
+                                  color: AppColors.color040120,
+                                ),
+                              ),
                       ),
                     ],
                   ),

@@ -8,31 +8,34 @@ class GameDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GetBuilder<GameDetailController>(
-        init: GameDetailController(),
-        builder: (final GameDetailController controller) {
-          return SafeArea(
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                    onPressed: () {
-                      Get.back();
-                    },
-                    icon: Icon(Icons.close),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        body: GetBuilder<GameDetailController>(
+          init: GameDetailController(),
+          builder: (final GameDetailController controller) {
+            return SafeArea(
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                      onPressed: () {
+                        Get.back();
+                      },
+                      icon: const Icon(Icons.close),
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: WebViewWidget(
-                    controller: controller.webViewController,
+                  Expanded(
+                    child: WebViewWidget(
+                      controller: controller.webViewController,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

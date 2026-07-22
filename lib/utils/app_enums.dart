@@ -30,4 +30,11 @@ enum AppLanguages {
   final String nativeTitle;
   final String languageCode;
   final String badgeText;
+
+  static AppLanguages fromLanguageCode(final String? languageCode) {
+    return AppLanguages.values.firstWhere(
+      (final AppLanguages language) => language.languageCode == languageCode,
+      orElse: () => AppLanguages.english,
+    );
+  }
 }

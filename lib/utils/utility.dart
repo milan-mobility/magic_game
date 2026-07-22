@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:magic_games/helpers/extensions/list_extension.dart';
 import 'package:magic_games/utils/app_constants.dart';
 import 'package:magic_games/view/base/custom_snack_bar.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -29,7 +31,7 @@ class Utility {
     FocusScope.of(context).unfocus();
   }
 
-  /*static Future<List<String>> getPhotos({final bool isMultiple = true}) async {
+  static Future<List<String>> getPhotos({final bool isMultiple = true}) async {
     List<String> images = <String>[];
     try {
       List<XFile> xFileList = <XFile>[];
@@ -40,24 +42,21 @@ class Utility {
           imageQuality: 60,
         );
       } else {
-        final XFile? image =
-            await ImagePicker().pickImage(source: ImageSource.gallery);
+        final XFile? image = await ImagePicker().pickImage(
+          source: ImageSource.gallery,
+        );
         if (image != null) {
           xFileList.add(image);
         }
       }
       if (xFileList.isNotNullOrEmpty()) {
-        return images = xFileList
-            .map(
-              (final XFile e) => e.path,
-            )
-            .toList();
+        return images = xFileList.map((final XFile e) => e.path).toList();
       }
     } catch (e) {
       debugPrint(e.toString());
     }
     return images;
-  }*/
+  }
 
   static Future<int> getAndroidOSVersion() async {
     final AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
@@ -166,11 +165,34 @@ class Utility {
       return;
     }
 
-    final Uri emailUri = Uri(
-      scheme: 'mailto',
-      path: email,
-      queryParameters: {'subject': subject, 'body': body},
+    final List<String> queryParts = <String>[];
+    if (subject.trim().isNotEmpty) {
+      queryParts.add('subject=${Uri.encodeComponent(subject)}');
+    }
+    if (body.trim().isNotEmpty) {
+      queryParts.add('body=${Uri.encodeComponent(body)}');
+    }
+
+    final Uri emailUri = Uri.parse(
+      'mailto:$email${queryParts.isEmpty ? '' : '?${queryParts.join('&')}'}',
     );
+
+    try {
+      final bool launched = await launchUrl(
+        emailUri,
+        mode: LaunchMode.externalApplication,
+      );
+
+      if (!launched) {
+        showErrorSnackBar(message: 'No email app found'.tr);
+      }
+    } catch (e) {
+      showErrorSnackBar(message: 'No email app found'.tr);
+    }
+  }
+
+  static Future<void> openUrl(final String url) async {
+    final Uri emailUri = Uri.parse(url);
 
     try {
       final bool launched = await launchUrl(

@@ -15,6 +15,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AnalyticsService analyticsService = Get.find<AnalyticsService>();
+    final SharedPreferenceHelper sharedPref =
+        Get.find<SharedPreferenceHelper>();
     return GetMaterialApp(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
       navigatorObservers: <NavigatorObserver>[analyticsService.observer],
       defaultTransition: Transition.noTransition,
       translations: AppTranslation(),
-      locale: Locale(AppLanguages.english.languageCode),
+      locale: Locale(sharedPref.selectedLanguage.languageCode),
       fallbackLocale: Locale(AppLanguages.english.languageCode),
       supportedLocales: translations.keys
           .map((final String languageCode) => Locale(languageCode))
