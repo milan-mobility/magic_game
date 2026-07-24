@@ -213,31 +213,3 @@ class _GameMiniThumb extends StatelessWidget {
     );
   }
 }
-
-class _SecondaryActionButton extends StatelessWidget {
-  const _SecondaryActionButton({required this.onTap});
-
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: AppResponsive.space(28),
-        height: AppResponsive.space(28),
-        decoration: BoxDecoration(
-          color: const Color(0xFFA98DFF),
-          borderRadius: BorderRadius.circular(5),
-        ),
-        alignment: Alignment.center,
-        child: Icon(
-          Icons.file_download_outlined,
-          color: AppColors.screenGgColor,
-          size: AppResponsive.space(15),
-        ),
-      ),
-    );
-  }
-}

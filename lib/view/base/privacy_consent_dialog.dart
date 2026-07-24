@@ -58,7 +58,7 @@ class PrivacyConsentDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              'Your Privacy is Important',
+              'Your Privacy is Important'.tr,
               style: poppinsW700.copyWith(
                 fontSize: AppResponsive.font(16),
                 height: 1.2,
@@ -85,7 +85,8 @@ class PrivacyConsentDialog extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: Text(
-                  'To Start using this APK, please read and\naccept our Terms of Service\nand Privacy Policy.',
+                  'To Start using this APK, please read and\naccept our Terms of Service\nand Privacy Policy.'
+                      .tr,
                   textAlign: TextAlign.center,
                   style: poppinsW400.copyWith(
                     fontSize: AppResponsive.font(13.5),
@@ -100,9 +101,9 @@ class PrivacyConsentDialog extends StatelessWidget {
               children: <Widget>[
                 Expanded(
                   child: _DialogActionButton(
-                    label: 'Privacy Policy',
+                    label: 'Privacy Policy'.tr,
                     onTap: () => _openDocument(
-                      title: 'Privacy Policy',
+                      title: 'Privacy Policy'.tr,
                       url: _privacyPolicyUrl,
                     ),
                   ),
@@ -110,9 +111,9 @@ class PrivacyConsentDialog extends StatelessWidget {
                 Gap(AppResponsive.space(12)),
                 Expanded(
                   child: _DialogActionButton(
-                    label: 'Terms & Condition',
+                    label: 'Terms & Condition'.tr,
                     onTap: () => _openDocument(
-                      title: 'Terms of service',
+                      title: 'Terms of service'.tr,
                       url: _termsAndConditions,
                     ),
                   ),
@@ -206,7 +207,7 @@ class _AcceptButton extends StatelessWidget {
             onTap: onTap,
             child: Center(
               child: Text(
-                'Accept & Continue',
+                'Accept & Continue'.tr,
                 style: poppinsW600.copyWith(
                   fontSize: AppResponsive.font(15),
                   color: AppColors.white,

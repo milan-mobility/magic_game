@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 import 'package:magic_games/utils/app_enums.dart';
@@ -27,7 +26,7 @@ class LanguageController extends GetxController {
     await _sharedPreferenceHelper.saveSelectedLanguageCode(
       selectedLanguage.languageCode,
     );
-    await Get.updateLocale(Locale(selectedLanguage.languageCode));
+    await Get.updateLocale(selectedLanguage.locale);
     Get.back(result: true);
   }
 }

@@ -5,6 +5,7 @@ import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 import 'package:magic_games/data/repositories/api_repo.dart';
 import 'package:magic_games/helpers/services/analytics_service.dart';
 import 'package:magic_games/helpers/services/auth_service.dart';
+import 'package:magic_games/helpers/services/premium_access_service.dart';
 import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:magic_games/view/base/controller/network_controller.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
@@ -30,6 +31,10 @@ Future<void> init() async {
     permanent: true,
   );
   await remoteConfigService.initialize();
+  Get.put(
+    PremiumAccessService(Get.find<SharedPreferenceHelper>()),
+    permanent: true,
+  );
   Get.lazyPut(() => DioClient(Dio(), Get.find()));
 
   Get.lazyPut(() => ApiRepo(Get.find(), Get.find()), fenix: true);

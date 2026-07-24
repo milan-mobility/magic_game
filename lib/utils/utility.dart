@@ -116,8 +116,8 @@ class Utility {
         appUrl = iOSUrl;
       }
       final ShareParams params = ShareParams(
-        title: 'Game',
-        text: 'Game: $appUrl',
+        title: 'Game'.tr,
+        text: 'Game: @url'.trParams(<String, String>{'url': appUrl}),
       );
       SharePlus.instance.share(params);
     } catch (e) {
@@ -135,9 +135,10 @@ class Utility {
         appUrl = 'https://apps.apple.com/app/id';
       }
       final ShareParams params = ShareParams(
-        title: 'Take control of your money with AccountPundit!',
+        title: 'Take control of your money with AccountPundit!'.tr,
         text:
-            'Take control of your money with AccountPundit! Track income, expenses & budgets — all in one place. Download it free: $appUrl',
+            'Take control of your money with AccountPundit! Track income, expenses & budgets — all in one place. Download it free: @url'
+                .trParams(<String, String>{'url': appUrl}),
       );
       SharePlus.instance.share(params);
     } catch (e) {

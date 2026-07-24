@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+
 enum AppLanguages {
   english('English', 'English', 'en', 'E'),
   hindi('Hindi', 'हिन्दी', 'hi', 'हि'),
@@ -31,10 +33,25 @@ enum AppLanguages {
   final String languageCode;
   final String badgeText;
 
+  Locale get locale => localeFromLanguageCode(languageCode);
+
   static AppLanguages fromLanguageCode(final String? languageCode) {
     return AppLanguages.values.firstWhere(
       (final AppLanguages language) => language.languageCode == languageCode,
       orElse: () => AppLanguages.english,
     );
   }
+}
+
+Locale localeFromLanguageCode(final String languageCode) {
+  final List<String> parts = languageCode
+      .split(RegExp(r'[-_]'))
+      .where((final String part) => part.isNotEmpty)
+      .toList();
+
+  if (parts.length >= 2) {
+    return Locale(parts.first, parts[1].toUpperCase());
+  }
+
+  return Locale(parts.first);
 }

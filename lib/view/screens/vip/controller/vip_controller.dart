@@ -5,6 +5,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/billing_client_wrappers.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
+import 'package:magic_games/helpers/services/premium_access_service.dart';
 import 'package:magic_games/view/base/custom_snack_bar.dart';
 
 class VipController extends GetxController {
@@ -16,6 +17,8 @@ class VipController extends GetxController {
 
   final SharedPreferenceHelper sharedPreferenceHelper;
   final InAppPurchase _inAppPurchase = InAppPurchase.instance;
+  final PremiumAccessService _premiumAccessService =
+      Get.find<PremiumAccessService>();
 
   StreamSubscription<List<PurchaseDetails>>? _purchaseSubscription;
 
@@ -52,51 +55,64 @@ class VipController extends GetxController {
 
   String get purchaseButtonLabel {
     if (hasPremiumAccess) {
-      return 'Premium Active';
+      return 'Premium Active'.tr;
     }
 
     if (isPurchasePending) {
-      return 'Processing...';
+      return 'Processing...'.tr;
     }
 
     final VipPlanData? plan = selectedPlan;
     if (plan == null) {
-      return 'Plan unavailable';
+      return 'Plan unavailable'.tr;
     }
 
     if (plan.trialLabel != null) {
-      return 'Start ${plan.trialLabel!}';
+      return 'Start'.trParams(<String, String>{'trial': plan.trialLabel!.tr});
     }
 
-    return 'Subscribe for ${plan.displayPrice}';
+    return 'Subscribe for'.trParams(<String, String>{
+      'price': plan.displayPrice,
+    });
   }
 
   String get selectedPlanNote {
     return selectedPlan?.noteLabel ??
-        'Subscription renews automatically unless canceled.';
+        'Subscription renews automatically unless canceled.'.tr;
   }
 
   @override
   void onInit() {
     super.onInit();
-    hasPremiumAccess = sharedPreferenceHelper.hasPremiumAccess;
+    hasPremiumAccess = _premiumAccessService.hasPremiumAccess;
     _purchaseSubscription = _inAppPurchase.purchaseStream.listen(
       _handlePurchaseUpdates,
       onError: (final Object error) {
         isPurchasePending = false;
         isRestoring = false;
-        storeMessage = 'Unable to receive purchase updates.';
+        storeMessage = 'Unable to receive purchase updates.'.tr;
         update();
         showErrorSnackBar(message: error.toString());
       },
     );
-    loadPlans();
+    _initialize();
   }
 
   @override
   void onClose() {
     _purchaseSubscription?.cancel();
     super.onClose();
+  }
+
+  Future<void> _initialize() async {
+    await _syncPremiumAccess();
+    await loadPlans();
+  }
+
+  Future<void> _syncPremiumAccess() async {
+    await _premiumAccessService.refreshPremiumAccess();
+    hasPremiumAccess = _premiumAccessService.hasPremiumAccess;
+    update();
   }
 
   Future<void> loadPlans() async {
@@ -108,7 +124,7 @@ class VipController extends GetxController {
       isStoreAvailable = await _inAppPurchase.isAvailable();
       if (!isStoreAvailable) {
         plans = <VipPlanData>[];
-        storeMessage = 'The store is not available on this device.';
+        storeMessage = 'The store is not available on this device.'.tr;
         return;
       }
 
@@ -124,14 +140,16 @@ class VipController extends GetxController {
       if (response.productDetails.isEmpty) {
         plans = <VipPlanData>[];
         storeMessage =
-            'No plans were returned for $subscriptionProductId. Check the product setup in the store console.';
+            'No plans were returned for Check the product setup in the store console.'
+                .trParams(<String, String>{'productId': subscriptionProductId});
         return;
       }
 
       plans = _buildPlans(response.productDetails);
       if (plans.isEmpty) {
         storeMessage =
-            'The product is available, but no purchasable plans could be built from it.';
+            'The product is available, but no purchasable plans could be built from it.'
+                .tr;
         return;
       }
 
@@ -141,7 +159,7 @@ class VipController extends GetxController {
       selectedPlanId = hasSelectedPlan ? selectedPlanId : plans.first.planId;
     } catch (error) {
       plans = <VipPlanData>[];
-      storeMessage = 'Failed to load subscription plans.';
+      storeMessage = 'Failed to load subscription plans.'.tr;
       showErrorSnackBar(message: error.toString());
     } finally {
       isLoadingPlans = false;
@@ -162,7 +180,7 @@ class VipController extends GetxController {
     } catch (error) {
       isRestoring = false;
       update();
-      showErrorSnackBar(message: 'Unable to restore purchases.');
+      showErrorSnackBar(message: 'Unable to restore purchases.'.tr);
     }
   }
 
@@ -189,12 +207,12 @@ class VipController extends GetxController {
       if (!purchaseStarted) {
         isPurchasePending = false;
         update();
-        showErrorSnackBar(message: 'Unable to start the purchase flow.');
+        showErrorSnackBar(message: 'Unable to start the purchase flow.'.tr);
       }
     } catch (error) {
       isPurchasePending = false;
       update();
-      showErrorSnackBar(message: 'Unable to start the purchase flow.');
+      showErrorSnackBar(message: 'Unable to start the purchase flow.'.tr);
     }
   }
 
@@ -234,8 +252,8 @@ class VipController extends GetxController {
           isRestoring = false;
           showSuccessSnackBar(
             message: purchaseDetails.status == PurchaseStatus.restored
-                ? 'Your premium access has been restored.'
-                : 'Premium access is now active.',
+                ? 'Your premium access has been restored.'.tr
+                : 'Premium access is now active.'.tr,
           );
           break;
         case PurchaseStatus.error:
@@ -244,15 +262,15 @@ class VipController extends GetxController {
           showErrorSnackBar(
             message:
                 purchaseDetails.error?.message ??
-                'The purchase could not be completed.',
+                'The purchase could not be completed.'.tr,
           );
           break;
         case PurchaseStatus.canceled:
           isPurchasePending = false;
           isRestoring = false;
           showErrorSnackBar(
-            title: 'Purchase canceled',
-            message: 'The subscription purchase was canceled.',
+            title: 'Purchase canceled'.tr,
+            message: 'The subscription purchase was canceled.'.tr,
           );
           break;
       }
@@ -266,9 +284,8 @@ class VipController extends GetxController {
   }
 
   Future<void> _grantPremiumAccess(final String productId) async {
-    hasPremiumAccess = true;
-    await sharedPreferenceHelper.savePremiumAccess(true);
-    await sharedPreferenceHelper.savePremiumProductId(productId);
+    await _premiumAccessService.grantPremiumAccess(productId: productId);
+    hasPremiumAccess = _premiumAccessService.hasPremiumAccess;
   }
 
   List<VipPlanData> _buildPlans(final List<ProductDetails> productDetailsList) {
@@ -317,8 +334,12 @@ class VipController extends GetxController {
 
       return plan.copyWith(
         badgeName:
-            plan.badgeName ?? (index == cheapestIndex ? 'Best Value' : null),
-        discountLabel: savingsPercent >= 5 ? 'Save $savingsPercent%' : null,
+            plan.badgeName ?? (index == cheapestIndex ? 'Best Value'.tr : null),
+        discountLabel: savingsPercent >= 5
+            ? 'save_discount'.trParams(<String, String>{
+                'discount': '$savingsPercent%',
+              })
+            : null,
       );
     }).toList();
   }
@@ -371,12 +392,16 @@ class VipController extends GetxController {
       title: fallbackPeriod,
       displayPrice: productDetails.price,
       periodSuffix: '/ ${fallbackPeriod.toLowerCase()}',
-      billedLabel: 'Billed ${fallbackPeriod.toLowerCase()}',
+      billedLabel: 'billed_unit'.trParams(<String, String>{
+        'unit': fallbackPeriod.toLowerCase(),
+      }),
       description: productDetails.description,
       sortOrder: _sortOrderFromLabel(fallbackPeriod),
       normalizedYearlyPrice: productDetails.rawPrice,
-      noteLabel:
-          'Renews at ${productDetails.price} each ${fallbackPeriod.toLowerCase()}. Cancel anytime.',
+      noteLabel: 'Renews at each Cancel anytime.'.trParams(<String, String>{
+        'price': productDetails.price,
+        'period': fallbackPeriod.toLowerCase(),
+      }),
     );
   }
 
@@ -412,8 +437,15 @@ class VipController extends GetxController {
         ? null
         : _trialLabelFromPeriod(trialPhase.billingPeriod);
     final String noteLabel = trialLabel == null
-        ? 'Renews at ${recurringPhase.formattedPrice} per $periodUnit. Cancel anytime.'
-        : '$trialLabel, then ${recurringPhase.formattedPrice} per $periodUnit. Cancel anytime.';
+        ? 'Renews at each Cancel anytime.'.trParams(<String, String>{
+            'price': recurringPhase.formattedPrice,
+            'period': periodUnit,
+          })
+        : 'trial_then_price_period'.trParams(<String, String>{
+            'trial': trialLabel,
+            'price': recurringPhase.formattedPrice,
+            'period': periodUnit,
+          });
 
     return VipPlanData(
       planId:
@@ -425,14 +457,14 @@ class VipController extends GetxController {
       title: periodLabel,
       displayPrice: recurringPhase.formattedPrice,
       periodSuffix: '/ $periodUnit',
-      billedLabel: 'Billed $periodUnit',
+      billedLabel: 'billed_unit'.trParams(<String, String>{'unit': periodUnit}),
       description: productDetails.description,
       trialLabel: trialLabel,
       sortOrder: cycleDays,
       normalizedYearlyPrice: cycleDays <= 0
           ? productDetails.rawPrice
           : recurringPhase.priceAmountMicros / 1000000 * (365 / cycleDays),
-      badgeName: trialLabel != null ? 'Free Trial' : null,
+      badgeName: trialLabel != null ? 'Free Trial'.tr : null,
       noteLabel: noteLabel,
     );
   }
@@ -510,49 +542,53 @@ class VipController extends GetxController {
         parts.months == 0 &&
         parts.weeks == 0 &&
         parts.days == 0) {
-      return 'Yearly';
+      return 'Yearly'.tr;
     }
     if (parts.months == 1 &&
         parts.years == 0 &&
         parts.weeks == 0 &&
         parts.days == 0) {
-      return 'Monthly';
+      return 'Monthly'.tr;
     }
     if (parts.weeks == 1 &&
         parts.years == 0 &&
         parts.months == 0 &&
         parts.days == 0) {
-      return 'Weekly';
+      return 'Weekly'.tr;
     }
     if (parts.days == 7 &&
         parts.years == 0 &&
         parts.months == 0 &&
         parts.weeks == 0) {
-      return 'Weekly';
+      return 'Weekly'.tr;
     }
     if (parts.days == 1 &&
         parts.years == 0 &&
         parts.months == 0 &&
         parts.weeks == 0) {
-      return 'Daily';
+      return 'Daily'.tr;
     }
     if (parts.months > 1 &&
         parts.years == 0 &&
         parts.weeks == 0 &&
         parts.days == 0) {
-      return '${parts.months} Months';
+      return 'count_months'.trParams(<String, String>{
+        'count': '${parts.months}',
+      });
     }
     if (parts.weeks > 1 &&
         parts.years == 0 &&
         parts.months == 0 &&
         parts.days == 0) {
-      return '${parts.weeks} Weeks';
+      return 'count_weeks'.trParams(<String, String>{
+        'count': '${parts.weeks}',
+      });
     }
     if (parts.days > 1 &&
         parts.years == 0 &&
         parts.months == 0 &&
         parts.weeks == 0) {
-      return '${parts.days} Days';
+      return 'count_days'.trParams(<String, String>{'count': '${parts.days}'});
     }
     return null;
   }
@@ -593,19 +629,23 @@ class VipController extends GetxController {
         parts.years == 0 &&
         parts.weeks == 0 &&
         parts.days == 0) {
-      return '${parts.months} months';
+      return 'count_months'.trParams(<String, String>{
+        'count': '${parts.months}',
+      });
     }
     if (parts.weeks > 1 &&
         parts.years == 0 &&
         parts.months == 0 &&
         parts.days == 0) {
-      return '${parts.weeks} weeks';
+      return 'count_weeks'.trParams(<String, String>{
+        'count': '${parts.weeks}',
+      });
     }
     if (parts.days > 1 &&
         parts.years == 0 &&
         parts.months == 0 &&
         parts.weeks == 0) {
-      return '${parts.days} days';
+      return 'count_days'.trParams(<String, String>{'count': '${parts.days}'});
     }
     return null;
   }
@@ -613,18 +653,26 @@ class VipController extends GetxController {
   String _trialLabelFromPeriod(final String billingPeriod) {
     final _IsoPeriodParts parts = _parseBillingPeriod(billingPeriod);
     if (parts.days > 0) {
-      return '${parts.days} day free trial';
+      return 'count_day_free_trial'.trParams(<String, String>{
+        'count': '${parts.days}',
+      });
     }
     if (parts.weeks > 0) {
-      return '${parts.weeks * 7} day free trial';
+      return 'count_day_free_trial'.trParams(<String, String>{
+        'count': '${parts.weeks * 7}',
+      });
     }
     if (parts.months > 0) {
-      return '${parts.months} month free trial';
+      return 'count_month_free_trial'.trParams(<String, String>{
+        'count': '${parts.months}',
+      });
     }
     if (parts.years > 0) {
-      return '${parts.years} year free trial';
+      return 'count_year_free_trial'.trParams(<String, String>{
+        'count': '${parts.years}',
+      });
     }
-    return 'Free trial';
+    return 'Free trial'.tr;
   }
 
   int _durationInDays(final String billingPeriod) {

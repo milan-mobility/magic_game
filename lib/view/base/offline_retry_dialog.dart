@@ -61,7 +61,7 @@ class _OfflineRetryDialogState extends State<OfflineRetryDialog> {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(
-              "You're Offline",
+              "You're Offline".tr,
               textAlign: TextAlign.center,
               style: poppinsW700.copyWith(
                 fontSize: AppResponsive.font(18),
@@ -85,7 +85,8 @@ class _OfflineRetryDialogState extends State<OfflineRetryDialog> {
                 maxWidth: AppResponsive.value(260, tablet: 320),
               ),
               child: Text(
-                'To Start the app, Please connect to\nthe internet and try again.',
+                'To Start the app, Please connect to\nthe internet and try again.'
+                    .tr,
                 textAlign: TextAlign.center,
                 style: poppinsW400.copyWith(
                   fontSize: AppResponsive.font(13.5),
@@ -173,7 +174,7 @@ class _RetryButton extends StatelessWidget {
                       ),
                     )
                   : Text(
-                      'Retry',
+                      'Retry'.tr,
                       style: poppinsW700.copyWith(
                         fontSize: AppResponsive.font(16),
                         color: AppColors.color0D0630,

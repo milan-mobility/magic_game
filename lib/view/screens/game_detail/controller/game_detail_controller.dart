@@ -167,8 +167,6 @@ class GameDetailController extends GetxController {
         break;
 
       case 'openURL':
-        // openURL:https://www.facebook.com/icecreamfevercookinggame
-        // openURL:https://play.google.com/store/apps/dev?id=9213867137518194215
         Utility.openUrl(webMessage.payload);
         break;
 

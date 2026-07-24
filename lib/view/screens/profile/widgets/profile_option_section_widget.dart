@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
@@ -16,7 +17,7 @@ class ProfileOptionSectionWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          section.title,
+          section.title.tr,
           style: poppinsW600.copyWith(
             fontSize: AppResponsive.font(18),
             color: AppColors.white,

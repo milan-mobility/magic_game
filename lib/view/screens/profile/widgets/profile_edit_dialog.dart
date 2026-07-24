@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
@@ -109,7 +110,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                   child: Column(
                     children: <Widget>[
                       Text(
-                        'Edit Profile',
+                        'Edit Profile'.tr,
                         textAlign: TextAlign.center,
                         style: poppinsW700.copyWith(
                           fontSize: AppResponsive.font(24),
@@ -118,7 +119,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                       ),
                       Gap(AppResponsive.space(4)),
                       Text(
-                        'Change your avatar and name',
+                        'Change your avatar and name'.tr,
                         textAlign: TextAlign.center,
                         style: poppinsW500.copyWith(
                           fontSize: AppResponsive.font(12.5),
@@ -168,7 +169,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Choose your Avatar.',
+                'Choose your Avatar.'.tr,
                 style: poppinsW600.copyWith(
                   fontSize: AppResponsive.font(14),
                   color: AppColors.white,
@@ -209,7 +210,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Set your Name',
+                'Set your Name'.tr,
                 style: poppinsW600.copyWith(
                   fontSize: AppResponsive.font(14),
                   color: AppColors.white,
@@ -222,7 +223,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'This name will be visible to other players.',
+                'This name will be visible to other players.'.tr,
                 style: poppinsW400.copyWith(
                   fontSize: AppResponsive.font(11.5),
                   color: AppColors.white.withValues(alpha: 0.58),
@@ -231,7 +232,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
             ),
             Gap(AppResponsive.space(18)),
             CommonButton(
-              btnText: 'Save',
+              btnText: 'Save'.tr,
               onPressed: _submit,
               height: AppResponsive.value(48, tablet: 54),
               borderRadius: 10,
@@ -246,7 +247,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: AppResponsive.space(4)),
                 child: Text(
-                  'Cancel',
+                  'Cancel'.tr,
                   style: poppinsW600.copyWith(
                     fontSize: AppResponsive.font(14),
                     color: AppColors.color9B57FF,
@@ -444,13 +445,13 @@ class _GalleryOptionTile extends StatelessWidget {
                 )
               else
                 Image.asset(
-                  'assets/png/profile_pic/ic_gallery.png',
+                  Assets.png.profilePic.icGallery.path,
                   width: AppResponsive.value(34, tablet: 38),
                   height: AppResponsive.value(34, tablet: 38),
                 ),
               Gap(AppResponsive.space(6)),
               Text(
-                'From Gallery',
+                'From Gallery'.tr,
                 textAlign: TextAlign.center,
                 style: poppinsW400.copyWith(
                   fontSize: AppResponsive.font(9),
@@ -504,7 +505,7 @@ class _NameInputField extends StatelessWidget {
                 isCollapsed: true,
                 contentPadding: EdgeInsets.zero,
                 border: InputBorder.none,
-                hintText: 'Enter your Name',
+                hintText: 'Enter your Name'.tr,
                 hintStyle: poppinsW400.copyWith(
                   fontSize: AppResponsive.font(13),
                   color: AppColors.white.withValues(alpha: 0.38),

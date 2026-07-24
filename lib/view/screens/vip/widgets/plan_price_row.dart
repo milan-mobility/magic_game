@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
@@ -61,7 +62,7 @@ class PlanPriceRow extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppResponsive.space(5)),
                 ),
                 child: Text(
-                  badgeName ?? '',
+                  (badgeName ?? '').tr,
                   style: poppinsW300.copyWith(
                     fontSize: AppResponsive.font(12),
                     color: AppColors.white,
@@ -73,7 +74,7 @@ class PlanPriceRow extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    planDuration,
+                    planDuration.tr,
                     style: poppinsW600.copyWith(
                       fontSize: AppResponsive.font(18),
                       color: AppColors.white,
@@ -93,7 +94,7 @@ class PlanPriceRow extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      discount ?? '',
+                      (discount ?? '').tr,
                       style: poppinsW300.copyWith(
                         fontSize: AppResponsive.font(12),
                         color: AppColors.white,
@@ -105,7 +106,7 @@ class PlanPriceRow extends StatelessWidget {
             if (trialLabel != null) ...[
               Gap(AppResponsive.space(4)),
               Text(
-                trialLabel ?? '',
+                (trialLabel ?? '').tr,
                 style: poppinsW500.copyWith(
                   fontSize: AppResponsive.font(12),
                   color: AppColors.colorF5BD48,
@@ -130,7 +131,7 @@ class PlanPriceRow extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.only(bottom: AppResponsive.space(3)),
                     child: Text(
-                      priceSuffix,
+                      priceSuffix.tr,
                       style: poppinsW300.copyWith(
                         fontSize: AppResponsive.font(12),
                         color: AppColors.colorA29DBD,
@@ -152,7 +153,7 @@ class PlanPriceRow extends StatelessWidget {
                 Gap(AppResponsive.space(5)),
                 Expanded(
                   child: Text(
-                    billedLabel,
+                    billedLabel.tr,
                     style: poppinsW500.copyWith(
                       fontSize: AppResponsive.font(14),
                       color: AppColors.white,

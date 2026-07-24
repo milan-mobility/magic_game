@@ -1,3 +1,148 @@
 final Map<String, String> idId = <String, String>{
-  // Add Indonesian translations here. Use en_us_translations.dart as reference.
+  'No Internet Connection': "Tidak ada koneksi internet",
+  'Please check your network settings and try again.':
+      "Periksa pengaturan jaringan Anda lalu coba lagi.",
+  'Store unavailable': "Toko tidak tersedia",
+  'Add the iOS store URL key for this game to enable redirection.':
+      "Tambahkan kunci URL toko iOS untuk game ini agar pengalihan dapat digunakan.",
+  'Store URL is not available for this game.':
+      "URL toko tidak tersedia untuk game ini.",
+  'Invalid store URL': "URL toko tidak valid",
+  'This game has an invalid store redirect link.':
+      "Game ini memiliki tautan pengalihan toko yang tidak valid.",
+  'Update': "Perbarui",
+  'Explore games': "Jelajahi game",
+  'Featured Pick': "Pilihan unggulan",
+  'Play Now': "Main sekarang",
+  'Rating': "Rating",
+  'Search Games, categories': "Cari game, kategori",
+  'No sections available right now.':
+      "Tidak ada bagian yang tersedia saat ini.",
+  'Game Played': "Game dimainkan",
+  'Achievement': "Pencapaian",
+  'Favorites': "Favorit",
+  'Preferences': "Preferensi",
+  'Language': "Bahasa",
+  'Change app language': "Ubah bahasa aplikasi",
+  'Support': "Dukungan",
+  'Help & Support': "Bantuan & dukungan",
+  'Get help and contact us': "Dapatkan bantuan dan hubungi kami",
+  'Feedback': "Masukan",
+  'Share your thoughts': "Bagikan pendapat Anda",
+  'About': "Tentang",
+  'Terms of service': "Ketentuan layanan",
+  'Review the app usage terms': "Tinjau ketentuan penggunaan aplikasi",
+  'Privacy Policy': "Kebijakan Privasi",
+  'Learn how your data is handled': "Pelajari bagaimana data Anda ditangani",
+  'App Version': "Versi aplikasi",
+  'Current installed release': "Rilis yang saat ini terpasang",
+  'Logging out...': "Sedang keluar...",
+  'Signing in...': "Sedang masuk...",
+  'Log out': "Keluar",
+  'Log in with Google': "Masuk dengan Google",
+  'Signed in successfully.': "Berhasil masuk.",
+  'Google sign-in failed. Please try again.':
+      "Gagal masuk dengan Google. Silakan coba lagi.",
+  'Unable to sign in right now. Please try again.':
+      "Tidak dapat masuk saat ini. Silakan coba lagi.",
+  'Unable to sign in right now. Please verify your Firebase Google Sign-In setup.':
+      "Tidak dapat masuk saat ini. Mohon periksa pengaturan Firebase Google Sign-In Anda.",
+  'Logged out successfully.': "Berhasil keluar.",
+  'Unable to log out right now. Please try again.':
+      "Tidak dapat keluar saat ini. Silakan coba lagi.",
+  'Appearance switched to': "Tampilan diubah menjadi @value",
+  'Language changed to': "Bahasa diubah menjadi @value",
+  'Play games, earn achievements and\nsave your progress':
+      "Mainkan game, raih pencapaian dan\nsimpan progres Anda",
+  'Player': "Pemain",
+  'Guest': "Tamu",
+  'Guest Player': "Pemain tamu",
+  'Profile updated successfully.': "Profil berhasil diperbarui.",
+  'Enter your Name': "Masukkan nama Anda",
+  'From Gallery': "Dari galeri",
+  'Save': "Simpan",
+  'Cancel': "Batal",
+  'This name will be visible to other players.':
+      "Nama ini akan terlihat oleh pemain lain.",
+  'Set your Name': "Atur nama Anda",
+  'Choose your Avatar.': "Pilih avatar Anda.",
+  'Change your avatar and name': "Ubah avatar dan nama Anda",
+  'Edit Profile': "Edit profil",
+  'No games found.': "Tidak ada game ditemukan.",
+  'Premium Active': "Premium aktif",
+  'Processing...': "Memproses...",
+  'Plan unavailable': "Paket tidak tersedia",
+  'Start': "Mulai @trial",
+  'Subscribe for': "Berlangganan seharga @price",
+  'Subscription renews automatically unless canceled.':
+      "Langganan akan diperpanjang secara otomatis kecuali dibatalkan.",
+  'Unable to receive purchase updates.':
+      "Tidak dapat menerima pembaruan pembelian.",
+  'The store is not available on this device.':
+      "Toko tidak tersedia di perangkat ini.",
+  'No plans were returned for Check the product setup in the store console.':
+      "Tidak ada paket yang dikembalikan untuk @productId. Periksa pengaturan produk di konsol toko.",
+  'The product is available, but no purchasable plans could be built from it.':
+      "Produk tersedia, tetapi tidak ada paket yang dapat dibeli yang bisa dibuat darinya.",
+  'Failed to load subscription plans.': "Gagal memuat paket langganan.",
+  'Unable to restore purchases.': "Tidak dapat memulihkan pembelian.",
+  'Unable to start the purchase flow.': "Tidak dapat memulai alur pembelian.",
+  'The purchase could not be completed.': "Pembelian tidak dapat diselesaikan.",
+  'The subscription purchase was canceled.': "Pembelian langganan dibatalkan.",
+  'Purchase canceled': "Pembelian dibatalkan",
+  'save_discount': "Hemat @discount",
+  'Best Value': "Nilai terbaik",
+  'Monthly': "Bulanan",
+  'Yearly': "Tahunan",
+  'billed_unit': "Ditagih @unit",
+  'Renews at each Cancel anytime.':
+      "Diperpanjang seharga @price setiap @period. Batalkan kapan saja.",
+  'trial_then_price_period':
+      "@trial, lalu @price per @period. Batalkan kapan saja.",
+  'Free Trial': "Uji coba gratis",
+  'Weekly': "Mingguan",
+  'Daily': "Harian",
+  'Premium': "Premium",
+  'count_months': "@count bulan",
+  'count_weeks': "@count minggu",
+  'count_days': "@count hari",
+  'count_day free trial': "Uji coba gratis @count hari",
+  'count_month free trial': "Uji coba gratis @count bulan",
+  'count_year free trial': "Uji coba gratis @count tahun",
+  'Your New Happy Place with\n100+ Games for Pure Playtime\nBliss':
+      "Tempat bahagia baru Anda dengan\n100+ game untuk kesenangan\nbermain murni",
+  'Plus, new games monthly- tailored variety\nis the spice of play':
+      "Ditambah, game baru setiap bulan - variasi yang disesuaikan\nadalah bumbu dalam bermain",
+  'Let\'s Start': "Ayo mulai,",
+  'A new Version APP is available.\nPlease Update to continue using APP.':
+      "Versi baru aplikasi tersedia.\nSilakan perbarui untuk terus menggunakan aplikasi.",
+  'Home': "Beranda",
+  'Profile': "Profil",
+  'VIP': "VIP",
+  'You\'re Offline': "Anda sedang offline",
+  'To Start the app, Please connect to\nthe internet and try again.':
+      "Untuk memulai aplikasi, silakan sambungkan\nke internet dan coba lagi.",
+  'Your Privacy is Important': "Privasi Anda penting",
+  'To Start using this APK, please read and\naccept our Terms of Service\nand Privacy Policy.':
+      "Untuk mulai menggunakan APK ini, harap baca dan\nsetujui Ketentuan Layanan\nserta Kebijakan Privasi kami.",
+  'Terms & Condition': "Syarat & ketentuan",
+  'Accept & Continue': "Terima & lanjutkan",
+  'Loading subscription plans...': "Sedang memuat paket langganan...",
+  'No plans are available right now.':
+      "Saat ini tidak ada paket yang tersedia.",
+  'Retry': "Coba lagi",
+  'Get ultimate gaming experience with ultimate access and zero ads.':
+      "Dapatkan pengalaman bermain terbaik dengan akses penuh dan tanpa iklan.",
+  'VIP Members Benefits': "Manfaat anggota VIP",
+  'Remove All Ads': "Hapus semua iklan",
+  'Enjoy uninterrupted gaming with zero ads.':
+      "Nikmati bermain tanpa gangguan dan tanpa iklan.",
+  'Unlock All Games': "Buka semua game",
+  'Get Full access to 100+ games and all Future Releases.':
+      "Dapatkan akses penuh ke 100+ game dan semua rilis mendatang.",
+  'Choose your Plan': "Pilih paket Anda",
+  'Premium access is already active on this device.':
+      "Akses premium sudah aktif di perangkat ini.",
+  'Restoring purchases...': "Sedang memulihkan pembelian...",
+  'Restore Purchases': "Pulihkan pembelian",
 };

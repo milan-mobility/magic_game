@@ -1,17 +1,17 @@
-import 'dart:io';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 import 'package:magic_games/helpers/services/auth_service.dart';
 import 'package:magic_games/routes/route_helper.dart';
 import 'package:magic_games/utils/utility.dart';
 import 'package:magic_games/view/base/custom_snack_bar.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:magic_games/view/screens/profile/widgets/profile_edit_dialog.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ProfileController extends GetxController {
   static const List<String> builtInAvatarAssetPaths = <String>[
@@ -151,9 +151,9 @@ class ProfileController extends GetxController {
 
   String get actionButtonLabel {
     if (isAuthActionInProgress) {
-      return isLoggedIn ? 'Logging out...' : 'Signing in...';
+      return isLoggedIn ? 'Logging out...'.tr : 'Signing in...'.tr;
     }
-    return isLoggedIn ? 'Log out' : 'Log in with Google';
+    return isLoggedIn ? 'Log out'.tr : 'Log in with Google'.tr;
   }
 
   Future<void> onLoginTap() async {
@@ -167,24 +167,26 @@ class ProfileController extends GetxController {
     try {
       await _authService.signInWithGoogle();
       _syncAuthState();
-      showSuccessSnackBar(message: 'Signed in successfully.');
+      showSuccessSnackBar(message: 'Signed in successfully.'.tr);
     } on GoogleSignInException catch (e) {
       if (e.code == GoogleSignInExceptionCode.canceled) {
         return;
       }
       showErrorSnackBar(
-        message: e.description ?? 'Google sign-in failed. Please try again.',
+        message: e.description ?? 'Google sign-in failed. Please try again.'.tr,
       );
     } on FirebaseAuthException catch (e) {
       showErrorSnackBar(
-        message: e.message ?? 'Unable to sign in right now. Please try again.',
+        message:
+            e.message ?? 'Unable to sign in right now. Please try again.'.tr,
       );
     } on AuthException catch (e) {
       showErrorSnackBar(message: e.message);
     } catch (_) {
       showErrorSnackBar(
         message:
-            'Unable to sign in right now. Please verify your Firebase Google Sign-In setup.',
+            'Unable to sign in right now. Please verify your Firebase Google Sign-In setup.'
+                .tr,
       );
     } finally {
       isAuthActionInProgress = false;
@@ -203,14 +205,15 @@ class ProfileController extends GetxController {
     try {
       await _authService.signOut();
       _syncAuthState();
-      showSuccessSnackBar(message: 'Logged out successfully.');
+      showSuccessSnackBar(message: 'Logged out successfully.'.tr);
     } on FirebaseAuthException catch (e) {
       showErrorSnackBar(
-        message: e.message ?? 'Unable to log out right now. Please try again.',
+        message:
+            e.message ?? 'Unable to log out right now. Please try again.'.tr,
       );
     } catch (_) {
       showErrorSnackBar(
-        message: 'Unable to log out right now. Please try again.',
+        message: 'Unable to log out right now. Please try again.'.tr,
       );
     } finally {
       isAuthActionInProgress = false;
@@ -221,14 +224,22 @@ class ProfileController extends GetxController {
   void onAppearanceTap() {
     appearanceLabel = appearanceLabel == 'Dark' ? 'Light' : 'Dark';
     update();
-    showSuccessSnackBar(message: 'Appearance switched to $appearanceLabel.');
+    showSuccessSnackBar(
+      message: 'Appearance switched to'.trParams(<String, String>{
+        'value': appearanceLabel.tr,
+      }),
+    );
   }
 
   Future<void> onLanguageTap() async {
     final dynamic result = await Get.toNamed(RouteHelper.language);
     if (result == true) {
       _loadSelectedLanguage();
-      showSuccessSnackBar(message: 'Language changed to $languageLabel.');
+      showSuccessSnackBar(
+        message: 'Language changed to'.trParams(<String, String>{
+          'value': languageLabel,
+        }),
+      );
     }
   }
 
@@ -286,8 +297,8 @@ class ProfileController extends GetxController {
     final User? user = _authService.currentUser;
     isLoggedIn = user != null;
     playerName = _resolvePlayerName();
-    playerType = isLoggedIn ? 'Player' : 'Guest';
-    description = 'Play games, earn achievements and\nsave your progress';
+    playerType = isLoggedIn ? 'Player'.tr : 'Guest'.tr;
+    description = 'Play games, earn achievements and\nsave your progress'.tr;
     avatarImageUrl = _normalizedValue(_authService.currentPhotoUrl);
     avatarAssetPath = _normalizedValue(
       _sharedPreferenceHelper.profileAvatarAssetPath,
@@ -371,7 +382,7 @@ class ProfileController extends GetxController {
     }
 
     _syncAuthState();
-    showSuccessSnackBar(message: 'Profile updated successfully.');
+    showSuccessSnackBar(message: 'Profile updated successfully.'.tr);
   }
 
   Future<String> _persistAvatarFile(final String sourcePath) async {

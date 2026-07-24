@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
+import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
@@ -35,7 +37,7 @@ class ProfileOptionTileWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.title,
+                      item.title.tr,
                       style: poppinsW600.copyWith(
                         fontSize: AppResponsive.font(14),
                         color: AppColors.white,
@@ -43,7 +45,7 @@ class ProfileOptionTileWidget extends StatelessWidget {
                     ),
                     SizedBox(height: AppResponsive.space(3)),
                     Text(
-                      item.subtitle,
+                      item.subtitle.tr,
                       style: poppinsW400.copyWith(
                         fontSize: AppResponsive.font(12),
                         color: AppColors.colorD5CCF2,
@@ -57,7 +59,7 @@ class ProfileOptionTileWidget extends StatelessWidget {
                 SizedBox(width: AppResponsive.space(10)),
               ],
               SvgPicture.asset(
-                'assets/svg/ic_next.svg',
+                Assets.svg.icNext,
                 width: AppResponsive.space(9),
                 height: AppResponsive.space(14),
               ),

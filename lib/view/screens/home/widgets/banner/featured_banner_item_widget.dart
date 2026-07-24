@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
@@ -146,7 +147,7 @@ class FeaturedBannerItemWidget extends StatelessWidget {
                         CommonButton(
                           height: AppResponsive.space(30),
                           width: AppResponsive.space(120),
-                          btnText: 'Play Now',
+                          btnText: 'Play Now'.tr,
                           onPressed: onTap,
                           fontSize: 12,
                           icon: Assets.svg.icPlay,
@@ -163,7 +164,7 @@ class FeaturedBannerItemWidget extends StatelessWidget {
                       _BannerMetric(
                         icon: Assets.svg.icStar,
                         title: banner.rating ?? '--',
-                        subtitle: 'Rating',
+                        subtitle: 'Rating'.tr,
                       ),
                       Container(
                         width: AppResponsive.space(1),

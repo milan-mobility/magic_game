@@ -79,7 +79,7 @@ class HomeScreen extends GetView<HomeController> {
                             vertical: 48,
                           ),
                           child: Text(
-                            'No sections available right now.',
+                            'No sections available right now.'.tr,
                             style: poppinsW500.copyWith(
                               fontSize: AppResponsive.font(16),
                               color: AppColors.white,

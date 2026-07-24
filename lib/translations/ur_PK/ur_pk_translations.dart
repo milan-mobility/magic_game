@@ -1,3 +1,148 @@
 final Map<String, String> urPk = <String, String>{
-  // Add Urdu translations here. Use en_us_translations.dart as reference.
+  'No Internet Connection': "انٹرنیٹ کنکشن موجود نہیں",
+  'Please check your network settings and try again.':
+      "براہ کرم اپنی نیٹ ورک سیٹنگز چیک کریں اور دوبارہ کوشش کریں۔",
+  'Store unavailable': "اسٹور دستیاب نہیں",
+  'Add the iOS store URL key for this game to enable redirection.':
+      "ری ڈائریکشن فعال کرنے کے لیے اس گیم کے لیے iOS اسٹور URL کلید شامل کریں۔",
+  'Store URL is not available for this game.':
+      "اس گیم کے لیے اسٹور URL دستیاب نہیں ہے۔",
+  'Invalid store URL': "غلط اسٹور URL",
+  'This game has an invalid store redirect link.':
+      "اس گیم میں غلط اسٹور ری ڈائریکٹ لنک موجود ہے۔",
+  'Update': "اپ ڈیٹ",
+  'Explore games': "گیمز دریافت کریں",
+  'Featured Pick': "نمایاں انتخاب",
+  'Play Now': "ابھی کھیلیں",
+  'Rating': "درجہ بندی",
+  'Search Games, categories': "گیمز، کیٹیگریز تلاش کریں",
+  'No sections available right now.': "اس وقت کوئی سیکشن دستیاب نہیں ہے۔",
+  'Game Played': "کھیلی گئی گیم",
+  'Achievement': "کامیابی",
+  'Favorites': "پسندیدہ",
+  'Preferences': "ترجیحات",
+  'Language': "زبان",
+  'Change app language': "ایپ کی زبان تبدیل کریں",
+  'Support': "مدد",
+  'Help & Support': "مدد اور سپورٹ",
+  'Get help and contact us': "مدد حاصل کریں اور ہم سے رابطہ کریں",
+  'Feedback': "آراء",
+  'Share your thoughts': "اپنے خیالات شیئر کریں",
+  'About': "تعارف",
+  'Terms of service': "سروس کی شرائط",
+  'Review the app usage terms': "ایپ کے استعمال کی شرائط دیکھیں",
+  'Privacy Policy': "پرائیویسی پالیسی",
+  'Learn how your data is handled':
+      "جانیں کہ آپ کے ڈیٹا کو کیسے سنبھالا جاتا ہے",
+  'App Version': "ایپ ورژن",
+  'Current installed release': "موجودہ انسٹال شدہ ورژن",
+  'Logging out...': "لاگ آؤٹ ہو رہا ہے...",
+  'Signing in...': "سائن اِن ہو رہا ہے...",
+  'Log out': "لاگ آؤٹ",
+  'Log in with Google': "Google کے ساتھ لاگ اِن کریں",
+  'Signed in successfully.': "کامیابی سے سائن اِن ہو گیا۔",
+  'Google sign-in failed. Please try again.':
+      "Google سائن اِن ناکام ہو گیا۔ براہ کرم دوبارہ کوشش کریں۔",
+  'Unable to sign in right now. Please try again.':
+      "اس وقت سائن اِن ممکن نہیں۔ براہ کرم دوبارہ کوشش کریں۔",
+  'Unable to sign in right now. Please verify your Firebase Google Sign-In setup.':
+      "اس وقت سائن اِن ممکن نہیں۔ براہ کرم اپنا Firebase Google Sign-In سیٹ اپ چیک کریں۔",
+  'Logged out successfully.': "کامیابی سے لاگ آؤٹ ہو گیا۔",
+  'Unable to log out right now. Please try again.':
+      "اس وقت لاگ آؤٹ ممکن نہیں۔ براہ کرم دوبارہ کوشش کریں۔",
+  'Appearance switched to': "ظاہری شکل @value میں تبدیل کر دی گئی",
+  'Language changed to': "زبان @value میں تبدیل کر دی گئی",
+  'Play games, earn achievements and\nsave your progress':
+      "گیمز کھیلیں، کامیابیاں حاصل کریں اور\nاپنی پیش رفت محفوظ کریں",
+  'Player': "کھلاڑی",
+  'Guest': "مہمان",
+  'Guest Player': "مہمان کھلاڑی",
+  'Profile updated successfully.': "پروفائل کامیابی سے اپ ڈیٹ ہو گئی۔",
+  'Enter your Name': "اپنا نام درج کریں",
+  'From Gallery': "گیلری سے",
+  'Save': "محفوظ کریں",
+  'Cancel': "منسوخ کریں",
+  'This name will be visible to other players.':
+      "یہ نام دوسرے کھلاڑیوں کو نظر آئے گا۔",
+  'Set your Name': "اپنا نام سیٹ کریں",
+  'Choose your Avatar.': "اپنا اوتار منتخب کریں۔",
+  'Change your avatar and name': "اپنا اوتار اور نام تبدیل کریں",
+  'Edit Profile': "پروفائل میں ترمیم کریں",
+  'No games found.': "کوئی گیم نہیں ملی۔",
+  'Premium Active': "پریمیم فعال",
+  'Processing...': "پروسیسنگ جاری ہے...",
+  'Plan unavailable': "پلان دستیاب نہیں",
+  'Start': "@trial شروع کریں",
+  'Subscribe for': "@price میں سبسکرائب کریں",
+  'Subscription renews automatically unless canceled.':
+      "منسوخ نہ کرنے کی صورت میں سبسکرپشن خودکار طور پر تجدید ہو جائے گی۔",
+  'Unable to receive purchase updates.':
+      "خریداری کی اپ ڈیٹس موصول نہیں ہو سکیں۔",
+  'The store is not available on this device.':
+      "یہ اسٹور اس ڈیوائس پر دستیاب نہیں ہے۔",
+  'No plans were returned for Check the product setup in the store console.':
+      "@productId کے لیے کوئی پلان واپس نہیں آیا۔ اسٹور کنسول میں پروڈکٹ سیٹ اپ چیک کریں۔",
+  'The product is available, but no purchasable plans could be built from it.':
+      "پروڈکٹ دستیاب ہے، لیکن اس سے خریدنے کے قابل کوئی پلان نہیں بنایا جا سکا۔",
+  'Failed to load subscription plans.': "سبسکرپشن پلان لوڈ نہیں ہو سکے۔",
+  'Unable to restore purchases.': "خریداری بحال نہیں کی جا سکی۔",
+  'Unable to start the purchase flow.': "خریداری کا عمل شروع نہیں ہو سکا۔",
+  'The purchase could not be completed.': "خریداری مکمل نہیں ہو سکی۔",
+  'The subscription purchase was canceled.':
+      "سبسکرپشن خریداری منسوخ کر دی گئی۔",
+  'Purchase canceled': "خریداری منسوخ کر دی گئی",
+  'save_discount': "@discount بچائیں",
+  'Best Value': "بہترین قیمت",
+  'Monthly': "ماہانہ",
+  'Yearly': "سالانہ",
+  'billed_unit': "@unit کے حساب سے بل کیا جائے گا",
+  'Renews at each Cancel anytime.':
+      "@price میں ہر @period پر تجدید ہوگی۔ کسی بھی وقت منسوخ کریں۔",
+  'trial_then_price_period':
+      "@trial، پھر @price فی @period۔ کسی بھی وقت منسوخ کریں۔",
+  'Free Trial': "مفت آزمائش",
+  'Weekly': "ہفتہ وار",
+  'Daily': "یومیہ",
+  'Premium': "پریمیم",
+  'count_months': "@count ماہ",
+  'count_weeks': "@count ہفتے",
+  'count_days': "@count دن",
+  'count_day free trial': "@count دن کی مفت آزمائش",
+  'count_month free trial': "@count ماہ کی مفت آزمائش",
+  'count_year free trial': "@count سال کی مفت آزمائش",
+  'Your New Happy Place with\n100+ Games for Pure Playtime\nBliss':
+      "100+ گیمز کے ساتھ آپ کی نئی خوشیوں کی جگہ\nجہاں خالص کھیلنے کی\nلذت ملے",
+  'Plus, new games monthly- tailored variety\nis the spice of play':
+      "مزید یہ کہ ہر ماہ نئی گیمز - آپ کے مطابق تنوع\nکھیلنے کو مزید دلچسپ بناتا ہے",
+  'Let\'s Start': "آئیں شروع کریں،",
+  'A new Version APP is available.\nPlease Update to continue using APP.':
+      "ایپ کا نیا ورژن دستیاب ہے۔\nایپ استعمال جاری رکھنے کے لیے اپ ڈیٹ کریں۔",
+  'Home': "ہوم",
+  'Profile': "پروفائل",
+  'VIP': "VIP",
+  'You\'re Offline': "آپ آف لائن ہیں",
+  'To Start the app, Please connect to\nthe internet and try again.':
+      "ایپ شروع کرنے کے لیے، براہ کرم\nانٹرنیٹ سے جڑیں اور دوبارہ کوشش کریں۔",
+  'Your Privacy is Important': "آپ کی رازداری اہم ہے",
+  'To Start using this APK, please read and\naccept our Terms of Service\nand Privacy Policy.':
+      "اس APK کو استعمال کرنے کے لیے براہ کرم ہماری\nسروس کی شرائط\nاور پرائیویسی پالیسی پڑھ کر قبول کریں۔",
+  'Terms & Condition': "شرائط و ضوابط",
+  'Accept & Continue': "قبول کریں اور جاری رکھیں",
+  'Loading subscription plans...': "سبسکرپشن پلان لوڈ ہو رہے ہیں...",
+  'No plans are available right now.': "اس وقت کوئی پلان دستیاب نہیں ہے۔",
+  'Retry': "دوبارہ کوشش کریں",
+  'Get ultimate gaming experience with ultimate access and zero ads.':
+      "مکمل رسائی اور بغیر اشتہارات کے بہترین گیمنگ تجربہ حاصل کریں۔",
+  'VIP Members Benefits': "VIP اراکین کے فوائد",
+  'Remove All Ads': "تمام اشتہارات ہٹا دیں",
+  'Enjoy uninterrupted gaming with zero ads.':
+      "بغیر اشتہارات کے بلا تعطل گیمنگ سے لطف اٹھائیں۔",
+  'Unlock All Games': "تمام گیمز ان لاک کریں",
+  'Get Full access to 100+ games and all Future Releases.':
+      "100+ گیمز اور آنے والی تمام ریلیزز تک مکمل رسائی حاصل کریں۔",
+  'Choose your Plan': "اپنا پلان منتخب کریں",
+  'Premium access is already active on this device.':
+      "اس ڈیوائس پر پریمیم رسائی پہلے سے فعال ہے۔",
+  'Restoring purchases...': "خریداریاں بحال کی جا رہی ہیں...",
+  'Restore Purchases': "خریداریاں بحال کریں",
 };

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
@@ -22,7 +23,7 @@ class FeaturedBannerBadgeWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final String title = badge?.name?.trim().isNotEmpty == true
         ? badge!.name!.trim()
-        : 'Featured Pick';
+        : 'Featured Pick'.tr;
 
     return Row(
       children: [

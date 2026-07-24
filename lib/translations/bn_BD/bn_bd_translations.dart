@@ -1,3 +1,145 @@
 final Map<String, String> bnBd = <String, String>{
-  // Add Bengali translations here. Use en_us_translations.dart as reference.
+  'No Internet Connection': "ইন্টারনেট সংযোগ নেই",
+  'Please check your network settings and try again.':
+      "অনুগ্রহ করে আপনার নেটওয়ার্ক সেটিংস পরীক্ষা করে আবার চেষ্টা করুন।",
+  'Store unavailable': "স্টোর উপলভ্য নয়",
+  'Add the iOS store URL key for this game to enable redirection.':
+      "রিডাইরেকশন চালু করতে এই গেমের জন্য iOS স্টোর URL কী যোগ করুন।",
+  'Store URL is not available for this game.':
+      "এই গেমের জন্য স্টোর URL উপলভ্য নয়।",
+  'Invalid store URL': "অবৈধ স্টোর URL",
+  'This game has an invalid store redirect link.':
+      "এই গেমটির স্টোর রিডাইরেক্ট লিংক অবৈধ।",
+  'Update': "আপডেট",
+  'Explore games': "গেম অন্বেষণ করুন",
+  'Featured Pick': "বিশেষ নির্বাচন",
+  'Play Now': "এখনই খেলুন",
+  'Rating': "রেটিং",
+  'Search Games, categories': "গেম ও ক্যাটাগরি খুঁজুন",
+  'No sections available right now.': "এই মুহূর্তে কোনো সেকশন উপলভ্য নয়।",
+  'Game Played': "খেলা হয়েছে",
+  'Achievement': "অর্জন",
+  'Favorites': "পছন্দের",
+  'Preferences': "পছন্দসমূহ",
+  'Language': "ভাষা",
+  'Change app language': "অ্যাপের ভাষা পরিবর্তন করুন",
+  'Support': "সহায়তা",
+  'Help & Support': "সহায়তা ও সাপোর্ট",
+  'Get help and contact us': "সহায়তা নিন এবং আমাদের সাথে যোগাযোগ করুন",
+  'Feedback': "মতামত",
+  'Share your thoughts': "আপনার মতামত শেয়ার করুন",
+  'About': "সম্পর্কে",
+  'Terms of service': "সেবার শর্তাবলী",
+  'Review the app usage terms': "অ্যাপ ব্যবহারের শর্তাবলী পর্যালোচনা করুন",
+  'Privacy Policy': "গোপনীয়তা নীতি",
+  'Learn how your data is handled': "আপনার ডেটা কীভাবে ব্যবহৃত হয় জানুন",
+  'App Version': "অ্যাপ সংস্করণ",
+  'Current installed release': "বর্তমানে ইনস্টল করা সংস্করণ",
+  'Logging out...': "লগ আউট করা হচ্ছে...",
+  'Signing in...': "সাইন ইন করা হচ্ছে...",
+  'Log out': "লগ আউট",
+  'Log in with Google': "Google দিয়ে লগ ইন করুন",
+  'Signed in successfully.': "সফলভাবে সাইন ইন হয়েছে।",
+  'Google sign-in failed. Please try again.':
+      "Google সাইন-ইন ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
+  'Unable to sign in right now. Please try again.':
+      "এখন সাইন ইন করা যাচ্ছে না। অনুগ্রহ করে আবার চেষ্টা করুন।",
+  'Unable to sign in right now. Please verify your Firebase Google Sign-In setup.':
+      "এখন সাইন ইন করা যাচ্ছে না। অনুগ্রহ করে আপনার Firebase Google Sign-In সেটআপ যাচাই করুন।",
+  'Logged out successfully.': "সফলভাবে লগ আউট হয়েছে।",
+  'Unable to log out right now. Please try again.':
+      "এখন লগ আউট করা যাচ্ছে না। অনুগ্রহ করে আবার চেষ্টা করুন।",
+  'Appearance switched to': "চেহারা পরিবর্তিত হয়েছে @value",
+  'Language changed to': "ভাষা পরিবর্তিত হয়েছে @value",
+  'Play games, earn achievements and\nsave your progress':
+      "গেম খেলুন, অর্জন সংগ্রহ করুন এবং\nআপনার অগ্রগতি সংরক্ষণ করুন",
+  'Player': "খেলোয়াড়",
+  'Guest': "অতিথি",
+  'Guest Player': "অতিথি খেলোয়াড়",
+  'Profile updated successfully.': "প্রোফাইল সফলভাবে আপডেট হয়েছে।",
+  'Enter your Name': "আপনার নাম লিখুন",
+  'From Gallery': "গ্যালারি থেকে",
+  'Save': "সংরক্ষণ করুন",
+  'Cancel': "বাতিল",
+  'This name will be visible to other players.':
+      "এই নামটি অন্যান্য খেলোয়াড়দের কাছে দৃশ্যমান হবে।",
+  'Set your Name': "আপনার নাম সেট করুন",
+  'Choose your Avatar.': "আপনার অ্যাভাটার বেছে নিন।",
+  'Change your avatar and name': "আপনার অ্যাভাটার ও নাম পরিবর্তন করুন",
+  'Edit Profile': "প্রোফাইল সম্পাদনা করুন",
+  'No games found.': "কোনো গেম পাওয়া যায়নি।",
+  'Premium Active': "প্রিমিয়াম সক্রিয়",
+  'Processing...': "প্রক্রিয়া চলছে...",
+  'Plan unavailable': "প্ল্যান উপলভ্য নয়",
+  'Start': "শুরু করুন @trial",
+  'Subscribe for': "@price-এ সাবস্ক্রাইব করুন",
+  'Subscription renews automatically unless canceled.':
+      "বাতিল না করলে সাবস্ক্রিপশন স্বয়ংক্রিয়ভাবে নবায়ন হবে।",
+  'Unable to receive purchase updates.': "ক্রয়ের আপডেট পাওয়া যাচ্ছে না।",
+  'The store is not available on this device.': "এই ডিভাইসে স্টোর উপলভ্য নয়।",
+  'No plans were returned for Check the product setup in the store console.':
+      "@productId-এর জন্য কোনো প্ল্যান পাওয়া যায়নি। স্টোর কনসোলে পণ্যের সেটআপ পরীক্ষা করুন।",
+  'The product is available, but no purchasable plans could be built from it.':
+      "পণ্যটি উপলভ্য, কিন্তু এটি থেকে কেনার মতো কোনো প্ল্যান তৈরি করা যায়নি।",
+  'Failed to load subscription plans.': "সাবস্ক্রিপশন প্ল্যান লোড করা যায়নি।",
+  'Unable to restore purchases.': "ক্রয় পুনরুদ্ধার করা যাচ্ছে না।",
+  'Unable to start the purchase flow.': "ক্রয় প্রক্রিয়া শুরু করা যাচ্ছে না।",
+  'The purchase could not be completed.': "ক্রয় সম্পন্ন করা যায়নি।",
+  'The subscription purchase was canceled.':
+      "সাবস্ক্রিপশন ক্রয় বাতিল করা হয়েছে।",
+  'Purchase canceled': "ক্রয় বাতিল হয়েছে",
+  'save_discount': "@discount সাশ্রয় করুন",
+  'Best Value': "সেরা মূল্য",
+  'Monthly': "মাসিক",
+  'Yearly': "বার্ষিক",
+  'billed_unit': "@unit অনুযায়ী বিল করা হবে",
+  'Renews at each Cancel anytime.':
+      "@price প্রতি @period-এ নবায়ন হবে। যেকোনো সময় বাতিল করুন।",
+  'trial_then_price_period':
+      "@trial, তারপর প্রতি @period @price। যেকোনো সময় বাতিল করুন।",
+  'Free Trial': "ফ্রি ট্রায়াল",
+  'Weekly': "সাপ্তাহিক",
+  'Daily': "দৈনিক",
+  'Premium': "প্রিমিয়াম",
+  'count_months': "@count মাস",
+  'count_weeks': "@count সপ্তাহ",
+  'count_days': "@count দিন",
+  'count_day free trial': "@count দিনের ফ্রি ট্রায়াল",
+  'count_month free trial': "@count মাসের ফ্রি ট্রায়াল",
+  'count_year free trial': "@count বছরের ফ্রি ট্রায়াল",
+  'Your New Happy Place with\n100+ Games for Pure Playtime\nBliss':
+      "আপনার নতুন আনন্দের জায়গা\n১০০+ গেম নিয়ে নিখাদ\nখেলার সুখ",
+  'Plus, new games monthly- tailored variety\nis the spice of play':
+      "সাথে আছে প্রতি মাসে নতুন গেম - পছন্দমতো বৈচিত্র্যই\nখেলাকে আরও মজাদার করে",
+  'Let\'s Start': "চলুন শুরু করি,",
+  'A new Version APP is available.\nPlease Update to continue using APP.':
+      "অ্যাপের নতুন সংস্করণ উপলভ্য।\nঅ্যাপ ব্যবহার চালিয়ে যেতে আপডেট করুন।",
+  'Home': "হোম",
+  'Profile': "প্রোফাইল",
+  'VIP': "VIP",
+  'You\'re Offline': "আপনি অফলাইনে আছেন",
+  'To Start the app, Please connect to\nthe internet and try again.':
+      "অ্যাপ চালু করতে, অনুগ্রহ করে\nইন্টারনেটে সংযুক্ত হয়ে আবার চেষ্টা করুন।",
+  'Your Privacy is Important': "আপনার গোপনীয়তা গুরুত্বপূর্ণ",
+  'To Start using this APK, please read and\naccept our Terms of Service\nand Privacy Policy.':
+      "এই APK ব্যবহার শুরু করতে, অনুগ্রহ করে আমাদের\nসেবার শর্তাবলী\nএবং গোপনীয়তা নীতি পড়ে গ্রহণ করুন।",
+  'Terms & Condition': "শর্তাবলী",
+  'Accept & Continue': "গ্রহণ করুন ও এগিয়ে যান",
+  'Loading subscription plans...': "সাবস্ক্রিপশন প্ল্যান লোড হচ্ছে...",
+  'No plans are available right now.': "এই মুহূর্তে কোনো প্ল্যান উপলভ্য নেই।",
+  'Retry': "আবার চেষ্টা করুন",
+  'Get ultimate gaming experience with ultimate access and zero ads.':
+      "সম্পূর্ণ অ্যাক্সেস এবং শূন্য বিজ্ঞাপনে সেরা গেমিং অভিজ্ঞতা পান।",
+  'VIP Members Benefits': "VIP সদস্যদের সুবিধা",
+  'Remove All Ads': "সব বিজ্ঞাপন সরান",
+  'Enjoy uninterrupted gaming with zero ads.':
+      "কোনো বিজ্ঞাপন ছাড়াই নিরবচ্ছিন্ন গেমিং উপভোগ করুন।",
+  'Unlock All Games': "সব গেম আনলক করুন",
+  'Get Full access to 100+ games and all Future Releases.':
+      "১০০+ গেম এবং ভবিষ্যতের সব রিলিজে পূর্ণ অ্যাক্সেস পান।",
+  'Choose your Plan': "আপনার প্ল্যান বেছে নিন",
+  'Premium access is already active on this device.':
+      "এই ডিভাইসে প্রিমিয়াম অ্যাক্সেস ইতোমধ্যেই সক্রিয়।",
+  'Restoring purchases...': "কেনাকাটা পুনরুদ্ধার করা হচ্ছে...",
+  'Restore Purchases': "কেনাকাটা পুনরুদ্ধার করুন",
 };

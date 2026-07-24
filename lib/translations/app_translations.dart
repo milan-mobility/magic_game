@@ -38,8 +38,8 @@ Map<String, Map<String, String>> translations = <String, Map<String, String>>{
   'th': thTh,
   'tr': trTr,
   'ur': urPk,
-  'zh-CN': zhCn,
-  'zh-TW': zhTw,
+  'zh_CN': zhCn,
+  'zh_TW': zhTw,
 };
 
 class AppTranslation extends Translations {

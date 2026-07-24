@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
@@ -31,7 +32,7 @@ class PlanPriceWidget extends StatelessWidget {
             Gap(AppResponsive.space(12)),
             Expanded(
               child: Text(
-                'Loading subscription plans...',
+                'Loading subscription plans...'.tr,
                 style: poppinsW400.copyWith(
                   fontSize: AppResponsive.font(14),
                   color: AppColors.white,
@@ -56,7 +57,8 @@ class PlanPriceWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              controller.storeMessage ?? 'No plans are available right now.',
+              controller.storeMessage?.tr ??
+                  'No plans are available right now.'.tr,
               style: poppinsW400.copyWith(
                 fontSize: AppResponsive.font(14),
                 color: AppColors.white,
@@ -66,7 +68,7 @@ class PlanPriceWidget extends StatelessWidget {
             TextButton(
               onPressed: controller.loadPlans,
               child: Text(
-                'Retry',
+                'Retry'.tr,
                 style: poppinsW600.copyWith(
                   fontSize: AppResponsive.font(14),
                   color: AppColors.colorF5BD48,

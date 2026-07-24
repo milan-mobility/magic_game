@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/data/repositories/api_repo.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
+import 'package:magic_games/routes/route_helper.dart';
 import 'package:magic_games/utils/connection.dart';
 import 'package:magic_games/view/base/app_update_dialog.dart';
 import 'package:magic_games/view/base/appupgrader/upgrader/upgrade_messages.dart';
@@ -158,10 +159,11 @@ class HomeController extends GetxController implements GetxService {
     final String? storeUrl = _platformStoreUrl(game);
     if (!_hasText(storeUrl)) {
       showErrorSnackBar(
-        title: 'Store unavailable',
+        title: 'Store unavailable'.tr,
         message: GetPlatform.isIOS
             ? 'Add the iOS store URL key for this game to enable redirection.'
-            : 'Store URL is not available for this game.',
+                  .tr
+            : 'Store URL is not available for this game.'.tr,
       );
       return;
     }
@@ -171,8 +173,8 @@ class HomeController extends GetxController implements GetxService {
     );
     if (uri == null) {
       showErrorSnackBar(
-        title: 'Invalid store URL',
-        message: 'This game has an invalid store redirect link.',
+        title: 'Invalid store URL'.tr,
+        message: 'This game has an invalid store redirect link.'.tr,
       );
       return;
     }
@@ -181,7 +183,10 @@ class HomeController extends GetxController implements GetxService {
   }
 
   void openGame(final Games game) {
-    Get.toNamed('/gameDetail', arguments: <String, dynamic>{'game': game});
+    Get.toNamed(
+      RouteHelper.gameDetail,
+      arguments: <String, dynamic>{'game': game},
+    );
   }
 
   Future<void> _initializeUpgradeCheck() async {
@@ -216,7 +221,7 @@ class HomeController extends GetxController implements GetxService {
         }
       },
       barrierDismissible: !_upgrader.blocked(),
-      title: _upgrader.messages.message(UpgraderMessage.title) ?? 'Update',
+      title: _upgrader.messages.message(UpgraderMessage.title) ?? 'Update'.tr,
       message: _upgrader.message(),
       buttonLabel:
           _upgrader.messages.message(UpgraderMessage.buttonTitleUpdate) ??
@@ -600,7 +605,7 @@ class HomeController extends GetxController implements GetxService {
       return banner.badge!.trim();
     }
 
-    return 'Collection';
+    return 'Collection'.tr;
   }
 
   String _resolveCollectionSubtitle(
@@ -612,7 +617,7 @@ class HomeController extends GetxController implements GetxService {
       return subtitle;
     }
 
-    return _normalizeText(fallbackSubtitle) ?? 'Explore games';
+    return _normalizeText(fallbackSubtitle) ?? 'Explore games'.tr;
   }
 
   String? _categoryNameForId(
@@ -656,7 +661,7 @@ class HomeController extends GetxController implements GetxService {
       return fallbackTitle!.trim();
     }
 
-    return 'Games';
+    return 'Games'.tr;
   }
 
   String? _resolveSectionSubtitle(

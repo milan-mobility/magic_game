@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
@@ -163,7 +164,7 @@ class _ExploreButton extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                text,
+                text.tr,
                 style: poppinsW500.copyWith(
                   fontSize: AppResponsive.font(14),
                   color: AppColors.white,

@@ -1,3 +1,147 @@
 final Map<String, String> ruRu = <String, String>{
-  // Add Russian translations here. Use en_us_translations.dart as reference.
+  'No Internet Connection': "Нет подключения к интернету",
+  'Please check your network settings and try again.':
+      "Проверьте настройки сети и попробуйте снова.",
+  'Store unavailable': "Магазин недоступен",
+  'Add the iOS store URL key for this game to enable redirection.':
+      "Добавьте ключ URL магазина iOS для этой игры, чтобы включить перенаправление.",
+  'Store URL is not available for this game.':
+      "URL магазина недоступен для этой игры.",
+  'Invalid store URL': "Недопустимый URL магазина",
+  'This game has an invalid store redirect link.':
+      "У этой игры недействительная ссылка перенаправления в магазин.",
+  'Update': "Обновить",
+  'Explore games': "Исследуйте игры",
+  'Featured Pick': "Рекомендуемый выбор",
+  'Play Now': "Играть сейчас",
+  'Rating': "Рейтинг",
+  'Search Games, categories': "Поиск игр и категорий",
+  'No sections available right now.': "Сейчас нет доступных разделов.",
+  'Game Played': "Сыграно игр",
+  'Achievement': "Достижение",
+  'Favorites': "Избранное",
+  'Preferences': "Настройки",
+  'Language': "Язык",
+  'Change app language': "Изменить язык приложения",
+  'Support': "Поддержка",
+  'Help & Support': "Помощь и поддержка",
+  'Get help and contact us': "Получите помощь и свяжитесь с нами",
+  'Feedback': "Обратная связь",
+  'Share your thoughts': "Поделитесь своими мыслями",
+  'About': "О приложении",
+  'Terms of service': "Условия использования",
+  'Review the app usage terms':
+      "Ознакомьтесь с условиями использования приложения",
+  'Privacy Policy': "Политика конфиденциальности",
+  'Learn how your data is handled': "Узнайте, как обрабатываются ваши данные",
+  'App Version': "Версия приложения",
+  'Current installed release': "Текущая установленная версия",
+  'Logging out...': "Выход...",
+  'Signing in...': "Вход...",
+  'Log out': "Выйти",
+  'Log in with Google': "Войти через Google",
+  'Signed in successfully.': "Вход выполнен успешно.",
+  'Google sign-in failed. Please try again.':
+      "Не удалось войти через Google. Попробуйте снова.",
+  'Unable to sign in right now. Please try again.':
+      "Сейчас не удается войти. Попробуйте снова.",
+  'Unable to sign in right now. Please verify your Firebase Google Sign-In setup.':
+      "Сейчас не удается войти. Проверьте настройки Firebase Google Sign-In.",
+  'Logged out successfully.': "Выход выполнен успешно.",
+  'Unable to log out right now. Please try again.':
+      "Сейчас не удается выйти. Попробуйте снова.",
+  'Appearance switched to': "Оформление изменено на @value",
+  'Language changed to': "Язык изменен на @value",
+  'Play games, earn achievements and\nsave your progress':
+      "Играйте, получайте достижения и\nсохраняйте свой прогресс",
+  'Player': "Игрок",
+  'Guest': "Гость",
+  'Guest Player': "Гостевой игрок",
+  'Profile updated successfully.': "Профиль успешно обновлен.",
+  'Enter your Name': "Введите свое имя",
+  'From Gallery': "Из галереи",
+  'Save': "Сохранить",
+  'Cancel': "Отмена",
+  'This name will be visible to other players.':
+      "Это имя будет видно другим игрокам.",
+  'Set your Name': "Задайте свое имя",
+  'Choose your Avatar.': "Выберите свой аватар.",
+  'Change your avatar and name': "Измените свой аватар и имя",
+  'Edit Profile': "Редактировать профиль",
+  'No games found.': "Игры не найдены.",
+  'Premium Active': "Премиум активен",
+  'Processing...': "Обработка...",
+  'Plan unavailable': "План недоступен",
+  'Start': "Начать @trial",
+  'Subscribe for': "Подписаться за @price",
+  'Subscription renews automatically unless canceled.':
+      "Подписка продлевается автоматически, если ее не отменить.",
+  'Unable to receive purchase updates.':
+      "Не удалось получить обновления покупок.",
+  'The store is not available on this device.':
+      "Магазин недоступен на этом устройстве.",
+  'No plans were returned for Check the product setup in the store console.':
+      "Для @productId не было возвращено ни одного плана. Проверьте настройку продукта в консоли магазина.",
+  'The product is available, but no purchasable plans could be built from it.':
+      "Продукт доступен, но из него не удалось сформировать покупаемые планы.",
+  'Failed to load subscription plans.': "Не удалось загрузить планы подписки.",
+  'Unable to restore purchases.': "Не удалось восстановить покупки.",
+  'Unable to start the purchase flow.': "Не удалось начать процесс покупки.",
+  'The purchase could not be completed.': "Не удалось завершить покупку.",
+  'The subscription purchase was canceled.': "Покупка подписки была отменена.",
+  'Purchase canceled': "Покупка отменена",
+  'save_discount': "Сэкономьте @discount",
+  'Best Value': "Лучшая цена",
+  'Monthly': "Ежемесячно",
+  'Yearly': "Ежегодно",
+  'billed_unit': "Списывается @unit",
+  'Renews at each Cancel anytime.':
+      "Продлевается за @price каждый @period. Отменить можно в любое время.",
+  'trial_then_price_period':
+      "@trial, затем @price за @period. Отменить можно в любое время.",
+  'Free Trial': "Бесплатный пробный период",
+  'Weekly': "Еженедельно",
+  'Daily': "Ежедневно",
+  'Premium': "Премиум",
+  'count_months': "@count месяцев",
+  'count_weeks': "@count недель",
+  'count_days': "@count дней",
+  'count_day free trial': "@count день бесплатного пробного периода",
+  'count_month free trial': "@count месяц бесплатного пробного периода",
+  'count_year free trial': "@count год бесплатного пробного периода",
+  'Your New Happy Place with\n100+ Games for Pure Playtime\nBliss':
+      "Ваше новое счастливое место с\n100+ играми для чистого\nудовольствия от игры",
+  'Plus, new games monthly- tailored variety\nis the spice of play':
+      "Плюс новые игры каждый месяц - разнообразие на любой вкус\nделает игру еще интереснее",
+  'Let\'s Start': "Начнем,",
+  'A new Version APP is available.\nPlease Update to continue using APP.':
+      "Доступна новая версия приложения.\nОбновите приложение, чтобы продолжить использование.",
+  'Home': "Главная",
+  'Profile': "Профиль",
+  'VIP': "VIP",
+  'You\'re Offline': "Вы не в сети",
+  'To Start the app, Please connect to\nthe internet and try again.':
+      "Чтобы запустить приложение, подключитесь\nк интернету и попробуйте снова.",
+  'Your Privacy is Important': "Ваша конфиденциальность важна",
+  'To Start using this APK, please read and\naccept our Terms of Service\nand Privacy Policy.':
+      "Чтобы начать использовать этот APK,\nпрочитайте и примите наши Условия использования\nи Политику конфиденциальности.",
+  'Terms & Condition': "Условия и положения",
+  'Accept & Continue': "Принять и продолжить",
+  'Loading subscription plans...': "Загрузка планов подписки...",
+  'No plans are available right now.': "Сейчас нет доступных планов.",
+  'Retry': "Повторить",
+  'Get ultimate gaming experience with ultimate access and zero ads.':
+      "Получите максимальный игровой опыт с полным доступом и без рекламы.",
+  'VIP Members Benefits': "Преимущества для VIP-участников",
+  'Remove All Ads': "Убрать всю рекламу",
+  'Enjoy uninterrupted gaming with zero ads.':
+      "Наслаждайтесь игрой без перерывов и без рекламы.",
+  'Unlock All Games': "Разблокировать все игры",
+  'Get Full access to 100+ games and all Future Releases.':
+      "Получите полный доступ к 100+ играм и всем будущим релизам.",
+  'Choose your Plan': "Выберите план",
+  'Premium access is already active on this device.':
+      "Премиум-доступ уже активен на этом устройстве.",
+  'Restoring purchases...': "Восстановление покупок...",
+  'Restore Purchases': "Восстановить покупки",
 };

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
@@ -89,7 +90,7 @@ class ProfileSummaryCardWidget extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              playerType,
+                              playerType.tr,
                               style: poppinsW500.copyWith(
                                 fontSize: AppResponsive.font(12),
                                 color: AppColors.white,
@@ -110,7 +111,7 @@ class ProfileSummaryCardWidget extends StatelessWidget {
                           Gap(AppResponsive.space(8)),
                           Expanded(
                             child: Text(
-                              description,
+                              description.tr,
                               style: poppinsW400.copyWith(
                                 fontSize: AppResponsive.font(12),
                                 height: 1.45,

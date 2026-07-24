@@ -29,14 +29,20 @@ class VipScreen extends StatelessWidget {
             bottomNavigationBar: BottomNavigation(selectedIndex: 2),
             body: SafeArea(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  Image.asset(
+                    Assets.png.icHomeHeader.path,
+                    height: AppResponsive.value(35, tablet: 70),
+                    width: AppResponsive.value(140, tablet: 200),
+                  ),
                   Expanded(
                     child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Gap(AppResponsive.value(5, tablet: 8)),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -46,17 +52,6 @@ class VipScreen extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Image.asset(
-                                      Assets.png.icHomeHeader.path,
-                                      height: AppResponsive.value(
-                                        35,
-                                        tablet: 70,
-                                      ),
-                                      width: AppResponsive.value(
-                                        140,
-                                        tablet: 200,
-                                      ),
-                                    ),
                                     Gap(AppResponsive.space(40)),
                                     Text(
                                       'Upgrade to VIP'.tr,
@@ -81,7 +76,7 @@ class VipScreen extends StatelessWidget {
                                 flex: 1,
                                 child: Image.asset(
                                   Assets.png.icVipShield.path,
-                                  height: AppResponsive.value(200, tablet: 280),
+                                  height: AppResponsive.value(150, tablet: 280),
                                   width: AppResponsive.value(200, tablet: 280),
                                 ),
                               ),
@@ -92,7 +87,7 @@ class VipScreen extends StatelessWidget {
                             children: [
                               _SparkIcon(1),
                               Text(
-                                'VIP Members Benefits',
+                                'VIP Members Benefits'.tr,
                                 style: poppinsW700.copyWith(
                                   fontSize: AppResponsive.font(18),
                                   color: AppColors.colorED2EAA,
@@ -122,9 +117,10 @@ class VipScreen extends StatelessWidget {
                               children: [
                                 OfferBenefitRow(
                                   prefixIcon: Assets.png.icNoAds.path,
-                                  name: 'Remove All Ads',
+                                  name: 'Remove All Ads'.tr,
                                   desc:
-                                      'Enjoy uninterrupted gaming with zero ads.',
+                                      'Enjoy uninterrupted gaming with zero ads.'
+                                          .tr,
                                   suffixIcon: Assets.png.icTick.path,
                                 ),
                                 Gap(AppResponsive.space(10)),
@@ -149,7 +145,7 @@ class VipScreen extends StatelessWidget {
                             children: [
                               _SparkIcon(1),
                               Text(
-                                'Choose your Plan',
+                                'Choose your Plan'.tr,
                                 style: poppinsW700.copyWith(
                                   fontSize: 18,
                                   color: AppColors.colorED2EAA,
@@ -182,7 +178,8 @@ class VipScreen extends StatelessWidget {
                                 ),
                               ),
                               child: Text(
-                                'Premium access is already active on this device.',
+                                'Premium access is already active on this device.'
+                                    .tr,
                                 style: poppinsW500.copyWith(
                                   fontSize: AppResponsive.font(14),
                                   color: AppColors.colorF5BD48,
@@ -194,50 +191,52 @@ class VipScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  CommonButton(
-                    onPressed: controller.canStartPurchase
-                        ? controller.startPurchase
-                        : null,
-                    btnText: controller.purchaseButtonLabel,
-                    btnBgColor: AppColors.colorF5BD48,
-                    btnTxtColor: AppColors.black,
-                    height: AppResponsive.space(45),
-                  ),
-                  Gap(AppResponsive.space(4)),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        Assets.svg.icShield,
-                        height: AppResponsive.space(15),
-                        width: AppResponsive.space(15),
-                      ),
-                      Gap(AppResponsive.space(5)),
-                      Expanded(
-                        child: Text(
-                          controller.selectedPlanNote,
-                          style: poppinsW400.copyWith(
-                            fontSize: AppResponsive.font(14),
-                            color: AppColors.color9794B0,
+                  if (!controller.hasPremiumAccess) ...[
+                    CommonButton(
+                      onPressed: controller.canStartPurchase
+                          ? controller.startPurchase
+                          : null,
+                      btnText: controller.purchaseButtonLabel,
+                      btnBgColor: AppColors.colorF5BD48,
+                      btnTxtColor: AppColors.black,
+                      height: AppResponsive.space(45),
+                    ),
+                    Gap(AppResponsive.space(4)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          Assets.svg.icShield,
+                          height: AppResponsive.space(15),
+                          width: AppResponsive.space(15),
+                        ),
+                        Gap(AppResponsive.space(5)),
+                        Expanded(
+                          child: Text(
+                            controller.selectedPlanNote,
+                            style: poppinsW400.copyWith(
+                              fontSize: AppResponsive.font(14),
+                              color: AppColors.color9794B0,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  TextButton(
-                    onPressed: controller.isRestoring
-                        ? null
-                        : controller.restorePurchases,
-                    child: Text(
-                      controller.isRestoring
-                          ? 'Restoring purchases...'
-                          : 'Restore Purchases',
-                      style: poppinsW500.copyWith(
-                        fontSize: AppResponsive.font(14),
-                        color: AppColors.colorF5BD48,
+                      ],
+                    ),
+                    TextButton(
+                      onPressed: controller.isRestoring
+                          ? null
+                          : controller.restorePurchases,
+                      child: Text(
+                        controller.isRestoring
+                            ? 'Restoring purchases...'.tr
+                            : 'Restore Purchases'.tr,
+                        style: poppinsW500.copyWith(
+                          fontSize: AppResponsive.font(14),
+                          color: AppColors.colorF5BD48,
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ],
               ).paddingSymmetric(horizontal: 10),
             ),

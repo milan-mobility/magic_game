@@ -72,7 +72,7 @@ class AppUpdateDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(
-              title,
+              title.tr,
               textAlign: TextAlign.center,
               style: poppinsW700.copyWith(
                 fontSize: AppResponsive.font(30),
@@ -95,7 +95,7 @@ class AppUpdateDialog extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: AppResponsive.space(8)),
               child: Text(
-                message,
+                message.tr,
                 textAlign: TextAlign.center,
                 style: poppinsW400.copyWith(
                   fontSize: AppResponsive.font(15),
@@ -105,7 +105,7 @@ class AppUpdateDialog extends StatelessWidget {
               ),
             ),
             Gap(AppResponsive.space(18)),
-            _UpdateActionButton(label: buttonLabel, onTap: onUpdate),
+            _UpdateActionButton(label: buttonLabel.tr, onTap: onUpdate),
             Gap(AppResponsive.space(8)),
           ],
         ),

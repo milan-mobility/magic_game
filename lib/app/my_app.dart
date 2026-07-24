@@ -29,10 +29,10 @@ class MyApp extends StatelessWidget {
       navigatorObservers: <NavigatorObserver>[analyticsService.observer],
       defaultTransition: Transition.noTransition,
       translations: AppTranslation(),
-      locale: Locale(sharedPref.selectedLanguage.languageCode),
-      fallbackLocale: Locale(AppLanguages.english.languageCode),
-      supportedLocales: translations.keys
-          .map((final String languageCode) => Locale(languageCode))
+      locale: sharedPref.selectedLanguage.locale,
+      fallbackLocale: AppLanguages.english.locale,
+      supportedLocales: AppLanguages.values
+          .map((final AppLanguages language) => language.locale)
           .toList(),
       localizationsDelegates: <LocalizationsDelegate<dynamic>>[
         GlobalMaterialLocalizations.delegate,

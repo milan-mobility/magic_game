@@ -67,7 +67,8 @@ class WelcomeScreen extends StatelessWidget {
                                 maxWidth: AppResponsive.value(360, tablet: 560),
                               ),
                               child: Text(
-                                'Your New Happy Place with\n100+ Games for Pure Playtime\nBliss',
+                                'Your New Happy Place with\n100+ Games for Pure Playtime\nBliss'
+                                    .tr,
                                 textAlign: TextAlign.center,
                                 style: poppinsW700.copyWith(
                                   fontSize: AppResponsive.font(18),
@@ -82,7 +83,8 @@ class WelcomeScreen extends StatelessWidget {
                                 maxWidth: AppResponsive.value(330, tablet: 520),
                               ),
                               child: Text(
-                                'Plus, new games monthly- tailored variety\nis the spice of play',
+                                'Plus, new games monthly- tailored variety\nis the spice of play'
+                                    .tr,
                                 textAlign: TextAlign.center,
                                 style: poppinsW400.copyWith(
                                   fontSize: AppResponsive.font(15),
@@ -163,7 +165,7 @@ class _WelcomeStartButton extends StatelessWidget {
             const _WelcomeSparkIcon(),
             Expanded(
               child: Text(
-                "Let's Start",
+                "Let's Start".tr,
                 textAlign: TextAlign.center,
                 style: poppinsW700.copyWith(
                   fontSize: AppResponsive.font(20),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
@@ -37,7 +38,7 @@ class ProfileStatItemWidget extends StatelessWidget {
         ),
         Gap(AppResponsive.space(2)),
         Text(
-          label,
+          label.tr,
           textAlign: TextAlign.center,
           style: poppinsW400.copyWith(
             fontSize: AppResponsive.font(12),

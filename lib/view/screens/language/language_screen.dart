@@ -36,7 +36,7 @@ class LanguageScreen extends StatelessWidget {
                   AppResponsive.space(16),
                 ),
                 child: CommonButton(
-                  btnText: 'Save Language',
+                  btnText: 'Save Language'.tr,
                   btnBgColor: AppColors.color8752FF,
                   borderRadius: 18,
                   height: AppResponsive.value(54, tablet: 62),
