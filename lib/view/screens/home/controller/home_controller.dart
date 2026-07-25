@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/data/repositories/api_repo.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
+import 'package:magic_games/helpers/services/premium_access_service.dart';
 import 'package:magic_games/routes/route_helper.dart';
 import 'package:magic_games/utils/connection.dart';
 import 'package:magic_games/view/base/app_update_dialog.dart';
@@ -26,16 +27,28 @@ class HomeController extends GetxController implements GetxService {
 
   final ApiRepo apiRepo;
   final Upgrader _upgrader;
+  final PremiumAccessService _premiumAccessService =
+      Get.find<PremiumAccessService>();
 
   final Rx<GameModel?> gameModel = Rx<GameModel?>(null);
   final RxBool isLoading = false.obs;
+  final RxBool hasPremiumAccess = false.obs;
   final RxString selectedCategoryId = ''.obs;
   StreamSubscription<UpgraderEvaluateNeed>? _upgradeSubscription;
+  Worker? _premiumAccessWorker;
   bool _isUpgradeDialogVisible = false;
 
   @override
   void onInit() {
     super.onInit();
+    hasPremiumAccess.value = _premiumAccessService.hasPremiumAccess;
+    _premiumAccessWorker = ever<bool>(
+      _premiumAccessService.hasPremiumAccessRx,
+      (final bool value) {
+        hasPremiumAccess.value = value;
+      },
+    );
+    _syncPremiumAccess();
     fetchGames();
   }
 
@@ -48,11 +61,14 @@ class HomeController extends GetxController implements GetxService {
   @override
   void onClose() {
     _upgradeSubscription?.cancel();
+    _premiumAccessWorker?.dispose();
     _upgrader.dispose();
     super.onClose();
   }
 
   Future<void> fetchGames() async {
+    await _syncPremiumAccess();
+
     final bool isInternetAvailable = await ConnectionUtils.isNetworkConnected();
     if (!isInternetAvailable) {
       return;
@@ -187,6 +203,15 @@ class HomeController extends GetxController implements GetxService {
       RouteHelper.gameDetail,
       arguments: <String, dynamic>{'game': game},
     );
+  }
+
+  bool requiresSubscriptionForGame(final Games game) {
+    return (game.subscription ?? false) && !hasPremiumAccess.value;
+  }
+
+  Future<void> _syncPremiumAccess() async {
+    await _premiumAccessService.refreshPremiumAccess();
+    hasPremiumAccess.value = _premiumAccessService.hasPremiumAccess;
   }
 
   Future<void> _initializeUpgradeCheck() async {

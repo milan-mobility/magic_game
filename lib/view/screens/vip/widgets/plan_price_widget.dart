@@ -104,7 +104,10 @@ class PlanPriceWidget extends StatelessWidget {
                 trialLabel: plan.trialLabel,
                 description: plan.description,
                 isSelected: controller.selectedPlan?.planId == plan.planId,
-                onTap: () => controller.selectPlan(plan.planId),
+                isActive: controller.activePlan?.planId == plan.planId,
+                onTap: controller.canSelectPlans
+                    ? () => controller.selectPlan(plan.planId)
+                    : null,
               ),
             );
           }).toList(),

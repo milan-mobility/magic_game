@@ -14,12 +14,14 @@ class GameIconItem extends StatelessWidget {
     super.key,
     required this.game,
     required this.rank,
+    required this.requiresSubscription,
     this.onTap,
   });
 
   final Games game;
   final int rank;
-  final VoidCallback? onTap;
+  final bool requiresSubscription;
+  final Function(bool)? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,9 @@ class GameIconItem extends StatelessWidget {
     final double imageSize = AppResponsive.value(90, tablet: 140);
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        onTap?.call(requiresSubscription);
+      },
       child: SizedBox(
         width: tileWidth,
         child: Column(

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -8,6 +9,8 @@ import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 import 'package:magic_games/helpers/ads/ads_services.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
+import 'package:magic_games/helpers/services/google_leaderboard_service.dart';
+import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:magic_games/helpers/styles.dart';
 import 'package:magic_games/utils/utility.dart';
 import 'package:magic_games/view/screens/profile/controller/profile_controller.dart';
@@ -16,11 +19,13 @@ import 'package:webview_flutter/webview_flutter.dart';
 class GameDetailController extends GetxController {
   final SharedPreferenceHelper _sharedPreferenceHelper =
       Get.find<SharedPreferenceHelper>();
+
   late WebViewController webViewController;
   bool _isShowingInterstitial = false;
   bool _isShowingRewarded = false;
-
   Games? games;
+
+  final RemoteConfigService _remoteConfigService = RemoteConfigService();
 
   @override
   void onInit() {
@@ -78,19 +83,16 @@ class GameDetailController extends GetxController {
     webViewController.loadRequest(Uri.parse(games?.gameurl ?? ''));
   }
 
-  void _handleWebMessage(final String message) {
+  Future<void> _handleWebMessage(final String message) async {
     final _WebMessage webMessage = _parseWebMessage(message);
 
     switch (webMessage.command) {
       case 'loadInterstitial':
-        AdService.preloadInterstitial();
+        AdService.preloadInterstitial(adUnitId: games?.interstitialid);
         break;
 
       case 'loadRewardedAd':
-        AdService.preloadRewardedAd();
-        break;
-
-      case 'gameStart':
+        AdService.preloadRewardedAd(adUnitId: games?.rewardid);
         break;
 
       case 'showInterstitial':
@@ -98,6 +100,7 @@ class GameDetailController extends GetxController {
         _isShowingInterstitial = true;
         _sendCallbackToJs('GamePause');
         final shownI = AdService.showInterstitial(
+          adUnitId: games?.interstitialid,
           onDismissed: () {
             _isShowingInterstitial = false;
             _sendCallbackToJs('GameResume');
@@ -114,6 +117,7 @@ class GameDetailController extends GetxController {
         _isShowingRewarded = true;
         _sendCallbackToJs('GamePause');
         final shownR = AdService.showRewardedAd(
+          adUnitId: games?.rewardid,
           onDismissed: () {
             _isShowingRewarded = false;
             _sendCallbackToJs('GameResume');
@@ -126,39 +130,30 @@ class GameDetailController extends GetxController {
         }
         break;
 
-      case 'sendFirebaseEvent':
-        break;
-
       case 'addHeart':
-        //Profile heart +1 increment always
         _addCurrentGameToFavorites();
+        await GoogleLeaderboardService.instance.submitScore(
+          _sharedPreferenceHelper.favoriteGamesCount,
+        );
         break;
 
       case 'addVibration':
-        //VIBRATE DEVICE WHEN IT'S FIRE
         HapticFeedback.mediumImpact();
         break;
 
-      case 'openMailComposer':
-        Utility.sendFeedbackEmail();
-        break;
-
       case 'moreGames':
-        //iOS: Will be given
-        Utility.moreGames(
-          androidUrl:
-              'https://play.google.com/store/apps/dev?id=6417410772580581502',
-          iOSUrl: '',
+        Utility.openUrl(
+          GetPlatform.isAndroid
+              ? _remoteConfigService.moreGameAndroid
+              : _remoteConfigService.moreGameIOS,
         );
         break;
 
       case 'rateUs':
-        // Current app rate us
         Utility.reviewApp();
         break;
 
       case 'shareApp':
-        // Share this app
         Utility.shareApp();
         break;
 
@@ -168,6 +163,25 @@ class GameDetailController extends GetxController {
 
       case 'openURL':
         Utility.openUrl(webMessage.payload);
+        break;
+
+      case 'openMailComposerSupport':
+        Utility.sendFeedbackEmail();
+        break;
+
+      case 'openMailComposer':
+        Utility.sendFeedbackEmail();
+        break;
+
+      case 'gameStart':
+        //Hide
+        break;
+
+      case 'googleLeaderBoard':
+        break;
+
+      case 'sendFirebaseEvent':
+        fireFirebaseEvent(webMessage.payload);
         break;
 
       default:
@@ -249,6 +263,10 @@ class GameDetailController extends GetxController {
     }
 
     return null;
+  }
+
+  Future<void> fireFirebaseEvent(final String name) async {
+    await FirebaseAnalytics.instance.logEvent(name: name);
   }
 
   Future<void> _sendCallbackToJs(final String event) async {

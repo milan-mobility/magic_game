@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
+import 'package:magic_games/helpers/services/google_leaderboard_service.dart';
 import 'package:magic_games/helpers/styles.dart';
 import 'package:magic_games/routes/route_helper.dart';
 
@@ -57,6 +58,28 @@ class BottomNavigation extends StatelessWidget {
               label: 'Home'.tr,
             ),
             BottomNavigationBarItem(
+              icon: SvgPicture.asset(Assets.svg.icVip, height: 22, width: 22),
+              activeIcon: SvgPicture.asset(
+                Assets.svg.icVip,
+                height: 22,
+                width: 22,
+              ),
+              label: 'VIP'.tr,
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset(
+                Assets.svg.icLeaderboard,
+                height: 22,
+                width: 22,
+              ),
+              activeIcon: SvgPicture.asset(
+                Assets.svg.icLeaderboard,
+                height: 22,
+                width: 22,
+              ),
+              label: 'Leader Board'.tr,
+            ),
+            BottomNavigationBarItem(
               icon: SvgPicture.asset(
                 Assets.svg.icProfile,
                 height: 22,
@@ -69,17 +92,8 @@ class BottomNavigation extends StatelessWidget {
               ),
               label: 'Profile'.tr,
             ),
-            BottomNavigationBarItem(
-              icon: SvgPicture.asset(Assets.svg.icVip, height: 22, width: 22),
-              activeIcon: SvgPicture.asset(
-                Assets.svg.icVip,
-                height: 22,
-                width: 22,
-              ),
-              label: 'VIP'.tr,
-            ),
           ],
-          onTap: (final int index) {
+          onTap: (final int index) async {
             switch (index) {
               case 0:
                 if (Get.currentRoute != RouteHelper.home) {
@@ -87,13 +101,16 @@ class BottomNavigation extends StatelessWidget {
                 }
                 break;
               case 1:
-                if (Get.currentRoute != RouteHelper.profile) {
-                  Get.offAndToNamed(RouteHelper.profile);
+                if (Get.currentRoute != RouteHelper.vip) {
+                  Get.offAndToNamed(RouteHelper.vip);
                 }
                 break;
               case 2:
-                if (Get.currentRoute != RouteHelper.vip) {
-                  Get.offAndToNamed(RouteHelper.vip);
+                await GoogleLeaderboardService.instance.showLeaderboard();
+                break;
+              default:
+                if (Get.currentRoute != RouteHelper.profile) {
+                  Get.offAndToNamed(RouteHelper.profile);
                 }
                 break;
             }

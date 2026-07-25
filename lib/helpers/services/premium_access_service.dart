@@ -5,16 +5,22 @@ import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 
 class PremiumAccessService extends GetxService {
-  PremiumAccessService(this._sharedPreferenceHelper);
+  PremiumAccessService(this._sharedPreferenceHelper)
+    : _hasPremiumAccess = RxBool(_sharedPreferenceHelper.hasPremiumAccess);
 
   static const String subscriptionProductId = 'onegame_plus_premium';
 
   final SharedPreferenceHelper _sharedPreferenceHelper;
   final InAppPurchase _inAppPurchase = InAppPurchase.instance;
+  final RxBool _hasPremiumAccess;
 
-  bool get hasPremiumAccess => _sharedPreferenceHelper.hasPremiumAccess;
+  bool get hasPremiumAccess => _hasPremiumAccess.value;
+
+  RxBool get hasPremiumAccessRx => _hasPremiumAccess;
 
   String? get premiumProductId => _sharedPreferenceHelper.premiumProductId;
+
+  String? get premiumPlanKey => _sharedPreferenceHelper.premiumPlanKey;
 
   Future<void> refreshPremiumAccess() async {
     if (!GetPlatform.isAndroid) {
@@ -37,12 +43,14 @@ class PremiumAccessService extends GetxService {
         return;
       }
 
-      final bool hasActivePurchase = response.pastPurchases.any(
-        _isOwnedPremiumPurchase,
-      );
+      final GooglePlayPurchaseDetails? activePurchase = response.pastPurchases
+          .firstWhereOrNull(_isOwnedPremiumPurchase);
 
-      if (hasActivePurchase) {
-        await grantPremiumAccess(productId: subscriptionProductId);
+      if (activePurchase != null) {
+        await grantPremiumAccess(
+          productId: subscriptionProductId,
+          planKey: activePurchase.billingClientPurchase.obfuscatedAccountId,
+        );
         return;
       }
 
@@ -52,16 +60,20 @@ class PremiumAccessService extends GetxService {
     }
   }
 
-  Future<void> grantPremiumAccess({String? productId}) async {
+  Future<void> grantPremiumAccess({String? productId, String? planKey}) async {
     await _sharedPreferenceHelper.savePremiumAccess(true);
     await _sharedPreferenceHelper.savePremiumProductId(
       productId ?? subscriptionProductId,
     );
+    await _sharedPreferenceHelper.savePremiumPlanKey(planKey);
+    _hasPremiumAccess.value = true;
   }
 
   Future<void> revokePremiumAccess() async {
     await _sharedPreferenceHelper.savePremiumAccess(false);
     await _sharedPreferenceHelper.savePremiumProductId(null);
+    await _sharedPreferenceHelper.savePremiumPlanKey(null);
+    _hasPremiumAccess.value = false;
   }
 
   bool _isOwnedPremiumPurchase(final GooglePlayPurchaseDetails purchase) {

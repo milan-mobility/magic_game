@@ -45,12 +45,26 @@ class VipController extends GetxController {
     return plans.first;
   }
 
+  VipPlanData? get activePlan {
+    if (!hasPremiumAccess || plans.isEmpty) {
+      return null;
+    }
+
+    return _planForStoredKey(_premiumAccessService.premiumPlanKey) ??
+        _planForStoredKey(sharedPreferenceHelper.selectedVipPlanKey) ??
+        _planById(selectedPlanId);
+  }
+
   bool get canStartPurchase {
     return !hasPremiumAccess &&
         !isPurchasePending &&
         !isLoadingPlans &&
         selectedPlan != null &&
         isStoreAvailable;
+  }
+
+  bool get canSelectPlans {
+    return !hasPremiumAccess && !isPurchasePending && !isLoadingPlans;
   }
 
   String get purchaseButtonLabel {
@@ -153,10 +167,21 @@ class VipController extends GetxController {
         return;
       }
 
-      final bool hasSelectedPlan = plans.any(
+      final VipPlanData? premiumPlan = _planForStoredKey(
+        _premiumAccessService.premiumPlanKey,
+      );
+      final VipPlanData? savedSelectedPlan = _planForStoredKey(
+        sharedPreferenceHelper.selectedVipPlanKey,
+      );
+      final VipPlanData? currentSelectedPlan = plans.firstWhereOrNull(
         (final VipPlanData plan) => plan.planId == selectedPlanId,
       );
-      selectedPlanId = hasSelectedPlan ? selectedPlanId : plans.first.planId;
+
+      selectedPlanId =
+          premiumPlan?.planId ??
+          savedSelectedPlan?.planId ??
+          currentSelectedPlan?.planId ??
+          plans.first.planId;
     } catch (error) {
       plans = <VipPlanData>[];
       storeMessage = 'Failed to load subscription plans.'.tr;
@@ -185,7 +210,16 @@ class VipController extends GetxController {
   }
 
   void selectPlan(final String planId) {
+    if (!canSelectPlans || selectedPlanId == planId) {
+      return;
+    }
+
     selectedPlanId = planId;
+    unawaited(
+      sharedPreferenceHelper.saveSelectedVipPlanKey(
+        _selectionKeyForPlan(_planById(planId)),
+      ),
+    );
     update();
   }
 
@@ -217,17 +251,23 @@ class VipController extends GetxController {
   }
 
   PurchaseParam _buildPurchaseParam(final VipPlanData plan) {
+    final String? planKey = _selectionKeyForPlan(plan);
+
     if (GetPlatform.isAndroid &&
         plan.productDetails is GooglePlayProductDetails) {
       final GooglePlayProductDetails details =
           plan.productDetails as GooglePlayProductDetails;
       return GooglePlayPurchaseParam(
         productDetails: details,
+        applicationUserName: planKey,
         offerToken: details.offerToken,
       );
     }
 
-    return PurchaseParam(productDetails: plan.productDetails);
+    return PurchaseParam(
+      productDetails: plan.productDetails,
+      applicationUserName: planKey,
+    );
   }
 
   Future<void> _handlePurchaseUpdates(
@@ -247,7 +287,7 @@ class VipController extends GetxController {
           break;
         case PurchaseStatus.purchased:
         case PurchaseStatus.restored:
-          await _grantPremiumAccess(purchaseDetails.productID);
+          await _grantPremiumAccess(purchaseDetails);
           isPurchasePending = false;
           isRestoring = false;
           showSuccessSnackBar(
@@ -283,9 +323,53 @@ class VipController extends GetxController {
     update();
   }
 
-  Future<void> _grantPremiumAccess(final String productId) async {
-    await _premiumAccessService.grantPremiumAccess(productId: productId);
+  Future<void> _grantPremiumAccess(
+    final PurchaseDetails purchaseDetails,
+  ) async {
+    final String? purchasedPlanKey =
+        purchaseDetails is GooglePlayPurchaseDetails
+        ? purchaseDetails.billingClientPurchase.obfuscatedAccountId
+        : _selectionKeyForPlan(selectedPlan);
+
+    await _premiumAccessService.grantPremiumAccess(
+      productId: purchaseDetails.productID,
+      planKey: purchasedPlanKey,
+    );
     hasPremiumAccess = _premiumAccessService.hasPremiumAccess;
+
+    final VipPlanData? purchasedPlan = _planForStoredKey(purchasedPlanKey);
+    if (purchasedPlan != null) {
+      selectedPlanId = purchasedPlan.planId;
+      await sharedPreferenceHelper.saveSelectedVipPlanKey(purchasedPlanKey);
+    }
+  }
+
+  VipPlanData? _planById(final String? planId) {
+    if (planId == null) {
+      return null;
+    }
+
+    return plans.firstWhereOrNull(
+      (final VipPlanData plan) => plan.planId == planId,
+    );
+  }
+
+  VipPlanData? _planForStoredKey(final String? planKey) {
+    if (planKey == null || planKey.isEmpty) {
+      return null;
+    }
+
+    return plans.firstWhereOrNull(
+      (final VipPlanData plan) => _selectionKeyForPlan(plan) == planKey,
+    );
+  }
+
+  String? _selectionKeyForPlan(final VipPlanData? plan) {
+    if (plan == null) {
+      return null;
+    }
+
+    return plan.storePlanKey ?? plan.planId;
   }
 
   List<VipPlanData> _buildPlans(final List<ProductDetails> productDetailsList) {

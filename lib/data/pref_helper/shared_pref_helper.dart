@@ -59,6 +59,35 @@ class SharedPreferenceHelper {
     return _sharedPreference.getString(PrefKeys.premiumProductId);
   }
 
+  Future<void> savePremiumPlanKey(final String? value) async {
+    if (value == null || value.trim().isEmpty) {
+      await _sharedPreference.remove(PrefKeys.premiumPlanKey);
+      return;
+    }
+
+    await _sharedPreference.setString(PrefKeys.premiumPlanKey, value.trim());
+  }
+
+  String? get premiumPlanKey {
+    return _sharedPreference.getString(PrefKeys.premiumPlanKey);
+  }
+
+  Future<void> saveSelectedVipPlanKey(final String? value) async {
+    if (value == null || value.trim().isEmpty) {
+      await _sharedPreference.remove(PrefKeys.selectedVipPlanKey);
+      return;
+    }
+
+    await _sharedPreference.setString(
+      PrefKeys.selectedVipPlanKey,
+      value.trim(),
+    );
+  }
+
+  String? get selectedVipPlanKey {
+    return _sharedPreference.getString(PrefKeys.selectedVipPlanKey);
+  }
+
   Future<void> saveSelectedLanguageCode(final String value) async {
     await _sharedPreference.setString(PrefKeys.selectedLanguageCode, value);
   }

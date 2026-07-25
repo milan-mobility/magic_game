@@ -16,12 +16,14 @@ class GameIconWithBanner extends StatelessWidget {
   const GameIconWithBanner({
     super.key,
     required this.game,
+    required this.requiresSubscription,
     this.onTap,
     this.onSecondaryTap,
   });
 
   final Games game;
-  final VoidCallback? onTap;
+  final bool requiresSubscription;
+  final Function(bool)? onTap;
   final VoidCallback? onSecondaryTap;
 
   @override
@@ -29,99 +31,108 @@ class GameIconWithBanner extends StatelessWidget {
     final double cardWidth = AppResponsive.value(155, tablet: 300);
     final double cardHeight = AppResponsive.value(165, tablet: 340);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        width: cardWidth,
-        height: cardHeight,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(5),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              _buildBackground(cardWidth, cardHeight),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: cardHeight * 1.0,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      stops: const <double>[0.0, 0.5, 1.0],
-                      colors: [
-                        AppColors.color5543AE.withValues(alpha: 0),
-                        AppColors.color5543AE.withValues(alpha: 0.38),
-                        AppColors.color0D0630.withValues(alpha: 1.0),
-                      ],
-                    ),
+    return SizedBox(
+      width: cardWidth,
+      height: cardHeight,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(5),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            _buildBackground(cardWidth, cardHeight),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: cardHeight * 1.0,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: const <double>[0.0, 0.5, 1.0],
+                    colors: [
+                      AppColors.color5543AE.withValues(alpha: 0),
+                      AppColors.color5543AE.withValues(alpha: 0.38),
+                      AppColors.color0D0630.withValues(alpha: 1.0),
+                    ],
                   ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.all(AppResponsive.space(8)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Spacer(),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        _GameMiniThumb(iconUrl: game.icon),
-                        Gap(AppResponsive.space(10)),
-                        Expanded(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                game.name ?? '',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: poppinsW600.copyWith(
-                                  fontSize: AppResponsive.font(10),
-                                  color: AppColors.white,
-                                ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(AppResponsive.space(8)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Spacer(),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      _GameMiniThumb(iconUrl: game.icon),
+                      Gap(AppResponsive.space(10)),
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              game.name ?? '',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: poppinsW600.copyWith(
+                                fontSize: AppResponsive.font(10),
+                                color: AppColors.white,
                               ),
-                              Text(
-                                game.categoryName ?? '',
-                                style: poppinsW500.copyWith(
-                                  fontSize: AppResponsive.font(9),
-                                  color: AppColors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Gap(AppResponsive.space(12)),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CommonButton(
-                            height: AppResponsive.space(25),
-                            btnText: 'Play Now'.tr,
-                            onPressed: onTap,
-                            icon: Assets.svg.icPlay,
-                            borderRadius: 5,
-                            style: poppinsW500.copyWith(
-                              fontSize: AppResponsive.font(8),
-                              color: AppColors.white,
                             ),
+                            Text(
+                              game.categoryName ?? '',
+                              style: poppinsW500.copyWith(
+                                fontSize: AppResponsive.font(9),
+                                color: AppColors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Gap(AppResponsive.space(12)),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CommonButton(
+                          height: AppResponsive.space(25),
+                          onPressed: () {
+                            onTap?.call(requiresSubscription);
+                          },
+                          borderRadius: 5,
+                          btnText: requiresSubscription
+                              ? 'Subscribe'.tr
+                              : 'Play Now'.tr,
+                          icon: requiresSubscription
+                              ? Assets.svg.icSubscribe
+                              : Assets.svg.icPlay,
+                          btnTxtColor: requiresSubscription
+                              ? AppColors.color00002F
+                              : AppColors.white,
+                          btnBgColor: requiresSubscription
+                              ? AppColors.colorF8AB0F
+                              : AppColors.color5820CB,
+                          style: poppinsW500.copyWith(
+                            fontSize: AppResponsive.font(8),
+                            color: AppColors.white,
                           ),
                         ),
-                        // Gap(AppResponsive.space(10)),
-                        // _SecondaryActionButton(onTap: onSecondaryTap ?? onTap),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                      // Gap(AppResponsive.space(10)),
+                      // _SecondaryActionButton(onTap: onSecondaryTap ?? onTap),
+                    ],
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

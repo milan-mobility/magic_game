@@ -21,7 +21,7 @@ class ProfileScreen extends StatelessWidget {
         builder: (final ProfileController controller) {
           return Scaffold(
             backgroundColor: AppColors.screenGgColor,
-            bottomNavigationBar: BottomNavigation(selectedIndex: 1),
+            bottomNavigationBar: BottomNavigation(selectedIndex: 3),
             body: SafeArea(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(

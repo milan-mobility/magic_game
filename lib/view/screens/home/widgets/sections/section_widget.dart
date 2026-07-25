@@ -17,6 +17,7 @@ class SectionWidget extends StatelessWidget {
     required this.layoutType,
     required this.games,
     required this.collections,
+    required this.requiresSubscriptionForGame,
     this.subtitle,
     this.onGameTap,
     this.onGameStoreTap,
@@ -27,7 +28,8 @@ class SectionWidget extends StatelessWidget {
   final HomeSectionLayoutType layoutType;
   final List<Games> games;
   final List<HomeCollectionCardData> collections;
-  final void Function(Games game)? onGameTap;
+  final bool Function(Games game) requiresSubscriptionForGame;
+  final void Function(Games game, bool)? onGameTap;
   final void Function(Games game)? onGameStoreTap;
 
   @override
@@ -108,24 +110,36 @@ class SectionWidget extends StatelessWidget {
       case HomeSectionLayoutType.banner:
         return GameBannerItem(
           game: games[index],
-          onTap: () => onGameTap?.call(games[index]),
+          requiresSubscription: requiresSubscriptionForGame(games[index]),
+          onTap: (final bool isSubscribe) {
+            onGameTap?.call(games[index], isSubscribe);
+          },
         );
       case HomeSectionLayoutType.iconWithIcon:
         return GameIconWithIcon(
           game: games[index],
-          onTap: () => onGameTap?.call(games[index]),
+          requiresSubscription: requiresSubscriptionForGame(games[index]),
+          onTap: (final bool isSubscribe) {
+            onGameTap?.call(games[index], isSubscribe);
+          },
         );
       case HomeSectionLayoutType.iconWithBanner:
         return GameIconWithBanner(
           game: games[index],
-          onTap: () => onGameTap?.call(games[index]),
+          requiresSubscription: requiresSubscriptionForGame(games[index]),
+          onTap: (final bool isSubscribe) {
+            onGameTap?.call(games[index], isSubscribe);
+          },
           onSecondaryTap: () => onGameStoreTap?.call(games[index]),
         );
       case HomeSectionLayoutType.icon:
         return GameIconItem(
           game: games[index],
           rank: index + 1,
-          onTap: () => onGameTap?.call(games[index]),
+          requiresSubscription: requiresSubscriptionForGame(games[index]),
+          onTap: (final bool isSubscribe) {
+            onGameTap?.call(games[index], isSubscribe);
+          },
         );
       case HomeSectionLayoutType.collection:
         final HomeCollectionCardData collection = collections[index];

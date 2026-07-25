@@ -144,4 +144,7 @@ final Map<String, String> enUs = <String, String>{
   'Restoring purchases...': 'Restoring purchases...',
   'Restore Purchases': 'Restore Purchases',
   'count_day_free_trial': '@count day Free Trial',
+
+  //New
+  'Subscribe': 'Subscribe',
 };

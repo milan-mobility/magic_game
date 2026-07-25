@@ -6,10 +6,18 @@ class GameCardWidget extends StatelessWidget {
   const GameCardWidget({super.key, required this.game, this.onTap});
 
   final Games game;
-  final VoidCallback? onTap;
+  final Function(bool)? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return GameIconWithIcon(game: game, onTap: onTap);
+    return GameIconWithIcon(
+      game: game,
+      requiresSubscription: game.subscription ?? false,
+      onTap: (final bool isSubscribe) {
+        if (isSubscribe) {
+          onTap?.call(isSubscribe);
+        }
+      },
+    );
   }
 }

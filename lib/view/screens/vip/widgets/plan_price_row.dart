@@ -15,6 +15,7 @@ class PlanPriceRow extends StatelessWidget {
     this.trialLabel,
     this.description,
     this.isSelected = false,
+    this.isActive = false,
     this.onTap,
     required this.planDuration,
     required this.price,
@@ -31,6 +32,7 @@ class PlanPriceRow extends StatelessWidget {
   final String? trialLabel;
   final String? description;
   final bool isSelected;
+  final bool isActive;
   final VoidCallback? onTap;
 
   @override
@@ -51,25 +53,27 @@ class PlanPriceRow extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (badgeName != null)
+            if (badgeName != null || isActive)
               Container(
                 padding: EdgeInsets.symmetric(
                   vertical: AppResponsive.space(2),
                   horizontal: AppResponsive.space(5),
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.colorFF4D7E,
+                  color: isActive
+                      ? AppColors.colorF5BD48
+                      : AppColors.colorFF4D7E,
                   borderRadius: BorderRadius.circular(AppResponsive.space(5)),
                 ),
                 child: Text(
-                  (badgeName ?? '').tr,
+                  (isActive ? 'Active' : (badgeName ?? '')).tr,
                   style: poppinsW300.copyWith(
                     fontSize: AppResponsive.font(12),
-                    color: AppColors.white,
+                    color: isActive ? AppColors.black : AppColors.white,
                   ),
                 ),
               ),
-            if (badgeName != null) Gap(AppResponsive.space(5)),
+            if (badgeName != null || isActive) Gap(AppResponsive.space(5)),
             Row(
               children: [
                 Expanded(
@@ -145,19 +149,28 @@ class PlanPriceRow extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SvgPicture.asset(
-                  Assets.svg.icTickRight,
-                  height: AppResponsive.space(20),
-                  width: AppResponsive.space(20),
-                ),
-                Gap(AppResponsive.space(5)),
                 Expanded(
-                  child: Text(
-                    billedLabel.tr,
-                    style: poppinsW500.copyWith(
-                      fontSize: AppResponsive.font(14),
-                      color: AppColors.white,
-                    ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (isSelected) ...[
+                        SvgPicture.asset(
+                          Assets.svg.icTickRight,
+                          height: AppResponsive.space(20),
+                          width: AppResponsive.space(20),
+                        ),
+                        Gap(AppResponsive.space(5)),
+                      ],
+                      Expanded(
+                        child: Text(
+                          billedLabel.tr,
+                          style: poppinsW500.copyWith(
+                            fontSize: AppResponsive.font(14),
+                            color: AppColors.white,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

@@ -14,6 +14,8 @@ class RemoteConfigService {
   static const String adIntervalKey = 'adinterval';
   static const String appVersionKey = 'appversion';
   static const String languageKey = 'language';
+  static const String moreGamesUrlAndroidKey = 'moregames';
+  static const String moreGamesUrliOSKey = 'moregamesios';
 
   final FirebaseRemoteConfig _remoteConfig;
 
@@ -32,6 +34,8 @@ class RemoteConfigService {
         configPathKey: Endpoints.defaultConfigPath,
         adIntervalKey: 60,
         appVersionKey: 1,
+        moreGamesUrlAndroidKey: Endpoints.moreGameAndroid,
+        moreGamesUrliOSKey: Endpoints.moreGameIOS,
         languageKey:
             '{"en":"language/en.json","pt":"language/pt.json","de":"language/de.json","es":"language/es.json","fr":"language/fr.json","it":"language/it.json","ja":"language/ja.json","ko":"language/ko.json","nl":"language/nl.json","ru":"language/ru.json","zh-TW":"language/zh-TW.json","zh-CN":"language/zh-CN.json","th":"language/th.json","ar":"language/ar.json","tr":"language/tr.json","id":"language/id.json","bn":"language/bn.json","ur":"language/ur.json","hi":"language/hi.json"}',
       });
@@ -52,11 +56,18 @@ class RemoteConfigService {
   }
 
   String get baseUrl => _normalizeBaseUrl(
-    getString(baseUrlKey, fallback: Endpoints.defaultBaseUrl),
+    _platformAwareBaseUrl(
+      getString(baseUrlKey, fallback: Endpoints.defaultBaseUrl),
+    ),
   );
 
   String get secondaryBaseUrl => _normalizeBaseUrl(
-    getString(secondaryBaseUrlKey, fallback: Endpoints.defaultSecondaryBaseUrl),
+    _platformAwareBaseUrl(
+      getString(
+        secondaryBaseUrlKey,
+        fallback: Endpoints.defaultSecondaryBaseUrl,
+      ),
+    ),
   );
 
   String get configPath => _normalizeRelativePath(
@@ -66,6 +77,12 @@ class RemoteConfigService {
   int get adInterval => getInt(adIntervalKey, fallback: 60);
 
   int get appVersion => getInt(appVersionKey, fallback: 1);
+
+  String get moreGameAndroid =>
+      getString(moreGamesUrlAndroidKey, fallback: Endpoints.moreGameAndroid);
+
+  String get moreGameIOS =>
+      getString(moreGamesUrliOSKey, fallback: Endpoints.moreGameIOS);
 
   Map<String, String> get languageMap => getJsonMap(
     languageKey,
@@ -155,6 +172,33 @@ class RemoteConfigService {
       return value;
     }
     return '$value/';
+  }
+
+  String _platformAwareBaseUrl(final String value) {
+    final String normalizedValue = _normalizeBaseUrl(value.trim());
+    if (defaultTargetPlatform != TargetPlatform.iOS) {
+      return normalizedValue;
+    }
+
+    if (normalizedValue.contains('/ios/')) {
+      return normalizedValue;
+    }
+
+    final Uri? uri = Uri.tryParse(normalizedValue);
+    if (uri == null || !uri.hasAuthority) {
+      return normalizedValue;
+    }
+
+    final List<String> pathSegments = uri.pathSegments.where((segment) {
+      return segment.isNotEmpty;
+    }).toList();
+
+    if (pathSegments.isEmpty) {
+      return normalizedValue;
+    }
+
+    pathSegments.insert(1, 'ios');
+    return uri.replace(pathSegments: pathSegments).toString();
   }
 
   String _normalizeRelativePath(String value) {

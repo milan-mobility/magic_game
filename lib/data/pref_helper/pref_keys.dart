@@ -5,6 +5,8 @@ class PrefKeys {
   static const String badgeCount = 'badgeCount';
   static const String hasPremiumAccess = 'hasPremiumAccess';
   static const String premiumProductId = 'premiumProductId';
+  static const String premiumPlanKey = 'premiumPlanKey';
+  static const String selectedVipPlanKey = 'selectedVipPlanKey';
   static const String selectedLanguageCode = 'selectedLanguageCode';
   static const String profileName = 'profileName';
   static const String profileAvatarAssetPath = 'profileAvatarAssetPath';

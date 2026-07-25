@@ -26,7 +26,7 @@ class VipScreen extends StatelessWidget {
         builder: (final VipController controller) {
           return Scaffold(
             backgroundColor: AppColors.screenGgColor,
-            bottomNavigationBar: BottomNavigation(selectedIndex: 2),
+            bottomNavigationBar: BottomNavigation(selectedIndex: 1),
             body: SafeArea(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,6 +191,7 @@ class VipScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                  Gap(30),
                   if (!controller.hasPremiumAccess) ...[
                     CommonButton(
                       onPressed: controller.canStartPurchase
@@ -221,20 +222,6 @@ class VipScreen extends StatelessWidget {
                           ),
                         ),
                       ],
-                    ),
-                    TextButton(
-                      onPressed: controller.isRestoring
-                          ? null
-                          : controller.restorePurchases,
-                      child: Text(
-                        controller.isRestoring
-                            ? 'Restoring purchases...'.tr
-                            : 'Restore Purchases'.tr,
-                        style: poppinsW500.copyWith(
-                          fontSize: AppResponsive.font(14),
-                          color: AppColors.colorF5BD48,
-                        ),
-                      ),
                     ),
                   ],
                 ],

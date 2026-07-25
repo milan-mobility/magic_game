@@ -13,127 +13,142 @@ import 'package:magic_games/view/screens/home/widgets/home_image_placeholder_wid
 
 //ICONWITHICON
 class GameIconWithIcon extends StatelessWidget {
-  const GameIconWithIcon({super.key, required this.game, this.onTap});
+  const GameIconWithIcon({
+    super.key,
+    required this.game,
+    required this.requiresSubscription,
+    this.onTap,
+  });
 
   final Games game;
-  final VoidCallback? onTap;
+  final bool requiresSubscription;
+  final Function(bool)? onTap;
 
   @override
   Widget build(BuildContext context) {
     final double cardWidth = AppResponsive.value(120, tablet: 214);
     final double cardHeight = AppResponsive.value(150, tablet: 290);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: cardWidth,
-        height: cardHeight,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: AppColors.color1C153F, width: 1.0),
-        ),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            _buildBackground(cardWidth, cardHeight),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              height: cardHeight * 1.2,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    stops: const <double>[0.0, 0.5, 1.0],
-                    colors: [
-                      AppColors.color5543AE.withValues(alpha: 0),
-                      AppColors.color5543AE.withValues(alpha: 0.38),
-                      AppColors.color0D0630.withValues(alpha: 1.0),
-                    ],
-                  ),
+    return Container(
+      width: cardWidth,
+      height: cardHeight,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(color: AppColors.color1C153F, width: 1.0),
+      ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          _buildBackground(cardWidth, cardHeight),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: cardHeight * 1.2,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: const <double>[0.0, 0.5, 1.0],
+                  colors: [
+                    AppColors.color5543AE.withValues(alpha: 0),
+                    AppColors.color5543AE.withValues(alpha: 0.38),
+                    AppColors.color0D0630.withValues(alpha: 1.0),
+                  ],
                 ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(AppResponsive.space(8)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (_hasText(game.badge))
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppResponsive.space(8),
-                          vertical: AppResponsive.space(4),
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.colorFF4D7E,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          game.badge!.trim(),
-                          style: poppinsW700.copyWith(
-                            fontSize: AppResponsive.font(10),
-                            color: AppColors.white,
-                          ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(AppResponsive.space(8)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (_hasText(game.badge))
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppResponsive.space(8),
+                        vertical: AppResponsive.space(4),
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.colorFF4D7E,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        game.badge!.trim(),
+                        style: poppinsW700.copyWith(
+                          fontSize: AppResponsive.font(10),
+                          color: AppColors.white,
                         ),
                       ),
                     ),
-                  const Spacer(),
-                  Row(
-                    children: [
-                      _GameThumb(iconUrl: game.icon),
-                      SizedBox(width: AppResponsive.space(10)),
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                  ),
+                const Spacer(),
+                Row(
+                  children: [
+                    _GameThumb(iconUrl: game.icon),
+                    SizedBox(width: AppResponsive.space(10)),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            game.name ?? '',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: poppinsW600.copyWith(
+                              fontSize: AppResponsive.font(10),
+                              color: AppColors.white,
+                            ),
+                          ),
+                          if (_hasText(game.categoryName))
                             Text(
-                              game.name ?? '',
+                              game.categoryName!.trim(),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: poppinsW600.copyWith(
-                                fontSize: AppResponsive.font(10),
+                              style: poppinsW500.copyWith(
+                                fontSize: AppResponsive.font(9),
                                 color: AppColors.white,
                               ),
                             ),
-                            if (_hasText(game.categoryName))
-                              Text(
-                                game.categoryName!.trim(),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: poppinsW500.copyWith(
-                                  fontSize: AppResponsive.font(9),
-                                  color: AppColors.white,
-                                ),
-                              ),
-                          ],
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                  Gap(AppResponsive.space(5)),
-                  CommonButton(
-                    height: AppResponsive.space(25),
-                    btnText: 'Play Now'.tr,
-                    onPressed: onTap,
-                    icon: Assets.svg.icPlay,
-                    borderRadius: 5,
-                    style: poppinsW500.copyWith(
-                      fontSize: AppResponsive.font(8),
-                      color: AppColors.white,
                     ),
+                  ],
+                ),
+                Gap(AppResponsive.space(5)),
+                CommonButton(
+                  height: AppResponsive.space(25),
+                  onPressed: () {
+                    onTap?.call(requiresSubscription);
+                  },
+                  borderRadius: 5,
+                  btnText: requiresSubscription
+                      ? 'Subscribe'.tr
+                      : 'Play Now'.tr,
+                  icon: requiresSubscription
+                      ? Assets.svg.icSubscribe
+                      : Assets.svg.icPlay,
+                  btnTxtColor: requiresSubscription
+                      ? AppColors.color00002F
+                      : AppColors.white,
+                  btnBgColor: requiresSubscription
+                      ? AppColors.colorF8AB0F
+                      : AppColors.color5820CB,
+                  style: poppinsW500.copyWith(
+                    fontSize: AppResponsive.font(8),
+                    color: AppColors.white,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
@@ -32,6 +33,7 @@ class HomeScreen extends GetView<HomeController> {
             final categories = controller.homeCategories;
             final featuredBanners = controller.featuredBanners;
             final sections = controller.homeSections;
+            final bool hasPremiumAccess = controller.hasPremiumAccess.value;
 
             return Column(
               children: [
@@ -96,11 +98,18 @@ class HomeScreen extends GetView<HomeController> {
                             layoutType: homeSection.layoutType,
                             games: homeSection.games,
                             collections: homeSection.collections,
-                            onGameTap: (game) {
-                              Get.toNamed(
-                                RouteHelper.gameDetail,
-                                arguments: <String, dynamic>{'game': game},
-                              );
+                            requiresSubscriptionForGame: (final Games game) =>
+                                (game.subscription ?? false) &&
+                                !hasPremiumAccess,
+                            onGameTap: (Games game, bool isSubscribe) {
+                              if (isSubscribe) {
+                                Get.offAllNamed(RouteHelper.vip);
+                              } else {
+                                Get.toNamed(
+                                  RouteHelper.gameDetail,
+                                  arguments: <String, dynamic>{'game': game},
+                                );
+                              }
                             },
                             onGameStoreTap: controller.openStoreForGame,
                           ),
