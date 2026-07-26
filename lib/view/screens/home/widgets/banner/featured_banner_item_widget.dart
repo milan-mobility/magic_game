@@ -17,18 +17,20 @@ class FeaturedBannerItemWidget extends StatelessWidget {
   const FeaturedBannerItemWidget({
     super.key,
     required this.bannerData,
+    required this.requiresSubscription,
     required this.onTap,
   });
 
   final HomeFeaturedBannerData bannerData;
-  final VoidCallback onTap;
+  final bool requiresSubscription;
+  final ValueChanged<bool> onTap;
 
   @override
   Widget build(BuildContext context) {
     final banner = bannerData.banner;
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: () => onTap(requiresSubscription),
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.color1C153F,
@@ -58,7 +60,7 @@ class FeaturedBannerItemWidget extends StatelessWidget {
                         ),
                       ),
                     ),
-                errorWidget: (_, __, ___) => _bannerFallback(),
+                errorWidget: (_, _, _) => _bannerFallback(),
               )
             else
               _bannerFallback(),
@@ -114,7 +116,7 @@ class FeaturedBannerItemWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          banner.name ?? '',
+                          _displayTitle,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: poppinsW600.copyWith(
@@ -147,10 +149,26 @@ class FeaturedBannerItemWidget extends StatelessWidget {
                         CommonButton(
                           height: AppResponsive.space(30),
                           width: AppResponsive.space(120),
-                          btnText: 'Play Now'.tr,
-                          onPressed: onTap,
+                          btnText: requiresSubscription
+                              ? 'Subscribe'.tr
+                              : 'Play Now'.tr,
+                          onPressed: () => onTap(requiresSubscription),
                           fontSize: 12,
-                          icon: Assets.svg.icPlay,
+                          icon: requiresSubscription
+                              ? Assets.svg.icSubscribe
+                              : Assets.svg.icPlay,
+                          btnTxtColor: requiresSubscription
+                              ? AppColors.color00002F
+                              : AppColors.white,
+                          btnBgColor: requiresSubscription
+                              ? AppColors.colorF8AB0F
+                              : AppColors.color5820CB,
+                          style: poppinsW500.copyWith(
+                            fontSize: AppResponsive.font(12),
+                            color: requiresSubscription
+                                ? AppColors.color00002F
+                                : AppColors.white,
+                          ),
                         ),
                       ],
                     ),
@@ -198,6 +216,20 @@ class FeaturedBannerItemWidget extends StatelessWidget {
   Widget _bannerFallback() {
     return const HomeImagePlaceholderWidget(iconSize: 42, borderRadius: 30);
   }
+
+  String get _displayTitle {
+    final String? gameShortname = bannerData.game.shortname?.trim();
+    if (gameShortname != null && gameShortname.isNotEmpty) {
+      return gameShortname;
+    }
+
+    final String? bannerShortname = bannerData.banner.shortname?.trim();
+    if (bannerShortname != null && bannerShortname.isNotEmpty) {
+      return bannerShortname;
+    }
+
+    return bannerData.banner.name ?? '';
+  }
 }
 
 class _BannerGameThumb extends StatelessWidget {
@@ -234,7 +266,7 @@ class _BannerGameThumb extends StatelessWidget {
                     ),
                   ),
               fit: BoxFit.cover,
-              errorWidget: (_, __, ___) => HomeImagePlaceholderWidget(
+              errorWidget: (_, _, _) => HomeImagePlaceholderWidget(
                 width: AppResponsive.space(25),
                 height: AppResponsive.space(25),
                 borderRadius: 3,

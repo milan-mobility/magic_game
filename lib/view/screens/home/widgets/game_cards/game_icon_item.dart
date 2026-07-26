@@ -75,7 +75,7 @@ class GameIconItem extends StatelessWidget {
             ),
             Gap(AppResponsive.value(8, tablet: 10)),
             Text(
-              game.name ?? '',
+              _displayTitle,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: poppinsW600.copyWith(
@@ -127,5 +127,14 @@ class GameIconItem extends StatelessWidget {
     }
 
     return value.imageUrl();
+  }
+
+  String get _displayTitle {
+    final String? shortname = game.shortname?.trim();
+    if (shortname != null && shortname.isNotEmpty) {
+      return shortname;
+    }
+
+    return game.name ?? '';
   }
 }

@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:magic_games/data/model/game_model.dart';
+import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
@@ -13,14 +15,22 @@ class SearchGameListItemWidget extends StatelessWidget {
     super.key,
     required this.game,
     required this.showInstallAction,
+    required this.showPlayAction,
+    required this.showSubscribeAction,
     required this.onTap,
-    required this.onActionTap,
+    required this.onInstallTap,
+    required this.onPlayTap,
+    required this.onSubscribeTap,
   });
 
   final Games game;
   final bool showInstallAction;
+  final bool showPlayAction;
+  final bool showSubscribeAction;
   final VoidCallback onTap;
-  final VoidCallback onActionTap;
+  final VoidCallback onInstallTap;
+  final VoidCallback onPlayTap;
+  final VoidCallback onSubscribeTap;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +57,7 @@ class SearchGameListItemWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    game.name ?? '',
+                    game.shortname ?? '',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: poppinsW600.copyWith(
@@ -77,9 +87,13 @@ class SearchGameListItemWidget extends StatelessWidget {
               ),
             ),
             Gap(AppResponsive.space(12)),
-            _SearchGameActionButton(
+            _SearchGameActions(
               showInstallAction: showInstallAction,
-              onTap: onActionTap,
+              showPlayAction: showPlayAction,
+              showSubscribeAction: showSubscribeAction,
+              onInstallTap: onInstallTap,
+              onPlayTap: onPlayTap,
+              onSubscribeTap: onSubscribeTap,
             ),
           ],
         ),
@@ -88,10 +102,6 @@ class SearchGameListItemWidget extends StatelessWidget {
   }
 
   String? get _subtitleText {
-    if (_hasText(game.shortname)) {
-      return game.shortname!.trim();
-    }
-
     if (_hasText(game.shortdesc)) {
       return game.shortdesc!.trim();
     }
@@ -163,11 +173,11 @@ class _SearchGameThumb extends StatelessWidget {
 
 class _SearchGameActionButton extends StatelessWidget {
   const _SearchGameActionButton({
-    required this.showInstallAction,
+    required this.icon,
     required this.onTap,
   });
 
-  final bool showInstallAction;
+  final IconData icon;
   final VoidCallback onTap;
 
   @override
@@ -185,12 +195,98 @@ class _SearchGameActionButton extends StatelessWidget {
         ),
         alignment: Alignment.center,
         child: Icon(
-          showInstallAction
-              ? Icons.file_download_outlined
-              : Icons.play_arrow_rounded,
+          icon,
           color: AppColors.white,
           size: AppResponsive.space(24),
         ),
+      ),
+    );
+  }
+}
+
+class _SearchGameActions extends StatelessWidget {
+  const _SearchGameActions({
+    required this.showInstallAction,
+    required this.showPlayAction,
+    required this.showSubscribeAction,
+    required this.onInstallTap,
+    required this.onPlayTap,
+    required this.onSubscribeTap,
+  });
+
+  final bool showInstallAction;
+  final bool showPlayAction;
+  final bool showSubscribeAction;
+  final VoidCallback onInstallTap;
+  final VoidCallback onPlayTap;
+  final VoidCallback onSubscribeTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool hasPrimaryActions = showInstallAction || showPlayAction;
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: AppResponsive.value(100, tablet: 120),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (hasPrimaryActions)
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (showInstallAction)
+                  _SearchGameActionButton(
+                    icon: Icons.file_download_outlined,
+                    onTap: onInstallTap,
+                  ),
+                if (showInstallAction && showPlayAction)
+                  Gap(AppResponsive.space(8)),
+                if (showPlayAction)
+                  _SearchGameActionButton(
+                    icon: Icons.play_arrow_rounded,
+                    onTap: onPlayTap,
+                  ),
+              ],
+            ),
+          if (showSubscribeAction) ...[
+            if (hasPrimaryActions) Gap(AppResponsive.space(8)),
+            InkWell(
+              onTap: onSubscribeTap,
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppResponsive.space(10),
+                  vertical: AppResponsive.space(8),
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.colorF8AB0F,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      Assets.svg.icSubscribe,
+                      width: AppResponsive.space(12),
+                      height: AppResponsive.space(12),
+                    ),
+                    Gap(AppResponsive.space(6)),
+                    Text(
+                      'Subscribe',
+                      style: poppinsW600.copyWith(
+                        fontSize: AppResponsive.font(10),
+                        color: AppColors.color00002F,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

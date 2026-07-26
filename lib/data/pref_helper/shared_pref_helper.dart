@@ -180,9 +180,46 @@ class SharedPreferenceHelper {
     return _sharedPreference.getInt(PrefKeys.favoriteEventCount) ?? 0;
   }
 
+  Future<void> saveRecentlyPlayedGameKeys(final List<String> values) async {
+    await _sharedPreference.setStringList(
+      PrefKeys.recentlyPlayedGameKeys,
+      values,
+    );
+  }
+
+  List<String> get recentlyPlayedGameKeys {
+    return _sharedPreference.getStringList(PrefKeys.recentlyPlayedGameKeys) ??
+        <String>[];
+  }
+
+  int get recentlyPlayedGamesCount => recentlyPlayedGameKeys.length;
+
+  Future<List<String>> addRecentlyPlayedGameKey(
+    final String value, {
+    final int maxEntries = 12,
+  }) async {
+    final String trimmedValue = value.trim();
+    if (trimmedValue.isEmpty) {
+      return recentlyPlayedGameKeys;
+    }
+
+    final List<String> updatedValues = recentlyPlayedGameKeys
+        .where((final String key) => key.trim() != trimmedValue)
+        .toList();
+    updatedValues.insert(0, trimmedValue);
+
+    if (updatedValues.length > maxEntries) {
+      updatedValues.removeRange(maxEntries, updatedValues.length);
+    }
+
+    await saveRecentlyPlayedGameKeys(updatedValues);
+    return updatedValues;
+  }
+
   Future<void> clear() async {
     final List<String> arrKeysToKeep = <String>[
       PrefKeys.favoriteEventCount,
+      PrefKeys.recentlyPlayedGameKeys,
       PrefKeys.premiumProductId,
       PrefKeys.premiumPlanKey,
       PrefKeys.selectedVipPlanKey,

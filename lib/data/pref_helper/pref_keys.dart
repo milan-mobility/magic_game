@@ -13,4 +13,5 @@ class PrefKeys {
   static const String googleProfilePhotoUrl = 'googleProfilePhotoUrl';
   static const String googleProfileDisplayName = 'googleProfileDisplayName';
   static const String favoriteEventCount = 'favoriteEventCount';
+  static const String recentlyPlayedGameKeys = 'recentlyPlayedGameKeys';
 }

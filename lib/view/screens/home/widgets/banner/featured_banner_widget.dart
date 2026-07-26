@@ -11,11 +11,13 @@ class FeaturedBannerWidget extends StatefulWidget {
   const FeaturedBannerWidget({
     super.key,
     required this.banners,
+    required this.requiresSubscriptionForGame,
     required this.onBannerTap,
   });
 
   final List<HomeFeaturedBannerData> banners;
-  final void Function(Games game) onBannerTap;
+  final bool Function(Games game) requiresSubscriptionForGame;
+  final void Function(Games game, bool isSubscribe) onBannerTap;
 
   @override
   State<FeaturedBannerWidget> createState() => _FeaturedBannerWidgetState();
@@ -92,7 +94,11 @@ class _FeaturedBannerWidgetState extends State<FeaturedBannerWidget> {
               final HomeFeaturedBannerData bannerData = widget.banners[index];
               return FeaturedBannerItemWidget(
                 bannerData: bannerData,
-                onTap: () => widget.onBannerTap(bannerData.game),
+                requiresSubscription: widget.requiresSubscriptionForGame(
+                  bannerData.game,
+                ),
+                onTap: (final bool isSubscribe) =>
+                    widget.onBannerTap(bannerData.game, isSubscribe),
               );
             },
           ),

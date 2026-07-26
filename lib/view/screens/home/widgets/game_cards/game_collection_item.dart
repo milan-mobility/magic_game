@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
@@ -66,7 +65,7 @@ class GameCollectionItem extends StatelessWidget {
                 children: [
                   if (_hasText(title))
                     Text(
-                      title!.trim(),
+                      title.trim(),
                       style: poppinsW700.copyWith(
                         fontSize: AppResponsive.font(14),
                         color: AppColors.white,
@@ -135,51 +134,5 @@ class GameCollectionItem extends StatelessWidget {
 
   bool _hasText(final String? value) {
     return value != null && value.trim().isNotEmpty;
-  }
-}
-
-class _ExploreButton extends StatelessWidget {
-  const _ExploreButton({required this.text, required this.onTap});
-
-  final String text;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Ink(
-          padding: EdgeInsets.symmetric(
-            horizontal: AppResponsive.space(16),
-            vertical: AppResponsive.space(10),
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.color4B21CA.withOpacity(0.92),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                text.tr,
-                style: poppinsW500.copyWith(
-                  fontSize: AppResponsive.font(14),
-                  color: AppColors.white,
-                ),
-              ),
-              Gap(AppResponsive.space(10)),
-              Icon(
-                Icons.arrow_forward_rounded,
-                color: AppColors.white,
-                size: AppResponsive.space(22),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:magic_games/data/api/api_end_points.dart';
 import 'package:magic_games/data/model/game_model.dart';
+import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 import 'package:magic_games/data/repositories/api_repo.dart';
-import 'package:magic_games/helpers/extensions/string_ext.dart';
 import 'package:magic_games/helpers/services/google_leaderboard_service.dart';
 import 'package:magic_games/helpers/services/premium_access_service.dart';
+import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:magic_games/routes/route_helper.dart';
 import 'package:magic_games/utils/connection.dart';
 import 'package:magic_games/view/base/app_update_dialog.dart';
@@ -30,11 +32,14 @@ class HomeController extends GetxController implements GetxService {
   final Upgrader _upgrader;
   final PremiumAccessService _premiumAccessService =
       Get.find<PremiumAccessService>();
+  final SharedPreferenceHelper _sharedPreferenceHelper =
+      Get.find<SharedPreferenceHelper>();
 
   final Rx<GameModel?> gameModel = Rx<GameModel?>(null);
   final RxBool isLoading = false.obs;
   final RxBool hasPremiumAccess = false.obs;
   final RxString selectedCategoryId = ''.obs;
+  final RxList<Games> recentPlayedGames = <Games>[].obs;
   StreamSubscription<UpgraderEvaluateNeed>? _upgradeSubscription;
   Worker? _premiumAccessWorker;
   bool _isUpgradeDialogVisible = false;
@@ -90,6 +95,7 @@ class HomeController extends GetxController implements GetxService {
       if (_hasText(defaultCategoryId)) {
         selectedCategoryId.value = defaultCategoryId!;
       }
+      _refreshRecentlyPlayedGames();
     } catch (e) {
       debugPrint('EXCEPTION=>${e.toString()}');
     } finally {
@@ -112,7 +118,7 @@ class HomeController extends GetxController implements GetxService {
         HomeCategoryData(
           id: entry.key,
           title: entry.value,
-          iconUrl: _normalizeImageUrl(category.url),
+          iconUrl: _normalizeCategoryImageUrl(category.url),
         ),
       );
     }
@@ -170,6 +176,20 @@ class HomeController extends GetxController implements GetxService {
       );
   }
 
+  Future<void> recordRecentlyPlayedGame(final Games game) async {
+    final String? gameKey = _recentlyPlayedKeyForGame(game);
+    if (!_hasText(gameKey)) {
+      return;
+    }
+
+    await _sharedPreferenceHelper.addRecentlyPlayedGameKey(gameKey!);
+    _refreshRecentlyPlayedGames();
+  }
+
+  void refreshRecentlyPlayedGames() {
+    _refreshRecentlyPlayedGames();
+  }
+
   void selectCategory(final String categoryId) {
     selectedCategoryId.value = categoryId;
   }
@@ -215,6 +235,30 @@ class HomeController extends GetxController implements GetxService {
   Future<void> _syncPremiumAccess() async {
     await _premiumAccessService.refreshPremiumAccess();
     hasPremiumAccess.value = _premiumAccessService.hasPremiumAccess;
+  }
+
+  void _refreshRecentlyPlayedGames() {
+    final GameModel? model = gameModel.value;
+    if (model == null) {
+      recentPlayedGames.clear();
+      return;
+    }
+
+    final Map<String, Games> gamesByKey = <String, Games>{};
+    for (final Games game in _catalogGames(model)) {
+      final String? gameKey = _recentlyPlayedKeyForGame(game);
+      if (!_hasText(gameKey) || gamesByKey.containsKey(gameKey)) {
+        continue;
+      }
+
+      gamesByKey[gameKey!] = game;
+    }
+
+    final List<Games> orderedGames = _sharedPreferenceHelper.recentlyPlayedGameKeys
+        .map((final String key) => gamesByKey[key])
+        .whereType<Games>()
+        .toList();
+    recentPlayedGames.assignAll(orderedGames);
   }
 
   Future<void> _initializeUpgradeCheck() async {
@@ -425,12 +469,22 @@ class HomeController extends GetxController implements GetxService {
     return _normalizeText(fallbackCategoryName);
   }
 
-  String? _normalizeImageUrl(final String? value) {
+  String? _normalizeCategoryImageUrl(final String? value) {
     if (!_hasText(value)) {
       return null;
     }
 
-    return value!.imageUrl();
+    final String baseUrl = Get.isRegistered<RemoteConfigService>()
+        ? Get.find<RemoteConfigService>().getString(
+            RemoteConfigService.baseUrlKey,
+            fallback: Endpoints.defaultBaseUrl,
+          )
+        : Endpoints.defaultBaseUrl;
+    final String normalizedBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl
+        : '$baseUrl/';
+
+    return '$normalizedBaseUrl${value!.trim()}';
   }
 
   String? _platformStoreUrl(final Games game) {
@@ -445,6 +499,40 @@ class HomeController extends GetxController implements GetxService {
     }
 
     return _normalizeText(game.storeurl);
+  }
+
+  List<Games> _catalogGames(final GameModel model) {
+    final List<Games> catalogGames = _gamesById(model).values.toList();
+    final Set<String> seenKeys = catalogGames
+        .map(_recentlyPlayedKeyForGame)
+        .whereType<String>()
+        .toSet();
+
+    for (final HomeFeaturedBannerData bannerData in featuredBanners) {
+      final Games game = bannerData.game;
+      final String? gameKey = _recentlyPlayedKeyForGame(game);
+      if (!_hasText(gameKey) || seenKeys.contains(gameKey)) {
+        continue;
+      }
+
+      seenKeys.add(gameKey!);
+      catalogGames.add(game);
+    }
+
+    return catalogGames;
+  }
+
+  String? _recentlyPlayedKeyForGame(final Games? game) {
+    if (game?.id != null) {
+      return 'game_${game!.id}';
+    }
+
+    final String? gameUrl = _normalizeText(game?.gameurl);
+    if (_hasText(gameUrl)) {
+      return gameUrl;
+    }
+
+    return _normalizeText(game?.name);
   }
 
   HomeSectionData? _buildHomeSection(

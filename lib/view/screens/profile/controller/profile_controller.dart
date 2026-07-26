@@ -53,8 +53,8 @@ class ProfileController extends GetxController {
   }
 
   List<ProfileStatData> get stats => <ProfileStatData>[
-    const ProfileStatData(
-      value: '24', //show total game played.
+    ProfileStatData(
+      value: _sharedPreferenceHelper.recentlyPlayedGamesCount.toString(),
       label: 'Game Played',
       iconAsset: 'assets/svg/ic_total_game.svg',
     ),

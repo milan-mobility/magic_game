@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:magic_games/data/model/game_model.dart';
+import 'package:magic_games/helpers/services/premium_access_service.dart';
 import 'package:magic_games/routes/route_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 
 class SearchGameController extends GetxController {
   SearchGameController();
+
+  final PremiumAccessService _premiumAccessService =
+      Get.find<PremiumAccessService>();
 
   final TextEditingController txtSearch = TextEditingController();
 
@@ -54,13 +58,44 @@ class SearchGameController extends GetxController {
       return;
     }
 
+    await onPlayTap(game);
+  }
+
+  bool shouldShowInstall(final Games game) {
+    if (requiresSubscriptionForGame(game)) {
+      return false;
+    }
+
+    return game.install == true;
+  }
+
+  bool shouldShowPlay(final Games game) {
+    if (requiresSubscriptionForGame(game)) {
+      return false;
+    }
+
+    return game.play == true;
+  }
+
+  bool shouldShowSubscribe(final Games game) =>
+      requiresSubscriptionForGame(game);
+
+  bool requiresSubscriptionForGame(final Games game) {
+    return (game.subscription ?? false) && !_premiumAccessService.hasPremiumAccess;
+  }
+
+  Future<void> onPlayTap(final Games game) async {
+    if (requiresSubscriptionForGame(game)) {
+      onSubscribeTap();
+      return;
+    }
+
     openGame(game);
   }
 
-  bool shouldShowInstall(final Games game) => game.install == true;
-
-  bool shouldShowPlay(final Games game) =>
-      !shouldShowInstall(game) && game.play == true;
+  void onSubscribeTap() {
+    Get.offAllNamed(RouteHelper.vip);
+  }
 
   Future<void> openStoreForGame(final Games game) async {
     final String? storeUrl = _platformStoreUrl(game);

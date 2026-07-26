@@ -9,6 +9,7 @@ import 'package:magic_games/routes/route_helper.dart';
 import 'package:magic_games/view/base/bottom_navigation_bar.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 import 'package:magic_games/view/screens/home/widgets/banner/featured_banner_widget.dart';
+import 'package:magic_games/view/screens/home/widgets/continue_playing_section.dart';
 import 'package:magic_games/view/screens/home/widgets/category/home_category_list_widget.dart';
 import 'package:magic_games/view/screens/home/widgets/home_header.dart';
 import 'package:magic_games/view/screens/home/widgets/sections/section_widget.dart';
@@ -32,6 +33,9 @@ class HomeScreen extends GetView<HomeController> {
 
             final categories = controller.homeCategories;
             final featuredBanners = controller.featuredBanners;
+            final recentPlayedGames = controller.recentPlayedGames.toList(
+              growable: false,
+            );
             final sections = controller.homeSections;
             final bool hasPremiumAccess = controller.hasPremiumAccess.value;
 
@@ -65,16 +69,39 @@ class HomeScreen extends GetView<HomeController> {
                       if (featuredBanners.isNotEmpty) ...[
                         FeaturedBannerWidget(
                           banners: featuredBanners,
-                          onBannerTap: (game) {
-                            Get.toNamed(
-                              RouteHelper.gameDetail,
-                              arguments: <String, dynamic>{'game': game},
-                            );
+                          requiresSubscriptionForGame:
+                              controller.requiresSubscriptionForGame,
+                          onBannerTap: (game, isSubscribe) {
+                            if (isSubscribe) {
+                              Get.offAllNamed(RouteHelper.vip);
+                            } else {
+                              Get.toNamed(
+                                RouteHelper.gameDetail,
+                                arguments: <String, dynamic>{'game': game},
+                              );
+                            }
                           },
                         ),
                         const SizedBox(height: 24),
                       ],
-                      if (sections.isEmpty)
+                      if (recentPlayedGames.isNotEmpty) ...[
+                        ContinuePlayingSection(
+                          games: recentPlayedGames,
+                          requiresSubscriptionForGame:
+                              controller.requiresSubscriptionForGame,
+                          onGameTap: (final Games game, final bool isSubscribe) {
+                            if (isSubscribe) {
+                              Get.offAllNamed(RouteHelper.vip);
+                            } else {
+                              Get.toNamed(
+                                RouteHelper.gameDetail,
+                                arguments: <String, dynamic>{'game': game},
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                      if (sections.isEmpty && recentPlayedGames.isEmpty)
                         Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,

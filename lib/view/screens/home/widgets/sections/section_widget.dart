@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
+import 'package:magic_games/view/screens/home/section_view_all_screen.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 import 'package:magic_games/view/screens/home/widgets/game_cards/game_banner_item.dart';
 import 'package:magic_games/view/screens/home/widgets/game_cards/game_collection_item.dart';
@@ -49,26 +51,48 @@ class SectionWidget extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Column(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  title,
-                  style: poppinsW600.copyWith(
-                    fontSize: AppResponsive.font(20),
-                    color: AppColors.white,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: poppinsW600.copyWith(
+                          fontSize: AppResponsive.font(20),
+                          color: AppColors.white,
+                        ),
+                      ),
+                      if (subtitle != null && subtitle!.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle!,
+                          style: poppinsW300.copyWith(
+                            fontSize: AppResponsive.font(14),
+                            color: AppColors.white,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                if (subtitle != null && subtitle!.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle!,
-                    style: poppinsW300.copyWith(
-                      fontSize: AppResponsive.font(14),
-                      color: AppColors.white,
+                const SizedBox(width: 12),
+                GestureDetector(
+                  onTap: _openViewAll,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      'View All'.tr,
+                      style: poppinsW500.copyWith(
+                        fontSize: AppResponsive.font(14),
+                        color: AppColors.color8752FF,
+                      ),
                     ),
                   ),
-                ],
+                ),
               ],
             ),
           ),
@@ -150,5 +174,17 @@ class SectionWidget extends StatelessWidget {
           leadingLabel: collection.leadingLabel,
         );
     }
+  }
+
+  void _openViewAll() {
+    Get.to(
+      () => SectionViewAllScreen(
+        title: title,
+        subtitle: subtitle,
+        layoutType: layoutType,
+        games: games,
+        collections: collections,
+      ),
+    );
   }
 }

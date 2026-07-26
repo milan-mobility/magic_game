@@ -98,7 +98,7 @@ class GameIconWithIcon extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            game.name ?? '',
+                            _displayTitle,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: poppinsW600.copyWith(
@@ -142,7 +142,9 @@ class GameIconWithIcon extends StatelessWidget {
                       : AppColors.color5820CB,
                   style: poppinsW500.copyWith(
                     fontSize: AppResponsive.font(8),
-                    color: AppColors.white,
+                    color: requiresSubscription
+                        ? AppColors.color00002F
+                        : AppColors.white,
                   ),
                 ),
               ],
@@ -195,6 +197,14 @@ class GameIconWithIcon extends StatelessWidget {
 
   bool _hasText(final String? value) {
     return value != null && value.trim().isNotEmpty;
+  }
+
+  String get _displayTitle {
+    if (_hasText(game.shortname)) {
+      return game.shortname!.trim();
+    }
+
+    return game.name ?? '';
   }
 }
 

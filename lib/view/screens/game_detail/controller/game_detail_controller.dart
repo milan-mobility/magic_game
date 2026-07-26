@@ -9,10 +9,12 @@ import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 import 'package:magic_games/helpers/ads/ads_services.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
+import 'package:magic_games/helpers/extensions/string_ext.dart';
 import 'package:magic_games/helpers/services/google_leaderboard_service.dart';
 import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:magic_games/helpers/styles.dart';
 import 'package:magic_games/utils/utility.dart';
+import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 import 'package:magic_games/view/screens/profile/controller/profile_controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -23,6 +25,7 @@ class GameDetailController extends GetxController {
   late WebViewController webViewController;
   bool _isShowingInterstitial = false;
   bool _isShowingRewarded = false;
+  bool isExitOverlayVisible = false;
   Games? games;
 
   final RemoteConfigService _remoteConfigService = RemoteConfigService();
@@ -31,6 +34,73 @@ class GameDetailController extends GetxController {
       _normalizedAdUnitId(games?.interstitialid);
 
   String? get _currentRewardedAdUnitId => _normalizedAdUnitId(games?.rewardid);
+
+  String get gameTitle {
+    final String? name = games?.name?.trim();
+    if (name != null && name.isNotEmpty) {
+      return name;
+    }
+
+    return 'Game'.tr;
+  }
+
+  String get gameDescription {
+    final String? description = games?.shortdesc?.trim();
+    if (description != null && description.isNotEmpty) {
+      return description;
+    }
+
+    return 'Jump back in and keep playing this game.'.tr;
+  }
+
+  String? get heroImageUrl {
+    final String? icon = games?.icon?.trim();
+    if (icon != null && icon.isNotEmpty) {
+      return icon.imageUrl();
+    }
+
+    final String? banner = games?.banner?.trim();
+    if (banner != null && banner.isNotEmpty) {
+      return banner.imageUrl();
+    }
+
+    return null;
+  }
+
+  String? get backgroundImageUrl {
+    final String? banner = games?.banner?.trim();
+    if (banner != null && banner.isNotEmpty) {
+      return banner.imageUrl();
+    }
+
+    return heroImageUrl;
+  }
+
+  List<String> get gameTags {
+    final String? categoryName = games?.categoryName?.trim();
+    if (categoryName == null || categoryName.isEmpty) {
+      return const <String>[];
+    }
+
+    final String primaryCategory = categoryName
+        .split(',')
+        .map((final String token) => token.trim())
+        .firstWhere(
+          (final String token) => token.isNotEmpty,
+          orElse: () => '',
+        );
+
+    if (primaryCategory.isEmpty) {
+      return const <String>[];
+    }
+
+    return <String>[primaryCategory];
+  }
+
+  bool get canDownloadCurrentGame {
+    final String? storeUrl = games?.storeurl?.trim();
+    return storeUrl != null && storeUrl.isNotEmpty;
+  }
 
   @override
   void onInit() {
@@ -87,6 +157,42 @@ class GameDetailController extends GetxController {
 
     debugPrint("GAME URL=>${games?.gameurl}");
     webViewController.loadRequest(Uri.parse(games?.gameurl ?? ''));
+  }
+
+  Future<void> showExitOverlay() async {
+    if (isExitOverlayVisible) {
+      return;
+    }
+
+    isExitOverlayVisible = true;
+    update();
+    await _applyExitOverlayOrientation();
+    await _sendCallbackToJs('GamePause');
+  }
+
+  Future<void> hideExitOverlay() async {
+    if (!isExitOverlayVisible) {
+      return;
+    }
+
+    isExitOverlayVisible = false;
+    update();
+    await _applyPreferredOrientation();
+    await _sendCallbackToJs('GameResume');
+  }
+
+  Future<bool> handleSystemBack() async {
+    if (isExitOverlayVisible) {
+      Get.back<void>();
+      return false;
+    }
+
+    await showExitOverlay();
+    return false;
+  }
+
+  Future<void> openCurrentGameStore() async {
+    await _openStoreForGame(games);
   }
 
   Future<void> _handleWebMessage(final String message) async {
@@ -198,7 +304,7 @@ class GameDetailController extends GetxController {
         break;
 
       case 'gameStart':
-        //Hide
+        await _recordCurrentGameAsRecentlyPlayed();
         break;
 
       case 'googleLeaderBoard':
@@ -262,6 +368,26 @@ class GameDetailController extends GetxController {
     );
   }
 
+  Future<void> _openStoreForGame(final Games? game) async {
+    final String? storeUrl = game?.storeurl?.trim();
+    if (storeUrl == null || storeUrl.isEmpty) {
+      _showToastMessage('Store URL is not available for this game.'.tr);
+      return;
+    }
+
+    if (GetPlatform.isIOS) {
+      _showToastMessage(
+        'Add the iOS store URL key for this game to enable redirection.'.tr,
+      );
+      return;
+    }
+
+    final String resolvedUrl = storeUrl.startsWith('http')
+        ? storeUrl
+        : 'https://play.google.com/store/apps/details?id=$storeUrl';
+    await Utility.openUrl(resolvedUrl);
+  }
+
   void _showToastMessage(final String message) {
     if (message.isEmpty) {
       return;
@@ -307,6 +433,43 @@ class GameDetailController extends GetxController {
     await FirebaseAnalytics.instance.logEvent(name: name);
   }
 
+  Future<void> _recordCurrentGameAsRecentlyPlayed() async {
+    if (games == null) {
+      return;
+    }
+
+    if (Get.isRegistered<HomeController>()) {
+      await Get.find<HomeController>().recordRecentlyPlayedGame(games!);
+    } else {
+      final String? gameKey = _recentlyPlayedKeyForGame;
+      if (gameKey != null) {
+        await _sharedPreferenceHelper.addRecentlyPlayedGameKey(gameKey);
+      }
+    }
+
+    if (Get.isRegistered<ProfileController>()) {
+      Get.find<ProfileController>().update();
+    }
+  }
+
+  String? get _recentlyPlayedKeyForGame {
+    if (games?.id != null) {
+      return 'game_${games!.id}';
+    }
+
+    final String? gameUrl = games?.gameurl?.trim();
+    if (gameUrl != null && gameUrl.isNotEmpty) {
+      return gameUrl;
+    }
+
+    final String? gameName = games?.name?.trim();
+    if (gameName != null && gameName.isNotEmpty) {
+      return gameName;
+    }
+
+    return null;
+  }
+
   Future<void> _sendCallbackToJs(final String event) async {
     debugPrint('Flutter → JS: $event');
     try {
@@ -342,6 +505,12 @@ class GameDetailController extends GetxController {
   }
 
   Future<void> _resetPreferredOrientation() async {
+    await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+      DeviceOrientation.portraitUp,
+    ]);
+  }
+
+  Future<void> _applyExitOverlayOrientation() async {
     await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
       DeviceOrientation.portraitUp,
     ]);

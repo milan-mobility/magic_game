@@ -95,9 +95,14 @@ class SearchGameScreen extends StatelessWidget {
                                 showInstallAction: controller.shouldShowInstall(
                                   game,
                                 ),
+                                showPlayAction: controller.shouldShowPlay(game),
+                                showSubscribeAction:
+                                    controller.shouldShowSubscribe(game),
                                 onTap: () => controller.openGame(game),
-                                onActionTap: () =>
-                                    controller.onPrimaryActionTap(game),
+                                onInstallTap: () =>
+                                    controller.openStoreForGame(game),
+                                onPlayTap: () => controller.onPlayTap(game),
+                                onSubscribeTap: controller.onSubscribeTap,
                               );
                             },
                           ),
