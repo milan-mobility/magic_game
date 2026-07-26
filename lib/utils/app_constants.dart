@@ -1,5 +1,5 @@
 class AppConstants {
-  static String appName = 'Magic Game Plus';
+  static String appName = 'OneGame+';
 
   static const String interstitialAndroid =
       'ca-app-pub-3940256099942544/1033173712';

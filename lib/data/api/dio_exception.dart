@@ -26,7 +26,7 @@ class DioExceptions implements Exception {
         message = 'Send timeout in connection with API server'.tr;
         break;
       case DioExceptionType.connectionError:
-        message = 'Connection Error';
+        message = 'Connection Error'.tr;
         break;
       case DioExceptionType.unknown:
         if ((dioError.message ?? '').contains('SocketException')) {

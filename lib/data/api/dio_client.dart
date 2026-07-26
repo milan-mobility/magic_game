@@ -3,19 +3,14 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:get/get.dart' as gett;
-import 'package:magic_games/data/api/api_end_points.dart';
 import 'package:magic_games/data/api/dio_interceptor.dart';
+import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 class DioClient extends gett.GetxController implements gett.GetxService {
   // injecting dio instance
-  DioClient(this._dio, {final String? deviceToken}) {
+  DioClient(this._dio, this._remoteConfigService, {final String? deviceToken}) {
     _dio
-      ..options.baseUrl = Endpoints.baseUrl
-      ..options.connectTimeout = const Duration(seconds: 60)
-      ..options.receiveTimeout = const Duration(seconds: 60)
-      ..options.responseType = ResponseType.json
-      ..options.contentType = Headers.jsonContentType
       ..interceptors.add(DioInterceptor())
       ..interceptors.add(
         PrettyDioLogger(
@@ -36,10 +31,21 @@ class DioClient extends gett.GetxController implements gett.GetxService {
               true;
       return client;
     };
+    _applyRuntimeConfig();
   }
 
   // dio instance
   final Dio _dio;
+  final RemoteConfigService _remoteConfigService;
+
+  void _applyRuntimeConfig() {
+    _dio.options
+      ..baseUrl = _remoteConfigService.baseUrl
+      ..connectTimeout = const Duration(seconds: 60)
+      ..receiveTimeout = const Duration(seconds: 60)
+      ..responseType = ResponseType.json
+      ..contentType = Headers.jsonContentType;
+  }
 
   // Get:-----------------------------------------------------------------------
   Future<Response<dynamic>> get(
@@ -50,6 +56,7 @@ class DioClient extends gett.GetxController implements gett.GetxService {
     final CancelToken? cancelToken,
     final ProgressCallback? onReceiveProgress,
   }) async {
+    _applyRuntimeConfig();
     try {
       final Response<dynamic> response = await _dio.get(
         uri,
@@ -75,6 +82,7 @@ class DioClient extends gett.GetxController implements gett.GetxService {
     final ProgressCallback? onSendProgress,
     final ProgressCallback? onReceiveProgress,
   }) async {
+    _applyRuntimeConfig();
     try {
       final Response<dynamic> response = await _dio.post(
         uri,
@@ -101,6 +109,7 @@ class DioClient extends gett.GetxController implements gett.GetxService {
     final ProgressCallback? onSendProgress,
     final ProgressCallback? onReceiveProgress,
   }) async {
+    _applyRuntimeConfig();
     try {
       final Response<dynamic> response = await _dio.patch(
         uri,
@@ -127,6 +136,7 @@ class DioClient extends gett.GetxController implements gett.GetxService {
     final ProgressCallback? onSendProgress,
     final ProgressCallback? onReceiveProgress,
   }) async {
+    _applyRuntimeConfig();
     try {
       final Response<dynamic> response = await _dio.put(
         uri,
@@ -153,6 +163,7 @@ class DioClient extends gett.GetxController implements gett.GetxService {
     final ProgressCallback? onSendProgress,
     final ProgressCallback? onReceiveProgress,
   }) async {
+    _applyRuntimeConfig();
     try {
       final Response<dynamic> response = await _dio.delete(
         uri,
@@ -177,6 +188,7 @@ class DioClient extends gett.GetxController implements gett.GetxService {
     final ProgressCallback? onSendProgress,
     final ProgressCallback? onReceiveProgress,
   }) async {
+    _applyRuntimeConfig();
     try {
       Options? dioOptions = options;
       dioOptions ??= Options();
