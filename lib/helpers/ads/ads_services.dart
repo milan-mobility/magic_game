@@ -12,6 +12,11 @@ class AdService {
   static String? _loadedInterstitialAdUnitId;
   static String? _loadedRewardedAdUnitId;
   static DateTime? _lastInterstitialShownAt;
+  static bool _isInterstitialLoading = false;
+  static bool _isRewardedLoading = false;
+  static bool _pendingInterstitialShow = false;
+  static String? _pendingInterstitialAdUnitId;
+  static VoidCallback? _pendingInterstitialDismissed;
 
   static bool get _shouldSuppressAds {
     if (!Get.isRegistered<PremiumAccessService>()) {
@@ -30,14 +35,15 @@ class AdService {
     final String resolvedAdUnitId = AdHelper.resolveInterstitialAdUnitId(
       adUnitId,
     );
-    if (_interstitialAd != null &&
-        _loadedInterstitialAdUnitId == resolvedAdUnitId) {
+    if (_loadedInterstitialAdUnitId == resolvedAdUnitId &&
+        (_interstitialAd != null || _isInterstitialLoading)) {
       return;
     }
 
     _interstitialAd?.dispose();
     _interstitialAd = null;
     _loadedInterstitialAdUnitId = resolvedAdUnitId;
+    _isInterstitialLoading = true;
 
     final AdRequest request = await ConsentManager.instance.getAdRequest();
     InterstitialAd.load(
@@ -45,13 +51,17 @@ class AdService {
       request: request,
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (final InterstitialAd ad) {
+          _isInterstitialLoading = false;
           _interstitialAd = ad;
           debugPrint('Interstitial ad pre-loaded');
+          _tryShowPendingInterstitial();
         },
         onAdFailedToLoad: (final LoadAdError error) {
+          _isInterstitialLoading = false;
           _interstitialAd = null;
           _loadedInterstitialAdUnitId = null;
           debugPrint('Failed to pre-load interstitial: $error');
+          _clearPendingInterstitial(invokeDismissed: true);
         },
       ),
     );
@@ -64,13 +74,15 @@ class AdService {
     }
 
     final String resolvedAdUnitId = AdHelper.resolveRewardedAdUnitId(adUnitId);
-    if (_rewardedAd != null && _loadedRewardedAdUnitId == resolvedAdUnitId) {
+    if (_loadedRewardedAdUnitId == resolvedAdUnitId &&
+        (_rewardedAd != null || _isRewardedLoading)) {
       return;
     }
 
     _rewardedAd?.dispose();
     _rewardedAd = null;
     _loadedRewardedAdUnitId = resolvedAdUnitId;
+    _isRewardedLoading = true;
 
     final AdRequest request = await ConsentManager.instance.getAdRequest();
     RewardedAd.load(
@@ -78,10 +90,12 @@ class AdService {
       request: request,
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (final RewardedAd ad) {
+          _isRewardedLoading = false;
           _rewardedAd = ad;
           debugPrint('Rewarded ad pre-loaded');
         },
         onAdFailedToLoad: (final LoadAdError error) {
+          _isRewardedLoading = false;
           _rewardedAd = null;
           _loadedRewardedAdUnitId = null;
           debugPrint('Failed to pre-load rewarded ad: $error');
@@ -113,9 +127,16 @@ class AdService {
     if (_interstitialAd == null ||
         _loadedInterstitialAdUnitId != resolvedAdUnitId) {
       debugPrint('Interstitial not ready yet, reloading...');
+      _pendingInterstitialShow = true;
+      _pendingInterstitialAdUnitId = resolvedAdUnitId;
+      _pendingInterstitialDismissed = onDismissed;
       preloadInterstitial(adUnitId: resolvedAdUnitId);
-      return false;
+      return true;
     }
+
+    _pendingInterstitialShow = false;
+    _pendingInterstitialAdUnitId = null;
+    _pendingInterstitialDismissed = null;
 
     final ad = _interstitialAd!;
     _interstitialAd = null; // clear before show to avoid double-use
@@ -186,12 +207,15 @@ class AdService {
     _interstitialAd?.dispose();
     _interstitialAd = null;
     _loadedInterstitialAdUnitId = null;
+    _isInterstitialLoading = false;
+    _clearPendingInterstitial();
   }
 
   static void _disposeRewardedAd() {
     _rewardedAd?.dispose();
     _rewardedAd = null;
     _loadedRewardedAdUnitId = null;
+    _isRewardedLoading = false;
   }
 
   static bool get _canShowInterstitialNow {
@@ -217,5 +241,35 @@ class AdService {
   static void dispose() {
     _disposeInterstitial();
     _disposeRewardedAd();
+  }
+
+  static void _tryShowPendingInterstitial() {
+    if (!_pendingInterstitialShow || _pendingInterstitialAdUnitId == null) {
+      return;
+    }
+
+    if (_interstitialAd == null ||
+        _loadedInterstitialAdUnitId != _pendingInterstitialAdUnitId) {
+      return;
+    }
+
+    final VoidCallback? onDismissed = _pendingInterstitialDismissed;
+    final String adUnitId = _pendingInterstitialAdUnitId!;
+    _pendingInterstitialShow = false;
+    _pendingInterstitialAdUnitId = null;
+    _pendingInterstitialDismissed = null;
+
+    showInterstitial(adUnitId: adUnitId, onDismissed: onDismissed);
+  }
+
+  static void _clearPendingInterstitial({bool invokeDismissed = false}) {
+    final VoidCallback? onDismissed = _pendingInterstitialDismissed;
+    _pendingInterstitialShow = false;
+    _pendingInterstitialAdUnitId = null;
+    _pendingInterstitialDismissed = null;
+
+    if (invokeDismissed) {
+      onDismissed?.call();
+    }
   }
 }

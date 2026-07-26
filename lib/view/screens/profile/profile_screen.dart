@@ -17,7 +17,6 @@ class ProfileScreen extends StatelessWidget {
     return AnnotatedRegion(
       value: SystemUiOverlayStyle.light,
       child: GetBuilder<ProfileController>(
-        init: ProfileController(),
         builder: (final ProfileController controller) {
           return Scaffold(
             backgroundColor: AppColors.screenGgColor,

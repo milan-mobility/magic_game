@@ -30,14 +30,6 @@ class SharedPreferenceHelper {
     return _sharedPreference.getString(PrefKeys.fcmToken);
   }
 
-  Future<void> saveBadge(final int value) async {
-    await _sharedPreference.setInt(PrefKeys.badgeCount, value);
-  }
-
-  int get getBadge {
-    return _sharedPreference.getInt(PrefKeys.badgeCount) ?? 0;
-  }
-
   Future<void> savePremiumAccess(final bool value) async {
     await _sharedPreference.setBool(PrefKeys.hasPremiumAccess, value);
   }
@@ -178,35 +170,26 @@ class SharedPreferenceHelper {
     return _sharedPreference.getString(PrefKeys.googleProfileDisplayName);
   }
 
-  Future<void> saveFavoriteGameKeys(final List<String> values) async {
-    await _sharedPreference.setStringList(
-      PrefKeys.favoriteGameKeys,
-      values.toSet().toList(),
-    );
+  Future<int> incrementFavoriteGamesCount() async {
+    final int updatedCount = favoriteGamesCount + 1;
+    await _sharedPreference.setInt(PrefKeys.favoriteEventCount, updatedCount);
+    return updatedCount;
   }
 
-  List<String> get favoriteGameKeys {
-    return _sharedPreference.getStringList(PrefKeys.favoriteGameKeys) ??
-        <String>[];
+  int get favoriteGamesCount {
+    return _sharedPreference.getInt(PrefKeys.favoriteEventCount) ?? 0;
   }
-
-  Future<bool> addFavoriteGameKey(final String value) async {
-    final String trimmedValue = value.trim();
-    if (trimmedValue.isEmpty) {
-      return false;
-    }
-
-    final Set<String> updatedValues = favoriteGameKeys.toSet()
-      ..add(trimmedValue);
-    await saveFavoriteGameKeys(updatedValues.toList());
-    return true;
-  }
-
-  int get favoriteGamesCount => favoriteGameKeys.length;
 
   Future<void> clear() async {
     final List<String> arrKeysToKeep = <String>[
-      // PrefKeys.addTransactionGuide,
+      PrefKeys.favoriteEventCount,
+      PrefKeys.premiumProductId,
+      PrefKeys.premiumPlanKey,
+      PrefKeys.selectedVipPlanKey,
+      PrefKeys.hasPremiumAccess,
+      PrefKeys.profileName,
+      PrefKeys.profileAvatarAssetPath,
+      PrefKeys.profileAvatarFilePath,
     ];
 
     final Set<String> keys = _sharedPreference.getKeys();

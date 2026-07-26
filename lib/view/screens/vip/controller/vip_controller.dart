@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/billing_client_wrappers.dart';
@@ -8,7 +9,7 @@ import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 import 'package:magic_games/helpers/services/premium_access_service.dart';
 import 'package:magic_games/view/base/custom_snack_bar.dart';
 
-class VipController extends GetxController {
+class VipController extends GetxController with WidgetsBindingObserver {
   VipController(this.sharedPreferenceHelper);
 
   static const String subscriptionProductId = 'onegame_plus_premium';
@@ -98,6 +99,7 @@ class VipController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     hasPremiumAccess = _premiumAccessService.hasPremiumAccess;
     _purchaseSubscription = _inAppPurchase.purchaseStream.listen(
       _handlePurchaseUpdates,
@@ -114,8 +116,16 @@ class VipController extends GetxController {
 
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
     _purchaseSubscription?.cancel();
     super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(final AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_handleAppResumed());
+    }
   }
 
   Future<void> _initialize() async {
@@ -230,6 +240,9 @@ class VipController extends GetxController {
     }
 
     try {
+      await sharedPreferenceHelper.saveSelectedVipPlanKey(
+        _selectionKeyForPlan(plan),
+      );
       isPurchasePending = true;
       update();
 
@@ -248,6 +261,22 @@ class VipController extends GetxController {
       update();
       showErrorSnackBar(message: 'Unable to start the purchase flow.'.tr);
     }
+  }
+
+  Future<void> _handleAppResumed() async {
+    await _syncPremiumAccess();
+
+    if (!hasPremiumAccess && (isPurchasePending || isRestoring)) {
+      isPurchasePending = false;
+      isRestoring = false;
+    }
+
+    if (plans.isEmpty || _planById(selectedPlanId) == null) {
+      await loadPlans();
+      return;
+    }
+
+    update();
   }
 
   PurchaseParam _buildPurchaseParam(final VipPlanData plan) {

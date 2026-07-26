@@ -37,10 +37,6 @@ class ProfileAvatarWidget extends StatelessWidget {
             height: avatarSize,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(
-                color: AppColors.color8752FF.withValues(alpha: 0.8),
-                width: 1.4,
-              ),
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -65,10 +61,6 @@ class ProfileAvatarWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppColors.color5820CB,
-                    border: Border.all(
-                      color: AppColors.color9B57FF,
-                      width: 1.2,
-                    ),
                   ),
                   alignment: Alignment.center,
                   child: SvgPicture.asset(

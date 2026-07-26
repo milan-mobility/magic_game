@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 import 'package:magic_games/helpers/extensions/list_extension.dart';
+import 'package:magic_games/routes/route_helper.dart';
 import 'package:magic_games/utils/app_constants.dart';
 import 'package:magic_games/view/base/custom_snack_bar.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -102,6 +104,13 @@ class Utility {
       debugPrint("EXCEPTION=>${e.toString()}");
     }
     return Platform.operatingSystem;
+  }
+
+  static void logout() {
+    final SharedPreferenceHelper sharedPref =
+        Get.find<SharedPreferenceHelper>();
+    sharedPref.clear();
+    Get.offAllNamed(RouteHelper.home);
   }
 
   static void moreGames({
@@ -265,6 +274,9 @@ class Utility {
     String userEmail = '',
     String userName = '',
   }) {
+    final String normalizedUserId = userId.trim();
+    final String normalizedUserEmail = userEmail.trim();
+    final String normalizedUserName = userName.trim();
     final StringBuffer buffer = StringBuffer()
       ..writeln('Hello OneGame+ Team,'.tr)
       ..writeln()
@@ -295,12 +307,20 @@ class Utility {
             .tr,
       )
       ..writeln()
-      ..writeln('${'Country:'.tr} $country')
-      ..writeln('${'User ID:'.tr}${'(if available)'.tr} ${userId.trim()}')
-      ..writeln('${'Email:'.tr}${'(if available)'.tr} ${userEmail.trim()}')
+      ..writeln('${'Country:'.tr} $country');
+
+    if (normalizedUserId.isNotEmpty) {
+      buffer.writeln('${'User ID:'.tr} $normalizedUserId');
+    }
+
+    if (normalizedUserEmail.isNotEmpty) {
+      buffer.writeln('${'Email:'.tr} $normalizedUserEmail');
+    }
+
+    buffer
       ..writeln()
       ..writeln('Best regards,'.tr)
-      ..writeln(userName.trim().isEmpty ? '</Your Name>'.tr : userName.trim());
+      ..writeln(normalizedUserName.isEmpty ? '</Your Name>'.tr : normalizedUserName);
 
     return buffer.toString().trimRight();
   }
@@ -313,6 +333,9 @@ class Utility {
     String userEmail = '',
     String userName = '',
   }) {
+    final String normalizedUserId = userId.trim();
+    final String normalizedUserEmail = userEmail.trim();
+    final String normalizedUserName = userName.trim();
     final StringBuffer buffer = StringBuffer()
       ..writeln('Hello OneGame+ Support Team,'.tr)
       ..writeln()
@@ -332,15 +355,25 @@ class Utility {
       ..writeln()
       ..writeln('${'Device Model:'.tr} $deviceModel')
       ..writeln('${'Operating System:'.tr} $operatingSystem')
-      ..writeln('${'Country:'.tr} $country')
-      ..writeln('${'User ID:'.tr}${'(if available)'.tr} ${userId.trim()}')
-      ..writeln('${'Email:'.tr}${'(if available)'.tr} ${userEmail.trim()}')
+      ..writeln('${'Country:'.tr} $country');
+
+    if (normalizedUserId.isNotEmpty) {
+      buffer.writeln('${'User ID:'.tr} $normalizedUserId');
+    }
+
+    if (normalizedUserEmail.isNotEmpty) {
+      buffer.writeln('${'Email:'.tr} $normalizedUserEmail');
+    }
+
+    buffer
       ..writeln()
       ..writeln('Thank you for your time and support.'.tr)
       ..writeln()
       ..writeln('Best regards,'.tr)
       ..writeln(
-        userName.trim().isEmpty ? '</User Name if Login>'.tr : userName.trim(),
+        normalizedUserName.isEmpty
+            ? '</User Name if Login>'.tr
+            : normalizedUserName,
       );
 
     return buffer.toString().trimRight();

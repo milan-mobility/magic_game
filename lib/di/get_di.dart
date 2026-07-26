@@ -9,6 +9,7 @@ import 'package:magic_games/helpers/services/premium_access_service.dart';
 import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:magic_games/view/base/controller/network_controller.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
+import 'package:magic_games/view/screens/profile/controller/profile_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> init() async {
@@ -35,6 +36,7 @@ Future<void> init() async {
     PremiumAccessService(Get.find<SharedPreferenceHelper>()),
     permanent: true,
   );
+  Get.put(ProfileController(), permanent: true);
   Get.lazyPut(() => DioClient(Dio(), Get.find()));
 
   Get.lazyPut(() => ApiRepo(Get.find(), Get.find()), fenix: true);

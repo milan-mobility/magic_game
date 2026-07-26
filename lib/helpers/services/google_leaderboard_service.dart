@@ -6,7 +6,7 @@ class GoogleLeaderboardService {
 
   static final GoogleLeaderboardService instance = GoogleLeaderboardService._();
 
-  static const String leaderboardId = 'YOUR_LEADERBOARD_ID';
+  static const String leaderboardId = 'CgkImLX9nZ8YEAIQAQ';
 
   Future<bool> signIn() async {
     try {

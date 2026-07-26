@@ -5,7 +5,9 @@ import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
-import 'package:magic_games/view/screens/home/controller/home_controller.dart';
+import 'package:magic_games/routes/route_helper.dart';
+import 'package:magic_games/view/screens/profile/controller/profile_controller.dart';
+import 'package:magic_games/view/screens/profile/widgets/profile_avatar_widget.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key, required this.onSearchTap});
@@ -14,8 +16,8 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<HomeController>(
-      builder: (final HomeController controller) {
+    return GetBuilder<ProfileController>(
+      builder: (final ProfileController controller) {
         return SizedBox(
           height: AppResponsive.value(50, tablet: 80),
           child: Row(
@@ -55,10 +57,23 @@ class HomeHeader extends StatelessWidget {
                 ),
               ),
               Gap(AppResponsive.space(10)),
-              Image.asset(Assets.png.icProfileIcon.path),
+              InkWell(
+                onTap: () {
+                  if (Get.currentRoute != RouteHelper.profile) {
+                    Get.offAndToNamed(RouteHelper.profile);
+                  }
+                },
+                borderRadius: BorderRadius.circular(999),
+                child: ProfileAvatarWidget(
+                  size: AppResponsive.value(50, tablet: 60),
+                  assetPath: controller.avatarAssetPath,
+                  filePath: controller.avatarFilePath,
+                  imageUrl: controller.avatarImageUrl,
+                ),
+              ),
             ],
           ),
-        ).paddingSymmetric(horizontal: AppResponsive.space(10));
+        );
       },
     );
   }

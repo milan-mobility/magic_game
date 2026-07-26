@@ -77,7 +77,7 @@ class BottomNavigation extends StatelessWidget {
                 height: 22,
                 width: 22,
               ),
-              label: 'Leader Board'.tr,
+              label: 'LeaderBoard'.tr,
             ),
             BottomNavigationBarItem(
               icon: SvgPicture.asset(

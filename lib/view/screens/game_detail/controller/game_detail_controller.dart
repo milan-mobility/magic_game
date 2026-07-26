@@ -27,6 +27,11 @@ class GameDetailController extends GetxController {
 
   final RemoteConfigService _remoteConfigService = RemoteConfigService();
 
+  String? get _currentInterstitialAdUnitId =>
+      _normalizedAdUnitId(games?.interstitialid);
+
+  String? get _currentRewardedAdUnitId => _normalizedAdUnitId(games?.rewardid);
+
   @override
   void onInit() {
     super.onInit();
@@ -34,6 +39,7 @@ class GameDetailController extends GetxController {
     if (Get.arguments != null) {
       games = Get.arguments['game'];
     }
+    _preloadGameAds();
     unawaited(_applyPreferredOrientation());
     webViewController = WebViewController();
     loadUrl();
@@ -88,19 +94,32 @@ class GameDetailController extends GetxController {
 
     switch (webMessage.command) {
       case 'loadInterstitial':
-        AdService.preloadInterstitial(adUnitId: games?.interstitialid);
+        _logMissingAdIdIfNeeded(
+          adType: 'interstitial',
+          adUnitId: _currentInterstitialAdUnitId,
+        );
+        AdService.preloadInterstitial(adUnitId: _currentInterstitialAdUnitId);
         break;
 
       case 'loadRewardedAd':
-        AdService.preloadRewardedAd(adUnitId: games?.rewardid);
+        _logMissingAdIdIfNeeded(
+          adType: 'rewarded',
+          adUnitId: _currentRewardedAdUnitId,
+        );
+        AdService.preloadRewardedAd(adUnitId: _currentRewardedAdUnitId);
         break;
 
       case 'showInterstitial':
+        _logMissingAdIdIfNeeded(
+          adType: 'interstitial',
+          adUnitId: _currentInterstitialAdUnitId,
+        );
+
         if (_isShowingInterstitial) return;
         _isShowingInterstitial = true;
         _sendCallbackToJs('GamePause');
         final shownI = AdService.showInterstitial(
-          adUnitId: games?.interstitialid,
+          adUnitId: _currentInterstitialAdUnitId,
           onDismissed: () {
             _isShowingInterstitial = false;
             _sendCallbackToJs('GameResume');
@@ -113,11 +132,16 @@ class GameDetailController extends GetxController {
         }
         break;
       case 'showRewardedPlus':
+        _logMissingAdIdIfNeeded(
+          adType: 'rewarded',
+          adUnitId: _currentRewardedAdUnitId,
+        );
+
         if (_isShowingRewarded) return;
         _isShowingRewarded = true;
         _sendCallbackToJs('GamePause');
         final shownR = AdService.showRewardedAd(
-          adUnitId: games?.rewardid,
+          adUnitId: _currentRewardedAdUnitId,
           onDismissed: () {
             _isShowingRewarded = false;
             _sendCallbackToJs('GameResume');
@@ -131,7 +155,7 @@ class GameDetailController extends GetxController {
         break;
 
       case 'addHeart':
-        _addCurrentGameToFavorites();
+        await _addCurrentGameToFavorites();
         await GoogleLeaderboardService.instance.submitScore(
           _sharedPreferenceHelper.favoriteGamesCount,
         );
@@ -201,6 +225,43 @@ class GameDetailController extends GetxController {
     );
   }
 
+  String? _normalizedAdUnitId(final String? adUnitId) {
+    final String? trimmedAdUnitId = adUnitId?.trim();
+    if (trimmedAdUnitId == null || trimmedAdUnitId.isEmpty) {
+      return null;
+    }
+
+    return trimmedAdUnitId;
+  }
+
+  void _preloadGameAds() {
+    _logMissingAdIdIfNeeded(
+      adType: 'interstitial',
+      adUnitId: _currentInterstitialAdUnitId,
+    );
+    _logMissingAdIdIfNeeded(
+      adType: 'rewarded',
+      adUnitId: _currentRewardedAdUnitId,
+    );
+    unawaited(
+      AdService.preloadInterstitial(adUnitId: _currentInterstitialAdUnitId),
+    );
+    unawaited(AdService.preloadRewardedAd(adUnitId: _currentRewardedAdUnitId));
+  }
+
+  void _logMissingAdIdIfNeeded({
+    required final String adType,
+    required final String? adUnitId,
+  }) {
+    if (adUnitId != null) {
+      return;
+    }
+
+    debugPrint(
+      'Current game ${games?.id ?? 'unknown'} has no $adType ad id, falling back to the default ad unit id.',
+    );
+  }
+
   void _showToastMessage(final String message) {
     if (message.isEmpty) {
       return;
@@ -235,34 +296,11 @@ class GameDetailController extends GetxController {
   }
 
   Future<void> _addCurrentGameToFavorites() async {
-    final String? favoriteGameKey = _favoriteGameKey;
-    if (favoriteGameKey == null) {
-      return;
-    }
-
-    await _sharedPreferenceHelper.addFavoriteGameKey(favoriteGameKey);
+    await _sharedPreferenceHelper.incrementFavoriteGamesCount();
 
     if (Get.isRegistered<ProfileController>()) {
       Get.find<ProfileController>().update();
     }
-  }
-
-  String? get _favoriteGameKey {
-    if (games?.id != null) {
-      return 'game_${games!.id}';
-    }
-
-    final String? gameUrl = games?.gameurl?.trim();
-    if (gameUrl != null && gameUrl.isNotEmpty) {
-      return gameUrl;
-    }
-
-    final String? gameName = games?.name?.trim();
-    if (gameName != null && gameName.isNotEmpty) {
-      return gameName;
-    }
-
-    return null;
   }
 
   Future<void> fireFirebaseEvent(final String name) async {

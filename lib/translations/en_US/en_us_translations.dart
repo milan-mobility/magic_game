@@ -147,4 +147,6 @@ final Map<String, String> enUs = <String, String>{
 
   //New
   'Subscribe': 'Subscribe',
+  'Score': 'Score',
+  'LeaderBoard': 'LeaderBoard',
 };

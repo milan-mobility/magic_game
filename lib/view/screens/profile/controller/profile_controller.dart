@@ -60,7 +60,7 @@ class ProfileController extends GetxController {
     ),
     ProfileStatData(
       value: _sharedPreferenceHelper.favoriteGamesCount.toString(),
-      label: 'Achievement',
+      label: 'Score',
       iconAsset: 'assets/svg/ic_profile_star.svg',
     ),
     ProfileStatData(
@@ -205,6 +205,7 @@ class ProfileController extends GetxController {
     try {
       await _authService.signOut();
       _syncAuthState();
+      Utility.logout();
       showSuccessSnackBar(message: 'Logged out successfully.'.tr);
     } on FirebaseAuthException catch (e) {
       showErrorSnackBar(

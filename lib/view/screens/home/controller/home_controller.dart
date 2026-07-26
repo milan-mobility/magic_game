@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/data/repositories/api_repo.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
+import 'package:magic_games/helpers/services/google_leaderboard_service.dart';
 import 'package:magic_games/helpers/services/premium_access_service.dart';
 import 'package:magic_games/routes/route_helper.dart';
 import 'package:magic_games/utils/connection.dart';
@@ -48,6 +49,8 @@ class HomeController extends GetxController implements GetxService {
         hasPremiumAccess.value = value;
       },
     );
+
+    GoogleLeaderboardService.instance.signIn();
     _syncPremiumAccess();
     fetchGames();
   }

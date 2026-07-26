@@ -25,19 +25,19 @@ class AdHelper {
   }
 
   static String resolveInterstitialAdUnitId(final String? customAdUnitId) {
-    final String? trimmedId = customAdUnitId?.trim();
-    if (trimmedId != null && trimmedId.isNotEmpty) {
-      return trimmedId;
-    }
+    // final String? trimmedId = customAdUnitId?.trim();
+    // if (trimmedId != null && trimmedId.isNotEmpty) {
+    //   return trimmedId;
+    // }
 
     return interstitialAdUnitId;
   }
 
   static String resolveRewardedAdUnitId(final String? customAdUnitId) {
-    final String? trimmedId = customAdUnitId?.trim();
-    if (trimmedId != null && trimmedId.isNotEmpty) {
-      return trimmedId;
-    }
+    // final String? trimmedId = customAdUnitId?.trim();
+    // if (trimmedId != null && trimmedId.isNotEmpty) {
+    //   return trimmedId;
+    // }
 
     return rewardedAdUnitId;
   }
