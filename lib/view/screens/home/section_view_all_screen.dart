@@ -6,11 +6,8 @@ import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
 import 'package:magic_games/routes/route_helper.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
-import 'package:magic_games/view/screens/home/widgets/game_cards/game_banner_item.dart';
 import 'package:magic_games/view/screens/home/widgets/game_cards/game_collection_item.dart';
-import 'package:magic_games/view/screens/home/widgets/game_cards/game_icon_item.dart';
-import 'package:magic_games/view/screens/home/widgets/game_cards/game_icon_with_banner.dart';
-import 'package:magic_games/view/screens/home/widgets/game_cards/game_icon_with_icon.dart';
+import 'package:magic_games/view/screens/search_games/widgets/search_game_list_item_widget.dart';
 
 class SectionViewAllScreen extends GetView<HomeController> {
   const SectionViewAllScreen({
@@ -48,110 +45,117 @@ class SectionViewAllScreen extends GetView<HomeController> {
       ),
       body: SafeArea(
         top: false,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(8, 8, 8, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (subtitle != null && subtitle!.trim().isNotEmpty) ...[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    subtitle!.trim(),
-                    style: poppinsW300.copyWith(
-                      fontSize: AppResponsive.font(14),
-                      color: AppColors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: _items(),
-              ),
-            ],
-          ),
-        ),
+        child: layoutType == HomeSectionLayoutType.collection
+            ? _buildCollectionView()
+            : _buildGameListView(),
       ),
     );
   }
 
-  List<Widget> _items() {
-    switch (layoutType) {
-      case HomeSectionLayoutType.banner:
-        return games
-            .map(
-              (final Games game) => GameBannerItem(
-                game: game,
-                requiresSubscription: controller.requiresSubscriptionForGame(game),
-                onTap: (final bool isSubscribe) {
-                  _openGame(game, isSubscribe);
-                },
-              ),
-            )
-            .toList();
-      case HomeSectionLayoutType.iconWithIcon:
-        return games
-            .map(
-              (final Games game) => GameIconWithIcon(
-                game: game,
-                requiresSubscription: controller.requiresSubscriptionForGame(game),
-                onTap: (final bool isSubscribe) {
-                  _openGame(game, isSubscribe);
-                },
-              ),
-            )
-            .toList();
-      case HomeSectionLayoutType.iconWithBanner:
-        return games
-            .map(
-              (final Games game) => GameIconWithBanner(
-                game: game,
-                requiresSubscription: controller.requiresSubscriptionForGame(game),
-                activeActionLabel: activeActionLabel,
-                onTap: (final bool isSubscribe) {
-                  _openGame(game, isSubscribe);
-                },
-                onSecondaryTap: () => controller.openStoreForGame(game),
-              ),
-            )
-            .toList();
-      case HomeSectionLayoutType.icon:
-        return games
-            .asMap()
-            .entries
-            .map(
-              (final MapEntry<int, Games> entry) => GameIconItem(
-                game: entry.value,
-                rank: entry.key + 1,
-                requiresSubscription: controller.requiresSubscriptionForGame(
-                  entry.value,
+  Widget _buildGameListView() {
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 24),
+      itemCount: games.length + (_hasSubtitle ? 1 : 0),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
+      itemBuilder: (_, index) {
+        if (_hasSubtitle) {
+          if (index == 0) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                subtitle!.trim(),
+                style: poppinsW300.copyWith(
+                  fontSize: AppResponsive.font(14),
+                  color: AppColors.white,
                 ),
-                onTap: (final bool isSubscribe) {
-                  _openGame(entry.value, isSubscribe);
-                },
               ),
-            )
-            .toList();
-      case HomeSectionLayoutType.collection:
-        return collections
-            .map(
-              (final HomeCollectionCardData collection) => GameCollectionItem(
-                title: collection.title,
-                subtitle: collection.subtitle,
-                imageUrl: collection.imageUrl,
-                leadingLabel: collection.leadingLabel,
+            );
+          }
+
+          index -= 1;
+        }
+
+        final Games game = games[index];
+        return SearchGameListItemWidget(
+          game: game,
+          showInstallAction: _shouldShowInstall(game),
+          showPlayAction: _shouldShowPlay(game),
+          showSubscribeAction: controller.requiresSubscriptionForGame(game),
+          onTap: () => controller.openGame(game),
+          onInstallTap: () => controller.openStoreForGame(game),
+          onPlayTap: () => _openGame(game, controller.requiresSubscriptionForGame(game)),
+          onSubscribeTap: _openVip,
+        );
+      },
+    );
+  }
+
+  Widget _buildCollectionView() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (_hasSubtitle) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                subtitle!.trim(),
+                style: poppinsW300.copyWith(
+                  fontSize: AppResponsive.font(14),
+                  color: AppColors.white,
+                ),
               ),
-            )
-            .toList();
+            ),
+            const SizedBox(height: 16),
+          ],
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: collections
+                .map(
+                  (final HomeCollectionCardData collection) => GameCollectionItem(
+                    title: collection.title,
+                    subtitle: collection.subtitle,
+                    imageUrl: collection.imageUrl,
+                    leadingLabel: collection.leadingLabel,
+                    onTap: () => controller.openCollectionSearch(collection),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool get _hasSubtitle {
+    return subtitle != null && subtitle!.trim().isNotEmpty;
+  }
+
+  bool _shouldShowInstall(final Games game) {
+    if (controller.requiresSubscriptionForGame(game)) {
+      return false;
     }
+
+    return game.install == true;
+  }
+
+  bool _shouldShowPlay(final Games game) {
+    if (controller.requiresSubscriptionForGame(game)) {
+      return false;
+    }
+
+    return game.play == true;
+  }
+
+  void _openVip() {
+    Get.offAllNamed(RouteHelper.vip);
   }
 
   void _openGame(final Games game, final bool isSubscribe) {
     if (isSubscribe) {
-      Get.offAllNamed(RouteHelper.vip);
+      _openVip();
       return;
     }
 

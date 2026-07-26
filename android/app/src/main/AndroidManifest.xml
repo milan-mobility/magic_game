@@ -40,8 +40,11 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
-        <!--        ca-app-pub-7707412763556101~6167130703-->
+            android:value="ca-app-pub-7707412763556101~6167130703" />
+
+<!--        Test-->
+<!--        ca-app-pub-3940256099942544~3347511713-->
+
     </application>
     <queries>
         <intent>

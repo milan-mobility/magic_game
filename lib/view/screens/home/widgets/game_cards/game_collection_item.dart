@@ -1,6 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
+import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
@@ -71,7 +74,7 @@ class GameCollectionItem extends StatelessWidget {
                         color: AppColors.white,
                       ),
                     ),
-                  Gap(AppResponsive.space(8)),
+                  // Gap(AppResponsive.space(8)),
                   Text(
                     subtitle,
                     maxLines: 1,
@@ -82,7 +85,7 @@ class GameCollectionItem extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  // _ExploreButton(text: actionText, onTap: onTap),
+                  _ExploreButton(text: actionText, onTap: onTap),
                 ],
               ),
             ),
@@ -115,7 +118,7 @@ class GameCollectionItem extends StatelessWidget {
                   image: DecorationImage(image: image, fit: BoxFit.cover),
                 ),
               ),
-      errorWidget: (_, __, ___) => HomeImagePlaceholderWidget(
+      errorWidget: (_, _, _) => HomeImagePlaceholderWidget(
         width: cardWidth,
         height: cardHeight,
         borderRadius: 15,
@@ -134,5 +137,48 @@ class GameCollectionItem extends StatelessWidget {
 
   bool _hasText(final String? value) {
     return value != null && value.trim().isNotEmpty;
+  }
+}
+
+class _ExploreButton extends StatelessWidget {
+  const _ExploreButton({required this.text, this.onTap});
+
+  final String text;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: AppResponsive.space(12),
+          vertical: AppResponsive.space(5),
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.colorF8AB0F,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              text.tr,
+              style: poppinsW500.copyWith(
+                fontSize: AppResponsive.font(11),
+                color: AppColors.white,
+              ),
+            ),
+            Gap(AppResponsive.space(8)),
+            SvgPicture.asset(
+              Assets.svg.icNext,
+              colorFilter: ColorFilter.mode(AppColors.white, BlendMode.srcIn),
+              width: AppResponsive.space(14),
+              height: AppResponsive.space(14),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

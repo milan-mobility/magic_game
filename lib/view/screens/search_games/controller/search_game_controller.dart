@@ -27,14 +27,20 @@ class SearchGameController extends GetxController {
     if (Get.arguments != null) {
       final dynamic rawCategories = Get.arguments['categories'];
       final dynamic rawGames = Get.arguments['games'];
+      final dynamic rawSelectedCategoryId = Get.arguments['selectedCategoryId'];
 
       categories = rawCategories is List
           ? rawCategories.cast<HomeCategoryData>()
           : <HomeCategoryData>[];
       allGames = rawGames is List ? rawGames.cast<Games>() : <Games>[];
+
+      if (rawSelectedCategoryId is String &&
+          rawSelectedCategoryId.trim().isNotEmpty) {
+        selectedCategoryId = rawSelectedCategoryId.trim();
+      }
     }
 
-    selectedCategoryId = _defaultCategoryId;
+    selectedCategoryId = _resolvedInitialCategoryId();
 
     txtSearch.addListener(_applyFilters);
     _applyFilters();
@@ -215,6 +221,15 @@ class SearchGameController extends GetxController {
     }
 
     return categories.first.id;
+  }
+
+  String _resolvedInitialCategoryId() {
+    if (_hasText(selectedCategoryId) &&
+        categories.any((final HomeCategoryData item) => item.id == selectedCategoryId)) {
+      return selectedCategoryId;
+    }
+
+    return _defaultCategoryId;
   }
 
   @override

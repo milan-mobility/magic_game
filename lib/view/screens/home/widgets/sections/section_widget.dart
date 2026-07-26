@@ -23,6 +23,7 @@ class SectionWidget extends StatelessWidget {
     this.subtitle,
     this.onGameTap,
     this.onGameStoreTap,
+    this.onCollectionTap,
   });
 
   final String title;
@@ -33,6 +34,7 @@ class SectionWidget extends StatelessWidget {
   final bool Function(Games game) requiresSubscriptionForGame;
   final void Function(Games game, bool)? onGameTap;
   final void Function(Games game)? onGameStoreTap;
+  final void Function(HomeCollectionCardData collection)? onCollectionTap;
 
   @override
   Widget build(BuildContext context) {
@@ -172,6 +174,7 @@ class SectionWidget extends StatelessWidget {
           subtitle: collection.subtitle,
           imageUrl: collection.imageUrl,
           leadingLabel: collection.leadingLabel,
+          onTap: () => onCollectionTap?.call(collection),
         );
     }
   }

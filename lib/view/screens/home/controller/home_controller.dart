@@ -652,12 +652,29 @@ class HomeController extends GetxController implements GetxService {
             ),
             subtitle: _resolveCollectionSubtitle(banner, section.subtitle),
             leadingLabel: _normalizeText(banner.badge),
+            categoryId: banner.category?.toString(),
             // Type 205 collection cards should always use the footer banner image.
             imageUrl: _normalizeText(banner.bannerurl),
           ),
         )
         .where((final HomeCollectionCardData card) => _hasText(card.title))
         .toList();
+  }
+
+  void openSearch({String? selectedCategoryId}) {
+    Get.toNamed(
+      RouteHelper.searchGames,
+      arguments: <String, dynamic>{
+        'categories': homeCategories,
+        'games': allGames,
+        if (_hasText(selectedCategoryId))
+          'selectedCategoryId': selectedCategoryId,
+      },
+    );
+  }
+
+  void openCollectionSearch(final HomeCollectionCardData collection) {
+    openSearch(selectedCategoryId: collection.categoryId);
   }
 
   bool _matchesSelectedCategory({
@@ -854,12 +871,14 @@ class HomeCollectionCardData {
     required this.subtitle,
     required this.leadingLabel,
     required this.imageUrl,
+    this.categoryId,
   });
 
   final String title;
   final String subtitle;
   final String? leadingLabel;
   final String? imageUrl;
+  final String? categoryId;
 }
 
 enum HomeSectionLayoutType {

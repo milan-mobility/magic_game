@@ -139,6 +139,7 @@ class HomeScreen extends GetView<HomeController> {
                               }
                             },
                             onGameStoreTap: controller.openStoreForGame,
+                            onCollectionTap: controller.openCollectionSearch,
                           ),
                         ),
                     ],
