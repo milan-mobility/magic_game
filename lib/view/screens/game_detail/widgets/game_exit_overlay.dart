@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:magic_games/gen/assets.gen.dart';
+import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
+import 'package:magic_games/view/screens/home/widgets/game_cards/game_icon_with_banner.dart';
 
 class GameExitOverlay extends StatelessWidget {
   const GameExitOverlay({
@@ -18,6 +18,9 @@ class GameExitOverlay extends StatelessWidget {
     required this.onBack,
     required this.onContinuePlaying,
     required this.onDownload,
+    required this.recommendedGames,
+    required this.requiresSubscriptionForGame,
+    required this.onRecommendedTap,
     this.canDownload = true,
   });
 
@@ -29,6 +32,9 @@ class GameExitOverlay extends StatelessWidget {
   final VoidCallback onBack;
   final VoidCallback onContinuePlaying;
   final VoidCallback? onDownload;
+  final List<Games> recommendedGames;
+  final bool Function(Games game) requiresSubscriptionForGame;
+  final void Function(Games game, bool isSubscribe) onRecommendedTap;
   final bool canDownload;
 
   @override
@@ -68,21 +74,16 @@ class GameExitOverlay extends StatelessWidget {
           SafeArea(
             bottom: false,
             child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                AppResponsive.space(16),
-                AppResponsive.space(12),
-                AppResponsive.space(16),
-                AppResponsive.space(20),
-              ),
               child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: isLandscape ? 920 : 560,
-                  ),
+                child: SizedBox(
+                  width: double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _OverlayBackButton(onTap: onBack),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: _OverlayBackButton(onTap: onBack),
+                      ),
                       Gap(AppResponsive.space(18)),
                       isLandscape
                           ? _LandscapeHeroSection(
@@ -93,6 +94,10 @@ class GameExitOverlay extends StatelessWidget {
                               canDownload: canDownload,
                               onContinuePlaying: onContinuePlaying,
                               onDownload: onDownload,
+                              recommendedGames: recommendedGames,
+                              requiresSubscriptionForGame:
+                                  requiresSubscriptionForGame,
+                              onRecommendedTap: onRecommendedTap,
                             )
                           : _PortraitHeroSection(
                               title: title,
@@ -102,6 +107,10 @@ class GameExitOverlay extends StatelessWidget {
                               canDownload: canDownload,
                               onContinuePlaying: onContinuePlaying,
                               onDownload: onDownload,
+                              recommendedGames: recommendedGames,
+                              requiresSubscriptionForGame:
+                                  requiresSubscriptionForGame,
+                              onRecommendedTap: onRecommendedTap,
                             ),
                     ],
                   ),
@@ -124,6 +133,9 @@ class _PortraitHeroSection extends StatelessWidget {
     required this.canDownload,
     required this.onContinuePlaying,
     required this.onDownload,
+    required this.recommendedGames,
+    required this.requiresSubscriptionForGame,
+    required this.onRecommendedTap,
   });
 
   final String title;
@@ -133,27 +145,36 @@ class _PortraitHeroSection extends StatelessWidget {
   final bool canDownload;
   final VoidCallback onContinuePlaying;
   final VoidCallback? onDownload;
+  final List<Games> recommendedGames;
+  final bool Function(Games game) requiresSubscriptionForGame;
+  final void Function(Games game, bool isSubscribe) onRecommendedTap;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Center(
-          child: _HeroArtwork(imageUrl: heroImageUrl),
-        ),
+        Center(child: _HeroArtwork(imageUrl: heroImageUrl)),
         Gap(AppResponsive.space(20)),
         _GameMetaBlock(
           title: title,
           description: description,
           tags: tags,
-        ),
+        ).paddingSymmetric(horizontal: 15),
         Gap(AppResponsive.space(18)),
         _ActionRow(
           canDownload: canDownload,
           onContinuePlaying: onContinuePlaying,
           onDownload: onDownload,
-        ),
+        ).paddingSymmetric(horizontal: 15),
+        if (recommendedGames.isNotEmpty) ...[
+          Gap(AppResponsive.space(24)),
+          _RecommendedGamesSection(
+            games: recommendedGames,
+            requiresSubscriptionForGame: requiresSubscriptionForGame,
+            onGameTap: onRecommendedTap,
+          ),
+        ],
       ],
     );
   }
@@ -168,6 +189,9 @@ class _LandscapeHeroSection extends StatelessWidget {
     required this.canDownload,
     required this.onContinuePlaying,
     required this.onDownload,
+    required this.recommendedGames,
+    required this.requiresSubscriptionForGame,
+    required this.onRecommendedTap,
   });
 
   final String title;
@@ -177,17 +201,16 @@ class _LandscapeHeroSection extends StatelessWidget {
   final bool canDownload;
   final VoidCallback onContinuePlaying;
   final VoidCallback? onDownload;
+  final List<Games> recommendedGames;
+  final bool Function(Games game) requiresSubscriptionForGame;
+  final void Function(Games game, bool isSubscribe) onRecommendedTap;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _HeroArtwork(
-          imageUrl: heroImageUrl,
-          width: 280,
-          height: 280,
-        ),
+        _HeroArtwork(imageUrl: heroImageUrl, width: 280, height: 280),
         Gap(AppResponsive.space(24)),
         Expanded(
           child: Column(
@@ -205,6 +228,14 @@ class _LandscapeHeroSection extends StatelessWidget {
                 onDownload: onDownload,
                 isLandscape: true,
               ),
+              if (recommendedGames.isNotEmpty) ...[
+                Gap(AppResponsive.space(24)),
+                _RecommendedGamesSection(
+                  games: recommendedGames,
+                  requiresSubscriptionForGame: requiresSubscriptionForGame,
+                  onGameTap: onRecommendedTap,
+                ),
+              ],
             ],
           ),
         ),
@@ -214,11 +245,7 @@ class _LandscapeHeroSection extends StatelessWidget {
 }
 
 class _HeroArtwork extends StatelessWidget {
-  const _HeroArtwork({
-    this.imageUrl,
-    this.width,
-    this.height,
-  });
+  const _HeroArtwork({this.imageUrl, this.width, this.height});
 
   final String? imageUrl;
   final double? width;
@@ -455,10 +482,7 @@ class _OverlayActionButton extends StatelessWidget {
               ? const LinearGradient(
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
-                  colors: <Color>[
-                    AppColors.color8752FF,
-                    AppColors.color5820CB,
-                  ],
+                  colors: <Color>[AppColors.color8752FF, AppColors.color5820CB],
                 )
               : null,
           color: isPrimary
@@ -503,6 +527,58 @@ class _OverlayActionButton extends StatelessWidget {
   }
 }
 
+class _RecommendedGamesSection extends StatelessWidget {
+  const _RecommendedGamesSection({
+    required this.games,
+    required this.requiresSubscriptionForGame,
+    required this.onGameTap,
+  });
+
+  final List<Games> games;
+  final bool Function(Games game) requiresSubscriptionForGame;
+  final void Function(Games game, bool isSubscribe) onGameTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'You May Like This'.tr,
+          style: poppinsW600.copyWith(
+            fontSize: AppResponsive.font(20),
+            color: AppColors.white,
+          ),
+        ),
+        Gap(AppResponsive.space(12)),
+        SizedBox(
+          height: AppResponsive.value(165, tablet: 225),
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: games.length,
+            separatorBuilder: (_, _) =>
+                SizedBox(width: AppResponsive.space(12)),
+            itemBuilder: (_, index) {
+              final Games game = games[index];
+              final bool requiresSubscription = requiresSubscriptionForGame(
+                game,
+              );
+
+              return GameIconWithBanner(
+                game: game,
+                requiresSubscription: requiresSubscription,
+                onTap: (final bool isSubscribe) {
+                  onGameTap(game, isSubscribe);
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _OverlayBackButton extends StatelessWidget {
   const _OverlayBackButton({required this.onTap});
 
@@ -512,21 +588,25 @@ class _OverlayBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppResponsive.space(14)),
+      borderRadius: BorderRadius.circular(AppResponsive.space(16)),
       child: Container(
-        padding: EdgeInsets.all(AppResponsive.space(10)),
+        padding: EdgeInsets.all(AppResponsive.space(12)),
         decoration: BoxDecoration(
-          color: AppColors.color170B3B.withValues(alpha: 0.92),
-          borderRadius: BorderRadius.circular(AppResponsive.space(14)),
+          color: AppColors.color170B3B.withValues(alpha: 0.98),
+          borderRadius: BorderRadius.circular(AppResponsive.space(16)),
           border: Border.all(
-            color: AppColors.color7433F9.withValues(alpha: 0.45),
+            color: AppColors.color9B57FF.withValues(alpha: 0.78),
+            width: 1.2,
           ),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: AppColors.black.withValues(alpha: 0.3),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
-        child: SvgPicture.asset(
-          Assets.svg.icBack,
-          width: AppResponsive.space(20),
-          height: AppResponsive.space(20),
-        ),
+        child: Icon(Icons.arrow_back_ios_new, color: AppColors.white, size: 25),
       ),
     );
   }

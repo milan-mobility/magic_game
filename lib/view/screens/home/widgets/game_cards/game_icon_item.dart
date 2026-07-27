@@ -26,7 +26,7 @@ class GameIconItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double tileWidth = AppResponsive.value(100, tablet: 140);
-    final double imageSize = AppResponsive.value(90, tablet: 140);
+    final double imageSize = AppResponsive.value(100, tablet: 150);
 
     return GestureDetector(
       onTap: () {

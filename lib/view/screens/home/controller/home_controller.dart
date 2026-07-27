@@ -545,10 +545,17 @@ class HomeController extends GetxController implements GetxService {
       return null;
     }
 
-    final HomeSectionLayoutType layoutType = _resolveSectionLayoutType(
+    final HomeSectionLayoutType resolvedLayoutType = _resolveSectionLayoutType(
       section,
       model.sectiontype,
     );
+    final String? normalizedSectionId = _normalizeText(section.id);
+    final String? normalizedSectionType = _normalizeText(section.type);
+    final bool showHourglassIndicator =
+        normalizedSectionId == '207' || normalizedSectionType == '207';
+    final HomeSectionLayoutType layoutType = showHourglassIndicator
+        ? HomeSectionLayoutType.iconWithBanner
+        : resolvedLayoutType;
     final String? selectedCategoryIdValue = _normalizeText(
       selectedCategoryId.value,
     );
@@ -590,6 +597,8 @@ class HomeController extends GetxController implements GetxService {
       title: _resolveSectionTitle(section, model.sectiontype, config),
       subtitle: _resolveSectionSubtitle(section, config),
       layoutType: layoutType,
+      showHourglassIndicator: showHourglassIndicator,
+      showViewAll: section.type != '205',
       sortOrder: config?.sortOrder ?? 999,
       games: games,
       collections: collections,
@@ -600,6 +609,10 @@ class HomeController extends GetxController implements GetxService {
     final Sections section,
     final Sectiontype? sectiontype,
   ) {
+    if (section.type == '206') {
+      return HomeSectionLayoutType.iconWithBannerDownload;
+    }
+
     final String normalizedType = _normalizeSectionLayoutLabel(
       sectiontype?.labelForType(section.type),
     );
@@ -611,6 +624,8 @@ class HomeController extends GetxController implements GetxService {
         return HomeSectionLayoutType.iconWithIcon;
       case 'iconwithbanner':
         return HomeSectionLayoutType.iconWithBanner;
+      case 'iconwithbannerdownload':
+        return HomeSectionLayoutType.iconWithBannerDownload;
       case 'icon':
         return HomeSectionLayoutType.icon;
       case 'collection':
@@ -827,6 +842,8 @@ class HomeSectionData {
     required this.title,
     required this.subtitle,
     required this.layoutType,
+    required this.showHourglassIndicator,
+    required this.showViewAll,
     required this.sortOrder,
     required this.games,
     required this.collections,
@@ -836,6 +853,8 @@ class HomeSectionData {
   final String title;
   final String? subtitle;
   final HomeSectionLayoutType layoutType;
+  final bool showHourglassIndicator;
+  final bool showViewAll;
   final int sortOrder;
   final List<Games> games;
   final List<HomeCollectionCardData> collections;
@@ -885,6 +904,7 @@ enum HomeSectionLayoutType {
   banner,
   iconWithIcon,
   iconWithBanner,
+  iconWithBannerDownload,
   icon,
   collection,
 }

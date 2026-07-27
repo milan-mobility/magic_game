@@ -78,7 +78,7 @@ class _FeaturedBannerWidgetState extends State<FeaturedBannerWidget> {
     }
 
     return SizedBox(
-      height: AppResponsive.value(255, tablet: 350),
+      height: AppResponsive.value(190, tablet: 310),
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [

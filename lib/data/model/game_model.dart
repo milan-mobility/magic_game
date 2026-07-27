@@ -127,8 +127,16 @@ class Sectiontype {
   String? s203;
   String? s204;
   String? s205;
+  String? s206;
 
-  Sectiontype({this.s201, this.s202, this.s203, this.s204, this.s205});
+  Sectiontype({
+    this.s201,
+    this.s202,
+    this.s203,
+    this.s204,
+    this.s205,
+    this.s206,
+  });
 
   Sectiontype.fromJson(Map<String, dynamic> json) {
     s201 = json['201'];
@@ -136,6 +144,7 @@ class Sectiontype {
     s203 = json['203'];
     s204 = json['204'];
     s205 = json['205'];
+    s206 = json['206'];
   }
 
   Map<String, dynamic> toJson() {
@@ -145,6 +154,7 @@ class Sectiontype {
     data['203'] = s203;
     data['204'] = s204;
     data['205'] = s205;
+    data['206'] = s206;
     return data;
   }
 
@@ -160,6 +170,8 @@ class Sectiontype {
         return s204;
       case '205':
         return s205;
+      case '206':
+        return s206;
       default:
         return null;
     }

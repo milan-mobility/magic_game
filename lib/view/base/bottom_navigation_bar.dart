@@ -73,7 +73,7 @@ class BottomNavigation extends StatelessWidget {
                 width: 22,
               ),
               activeIcon: SvgPicture.asset(
-                Assets.svg.icLeaderboard,
+                Assets.svg.icLeaderboardSelected,
                 height: 22,
                 width: 22,
               ),

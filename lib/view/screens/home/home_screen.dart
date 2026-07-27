@@ -123,6 +123,9 @@ class HomeScreen extends GetView<HomeController> {
                             title: homeSection.title,
                             subtitle: homeSection.subtitle,
                             layoutType: homeSection.layoutType,
+                            showHourglassIndicator:
+                                homeSection.showHourglassIndicator,
+                            showViewAll: homeSection.showViewAll,
                             games: homeSection.games,
                             collections: homeSection.collections,
                             requiresSubscriptionForGame: (final Games game) =>

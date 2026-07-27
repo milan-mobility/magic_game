@@ -10,8 +10,10 @@ class PrefKeys {
   static const String profileName = 'profileName';
   static const String profileAvatarAssetPath = 'profileAvatarAssetPath';
   static const String profileAvatarFilePath = 'profileAvatarFilePath';
+  static const String profileUpdatedAt = 'profileUpdatedAt';
   static const String googleProfilePhotoUrl = 'googleProfilePhotoUrl';
   static const String googleProfileDisplayName = 'googleProfileDisplayName';
+  static const String googleProfileUpdatedAt = 'googleProfileUpdatedAt';
   static const String favoriteEventCount = 'favoriteEventCount';
   static const String recentlyPlayedGameKeys = 'recentlyPlayedGameKeys';
 }

@@ -22,9 +22,16 @@ extension StringExt on String? {
   String imageUrl() {
     if (this == null) return '';
     final String baseUrl = Get.isRegistered<RemoteConfigService>()
-        ? Get.find<RemoteConfigService>().baseUrl
+        ? Get.find<RemoteConfigService>().getString(
+            RemoteConfigService.baseUrlKey,
+            fallback: Endpoints.defaultBaseUrl,
+          )
         : Endpoints.defaultBaseUrl;
-    return '$baseUrl$this';
+    final String normalizedBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl
+        : '$baseUrl/';
+    final String normalizedPath = this!.replaceFirst(RegExp(r'^/+'), '');
+    return '$normalizedBaseUrl$normalizedPath';
   }
 
   String convertddMMMyyyy({String format = 'yyyy-MM-dd HH:mm:ss'}) {

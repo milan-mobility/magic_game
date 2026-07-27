@@ -2,10 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:magic_games/data/api/api_end_points.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
-import 'package:magic_games/helpers/extensions/string_ext.dart';
+import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:magic_games/helpers/styles.dart';
 import 'package:magic_games/view/screens/home/widgets/home_image_placeholder_widget.dart';
 
@@ -29,7 +30,7 @@ class FeaturedBannerBadgeWidget extends StatelessWidget {
       children: [
         if (badge?.url != null && badge!.url!.trim().isNotEmpty)
           CachedNetworkImage(
-            imageUrl: badge!.url!.imageUrl(),
+            imageUrl: _badgeImageUrl!,
             imageBuilder:
                 (
                   final BuildContext context,
@@ -45,7 +46,7 @@ class FeaturedBannerBadgeWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-            errorWidget: (_, __, ___) => HomeImagePlaceholderWidget(
+            errorWidget: (_, _, _) => HomeImagePlaceholderWidget(
               width: AppResponsive.space(25),
               height: AppResponsive.space(25),
               borderRadius: 10,
@@ -89,5 +90,24 @@ class FeaturedBannerBadgeWidget extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String? get _badgeImageUrl {
+    final String? badgePath = badge?.url?.trim();
+    if (badgePath == null || badgePath.isEmpty) {
+      return null;
+    }
+
+    final String baseUrl = Get.isRegistered<RemoteConfigService>()
+        ? Get.find<RemoteConfigService>().getString(
+            RemoteConfigService.baseUrlKey,
+            fallback: Endpoints.defaultBaseUrl,
+          )
+        : Endpoints.defaultBaseUrl;
+    final String normalizedBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl
+        : '$baseUrl/';
+
+    return '$normalizedBaseUrl${badgePath.replaceFirst(RegExp(r'^/+'), '')}';
   }
 }

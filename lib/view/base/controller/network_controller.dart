@@ -52,11 +52,14 @@ class NetworkController extends GetxController implements GetxService {
 
   void _listenToNetworkChanges() {
     _connectionSubscription = ConnectionUtils.onStatusChange.listen((status) {
-      unawaited(_handleNetworkStatusChange(status == InternetStatus.connected));
+      unawaited(
+        _handleNetworkStatusChange(status == InternetStatus.connected),
+      );
     });
   }
 
-  Future<void> _handleNetworkStatusChange(bool connected) async {
+  Future<void> _handleNetworkStatusChange(bool streamConnected) async {
+    final bool connected = await ConnectionUtils.isNetworkConnected();
     final bool wasConnected = isConnected.value;
     isConnected.value = connected;
 
@@ -65,13 +68,19 @@ class NetworkController extends GetxController implements GetxService {
       return;
     }
 
-    if (wasConnected || !_isOfflineDialogVisible) {
+    if (!streamConnected && (wasConnected || !_isOfflineDialogVisible)) {
       await _showOfflineDialogIfNeeded();
     }
   }
 
   Future<void> _showOfflineDialogIfNeeded() async {
     if (_isOfflineDialogVisible) {
+      return;
+    }
+
+    final bool connected = await ConnectionUtils.isNetworkConnected();
+    if (connected) {
+      isConnected.value = true;
       return;
     }
 
@@ -95,6 +104,12 @@ class NetworkController extends GetxController implements GetxService {
     );
 
     _isOfflineDialogVisible = false;
+
+    final bool stillConnected = await ConnectionUtils.isNetworkConnected();
+    isConnected.value = stillConnected;
+    if (stillConnected) {
+      await _handleConnectionRestored();
+    }
   }
 
   Future<void> _handleConnectionRestored() async {

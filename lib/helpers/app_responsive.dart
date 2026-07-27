@@ -33,12 +33,24 @@ class AppResponsive {
 
   /// Auto Font Scaling
 
-  static double font(double size) {
-    if (isLargeTablet) return size + 4;
+  static double font(
+    double mobile, {
+    double? tablet,
+    double? largeTablet,
+  }) {
+    if (tablet != null || largeTablet != null) {
+      return value(
+        mobile,
+        tablet: tablet,
+        largeTablet: largeTablet,
+      );
+    }
 
-    if (isTablet) return size + 2;
+    if (isLargeTablet) return mobile + 4;
 
-    return size;
+    if (isTablet) return mobile + 2;
+
+    return mobile;
   }
 
   /// Auto Spacing

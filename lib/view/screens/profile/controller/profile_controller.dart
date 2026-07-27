@@ -300,27 +300,38 @@ class ProfileController extends GetxController {
     playerName = _resolvePlayerName();
     playerType = isLoggedIn ? 'Player'.tr : 'Guest'.tr;
     description = 'Play games, earn achievements and\nsave your progress'.tr;
-    avatarImageUrl = _normalizedValue(_authService.currentPhotoUrl);
     avatarAssetPath = _normalizedValue(
       _sharedPreferenceHelper.profileAvatarAssetPath,
     );
     avatarFilePath = _resolveStoredAvatarFilePath();
+    avatarImageUrl = _resolveAvatarImageUrl();
     update();
   }
 
   String _resolvePlayerName() {
-    final String? googleName = _normalizedValue(
-      _authService.currentDisplayName,
-    );
-    if (googleName != null) {
-      return googleName;
-    }
-
     final String? storedName = _normalizedValue(
       _sharedPreferenceHelper.profileName,
     );
-    if (storedName != null) {
-      return storedName;
+    final String? googleName = _normalizedValue(
+      _authService.currentDisplayName,
+    );
+
+    if (_prefersStoredProfileData) {
+      if (storedName != null) {
+        return storedName;
+      }
+
+      if (googleName != null) {
+        return googleName;
+      }
+    } else {
+      if (googleName != null) {
+        return googleName;
+      }
+
+      if (storedName != null) {
+        return storedName;
+      }
     }
 
     return 'Guest Player';
@@ -363,6 +374,30 @@ class ProfileController extends GetxController {
     return storedPath;
   }
 
+  String? _resolveAvatarImageUrl() {
+    final String? googlePhotoUrl = _normalizedValue(_authService.currentPhotoUrl);
+
+    if (_prefersStoredProfileData) {
+      if (_normalizedValue(avatarFilePath) != null ||
+          _normalizedValue(avatarAssetPath) != null) {
+        return null;
+      }
+
+      return googlePhotoUrl;
+    }
+
+    if (googlePhotoUrl != null) {
+      return googlePhotoUrl;
+    }
+
+    if (_normalizedValue(avatarFilePath) != null ||
+        _normalizedValue(avatarAssetPath) != null) {
+      return null;
+    }
+
+    return null;
+  }
+
   Future<void> _saveProfileChanges(final ProfileEditResult result) async {
     await _sharedPreferenceHelper.saveProfileName(result.name);
 
@@ -381,6 +416,9 @@ class ProfileController extends GetxController {
         result.selectedAssetPath,
       );
     }
+    await _sharedPreferenceHelper.saveProfileUpdatedAt(
+      DateTime.now().millisecondsSinceEpoch,
+    );
 
     _syncAuthState();
     showSuccessSnackBar(message: 'Profile updated successfully.'.tr);
@@ -442,6 +480,11 @@ class ProfileController extends GetxController {
 
     final String trimmedValue = value.trim();
     return trimmedValue.isEmpty ? null : trimmedValue;
+  }
+
+  bool get _prefersStoredProfileData {
+    return _sharedPreferenceHelper.profileUpdatedAt >=
+        _sharedPreferenceHelper.googleProfileUpdatedAt;
   }
 
   @override

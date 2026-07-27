@@ -111,6 +111,10 @@ class GameDetailScreen extends StatelessWidget {
                           backgroundImageUrl: controller.backgroundImageUrl,
                           tags: controller.gameTags,
                           canDownload: controller.canDownloadCurrentGame,
+                          recommendedGames: controller.recommendedGames,
+                          requiresSubscriptionForGame:
+                              controller.requiresSubscriptionForGame,
+                          onRecommendedTap: controller.openRecommendedGame,
                           onBack: () => Get.back<void>(),
                           onContinuePlaying: controller.hideExitOverlay,
                           onDownload: controller.canDownloadCurrentGame

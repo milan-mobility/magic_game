@@ -80,10 +80,11 @@ class SectionViewAllScreen extends GetView<HomeController> {
           game: game,
           showInstallAction: _shouldShowInstall(game),
           showPlayAction: _shouldShowPlay(game),
-          showSubscribeAction: controller.requiresSubscriptionForGame(game),
+          showSubscribeAction: _shouldShowSubscribe(game),
           onTap: () => controller.openGame(game),
           onInstallTap: () => controller.openStoreForGame(game),
-          onPlayTap: () => _openGame(game, controller.requiresSubscriptionForGame(game)),
+          onPlayTap: () =>
+              _openGame(game, controller.requiresSubscriptionForGame(game)),
           onSubscribeTap: _openVip,
         );
       },
@@ -134,6 +135,10 @@ class SectionViewAllScreen extends GetView<HomeController> {
   }
 
   bool _shouldShowInstall(final Games game) {
+    if (layoutType == HomeSectionLayoutType.iconWithBannerDownload) {
+      return game.install == true;
+    }
+
     if (controller.requiresSubscriptionForGame(game)) {
       return false;
     }
@@ -142,11 +147,23 @@ class SectionViewAllScreen extends GetView<HomeController> {
   }
 
   bool _shouldShowPlay(final Games game) {
+    if (layoutType == HomeSectionLayoutType.iconWithBannerDownload) {
+      return false;
+    }
+
     if (controller.requiresSubscriptionForGame(game)) {
       return false;
     }
 
     return game.play == true;
+  }
+
+  bool _shouldShowSubscribe(final Games game) {
+    if (layoutType == HomeSectionLayoutType.iconWithBannerDownload) {
+      return false;
+    }
+
+    return controller.requiresSubscriptionForGame(game);
   }
 
   void _openVip() {

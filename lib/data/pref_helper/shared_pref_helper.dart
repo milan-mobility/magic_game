@@ -138,6 +138,19 @@ class SharedPreferenceHelper {
     return _sharedPreference.getString(PrefKeys.profileAvatarFilePath);
   }
 
+  Future<void> saveProfileUpdatedAt(final int? value) async {
+    if (value == null || value <= 0) {
+      await _sharedPreference.remove(PrefKeys.profileUpdatedAt);
+      return;
+    }
+
+    await _sharedPreference.setInt(PrefKeys.profileUpdatedAt, value);
+  }
+
+  int get profileUpdatedAt {
+    return _sharedPreference.getInt(PrefKeys.profileUpdatedAt) ?? 0;
+  }
+
   Future<void> saveGoogleProfilePhotoUrl(final String? value) async {
     if (value == null || value.trim().isEmpty) {
       await _sharedPreference.remove(PrefKeys.googleProfilePhotoUrl);
@@ -168,6 +181,19 @@ class SharedPreferenceHelper {
 
   String? get googleProfileDisplayName {
     return _sharedPreference.getString(PrefKeys.googleProfileDisplayName);
+  }
+
+  Future<void> saveGoogleProfileUpdatedAt(final int? value) async {
+    if (value == null || value <= 0) {
+      await _sharedPreference.remove(PrefKeys.googleProfileUpdatedAt);
+      return;
+    }
+
+    await _sharedPreference.setInt(PrefKeys.googleProfileUpdatedAt, value);
+  }
+
+  int get googleProfileUpdatedAt {
+    return _sharedPreference.getInt(PrefKeys.googleProfileUpdatedAt) ?? 0;
   }
 
   Future<int> incrementFavoriteGamesCount() async {
@@ -227,6 +253,8 @@ class SharedPreferenceHelper {
       PrefKeys.profileName,
       PrefKeys.profileAvatarAssetPath,
       PrefKeys.profileAvatarFilePath,
+      PrefKeys.profileUpdatedAt,
+      PrefKeys.hasIntroDone,
     ];
 
     final Set<String> keys = _sharedPreference.getKeys();

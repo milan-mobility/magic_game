@@ -48,16 +48,17 @@ class SearchGameListItemWidget extends StatelessWidget {
           border: Border.all(color: AppColors.color2A1B59, width: 1),
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _SearchGameThumb(iconUrl: game.icon),
             Gap(AppResponsive.space(10)),
             Expanded(
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    game.shortname ?? '',
+                    _displayTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: poppinsW600.copyWith(
@@ -68,10 +69,11 @@ class SearchGameListItemWidget extends StatelessWidget {
                   if (_hasText(_subtitleText))
                     Text(
                       _subtitleText!,
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: poppinsW400.copyWith(
                         fontSize: AppResponsive.font(13),
+                        height: 1.35,
                         color: AppColors.white.withValues(alpha: 0.85),
                       ),
                     ),
@@ -107,6 +109,14 @@ class SearchGameListItemWidget extends StatelessWidget {
     }
 
     return null;
+  }
+
+  String get _displayTitle {
+    if (_hasText(game.shortname)) {
+      return game.shortname!.trim();
+    }
+
+    return game.name?.trim() ?? '';
   }
 
   List<String> get _tags {

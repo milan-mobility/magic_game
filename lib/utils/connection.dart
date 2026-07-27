@@ -8,6 +8,14 @@ class ConnectionUtils {
         uri: Uri.parse('https://captive.apple.com/hotspot-detect.html'),
         timeout: const Duration(seconds: 5),
       ),
+      InternetCheckOption(
+        uri: Uri.parse('https://www.google.com/generate_204'),
+        timeout: const Duration(seconds: 5),
+      ),
+      InternetCheckOption(
+        uri: Uri.parse('https://cloudflare.com/cdn-cgi/trace'),
+        timeout: const Duration(seconds: 5),
+      ),
     ],
   );
 

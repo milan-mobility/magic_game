@@ -13,12 +13,13 @@ import 'package:magic_games/helpers/extensions/string_ext.dart';
 import 'package:magic_games/helpers/services/google_leaderboard_service.dart';
 import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:magic_games/helpers/styles.dart';
+import 'package:magic_games/routes/route_helper.dart';
 import 'package:magic_games/utils/utility.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 import 'package:magic_games/view/screens/profile/controller/profile_controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class GameDetailController extends GetxController {
+class GameDetailController extends GetxController with WidgetsBindingObserver {
   final SharedPreferenceHelper _sharedPreferenceHelper =
       Get.find<SharedPreferenceHelper>();
 
@@ -85,10 +86,7 @@ class GameDetailController extends GetxController {
     final String primaryCategory = categoryName
         .split(',')
         .map((final String token) => token.trim())
-        .firstWhere(
-          (final String token) => token.isNotEmpty,
-          orElse: () => '',
-        );
+        .firstWhere((final String token) => token.isNotEmpty, orElse: () => '');
 
     if (primaryCategory.isEmpty) {
       return const <String>[];
@@ -102,17 +100,65 @@ class GameDetailController extends GetxController {
     return storeUrl != null && storeUrl.isNotEmpty;
   }
 
+  List<Games> get recommendedGames {
+    if (games == null || !Get.isRegistered<HomeController>()) {
+      return const <Games>[];
+    }
+
+    final Set<String> currentCategories = <String>{
+      ..._tokenizeCategoryValues(games?.category),
+      ..._tokenizeCategoryValues(games?.categoryName),
+    };
+    if (currentCategories.isEmpty) {
+      return const <Games>[];
+    }
+
+    final HomeController homeController = Get.find<HomeController>();
+    final List<Games> matchedGames = homeController.allGames.where((
+      final Games game,
+    ) {
+      if (_isSameGame(game, games)) {
+        return false;
+      }
+
+      final Set<String> candidateCategories = <String>{
+        ..._tokenizeCategoryValues(game.category),
+        ..._tokenizeCategoryValues(game.categoryName),
+      };
+
+      return candidateCategories.any(currentCategories.contains);
+    }).toList();
+
+    return matchedGames.take(10).toList(growable: false);
+  }
+
+  bool requiresSubscriptionForGame(final Games game) {
+    if (Get.isRegistered<HomeController>()) {
+      return Get.find<HomeController>().requiresSubscriptionForGame(game);
+    }
+
+    return game.subscription ?? false;
+  }
+
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
 
     if (Get.arguments != null) {
       games = Get.arguments['game'];
     }
     _preloadGameAds();
-    unawaited(_applyPreferredOrientation());
+    unawaited(_enterGameMode());
     webViewController = WebViewController();
     loadUrl();
+  }
+
+  @override
+  void didChangeAppLifecycleState(final AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_restoreImmersiveMode());
+    }
   }
 
   void loadUrl() {
@@ -132,6 +178,7 @@ class GameDetailController extends GetxController {
         },
         onPageFinished: (String url) async {
           debugPrint('Page finished: $url — notifying JS');
+          _scheduleImmersiveModeRestore();
           try {
             await webViewController.runJavaScript(
               "if (typeof onFlutterReady === 'function') onFlutterReady();",
@@ -195,6 +242,18 @@ class GameDetailController extends GetxController {
     await _openStoreForGame(games);
   }
 
+  void openRecommendedGame(final Games game, final bool isSubscribe) {
+    if (isSubscribe) {
+      Get.offAllNamed(RouteHelper.vip);
+      return;
+    }
+
+    Get.toNamed(
+      RouteHelper.gameDetail,
+      arguments: <String, dynamic>{'game': game},
+    );
+  }
+
   Future<void> _handleWebMessage(final String message) async {
     final _WebMessage webMessage = _parseWebMessage(message);
 
@@ -228,12 +287,14 @@ class GameDetailController extends GetxController {
           adUnitId: _currentInterstitialAdUnitId,
           onDismissed: () {
             _isShowingInterstitial = false;
+            _scheduleImmersiveModeRestore();
             _sendCallbackToJs('GameResume');
             _sendCallbackToJs('interstitialClosed');
           },
         );
         if (!shownI) {
           _isShowingInterstitial = false;
+          _scheduleImmersiveModeRestore();
           _sendCallbackToJs('GameResume');
         }
         break;
@@ -250,12 +311,14 @@ class GameDetailController extends GetxController {
           adUnitId: _currentRewardedAdUnitId,
           onDismissed: () {
             _isShowingRewarded = false;
+            _scheduleImmersiveModeRestore();
             _sendCallbackToJs('GameResume');
             _sendCallbackToJs('rewardEarned');
           },
         );
         if (!shownR) {
           _isShowingRewarded = false;
+          _scheduleImmersiveModeRestore();
           _sendCallbackToJs('GameResume');
         }
         break;
@@ -296,11 +359,8 @@ class GameDetailController extends GetxController {
         break;
 
       case 'openMailComposerSupport':
-        Utility.sendFeedbackEmail();
-        break;
-
       case 'openMailComposer':
-        Utility.sendFeedbackEmail();
+        Utility.sendHelpSupportEmailFromEvent(gameName: games?.name ?? '');
         break;
 
       case 'gameStart':
@@ -308,6 +368,7 @@ class GameDetailController extends GetxController {
         break;
 
       case 'googleLeaderBoard':
+        await GoogleLeaderboardService.instance.showLeaderboard();
         break;
 
       case 'sendFirebaseEvent':
@@ -483,9 +544,36 @@ class GameDetailController extends GetxController {
 
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+    unawaited(_restoreDefaultSystemUi());
     unawaited(_resetPreferredOrientation());
     AdService.dispose();
     super.onClose();
+  }
+
+  Future<void> _enterGameMode() async {
+    await _restoreImmersiveMode();
+    await _applyPreferredOrientation();
+  }
+
+  Future<void> _restoreImmersiveMode() async {
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
+
+  void _scheduleImmersiveModeRestore() {
+    unawaited(
+      Future<void>.delayed(
+        const Duration(milliseconds: 300),
+        _restoreImmersiveMode,
+      ),
+    );
+  }
+
+  Future<void> _restoreDefaultSystemUi() async {
+    await SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
   }
 
   Future<void> _applyPreferredOrientation() async {
@@ -496,12 +584,14 @@ class GameDetailController extends GetxController {
         DeviceOrientation.landscapeLeft,
         DeviceOrientation.landscapeRight,
       ]);
+      await _restoreImmersiveMode();
       return;
     }
 
     await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
       DeviceOrientation.portraitUp,
     ]);
+    await _restoreImmersiveMode();
   }
 
   Future<void> _resetPreferredOrientation() async {
@@ -514,6 +604,47 @@ class GameDetailController extends GetxController {
     await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
       DeviceOrientation.portraitUp,
     ]);
+    await _restoreImmersiveMode();
+  }
+
+  Set<String> _tokenizeCategoryValues(final String? value) {
+    final String? normalizedValue = value?.trim();
+    if (normalizedValue == null || normalizedValue.isEmpty) {
+      return const <String>{};
+    }
+
+    return normalizedValue
+        .split(RegExp(r'[,|/]'))
+        .map((final String item) => item.trim().toLowerCase())
+        .where((final String item) => item.isNotEmpty)
+        .toSet();
+  }
+
+  bool _isSameGame(final Games? first, final Games? second) {
+    if (first == null || second == null) {
+      return false;
+    }
+
+    if (first.id != null && second.id != null) {
+      return first.id == second.id;
+    }
+
+    final String? firstUrl = first.gameurl?.trim();
+    final String? secondUrl = second.gameurl?.trim();
+    if (firstUrl != null &&
+        secondUrl != null &&
+        firstUrl.isNotEmpty &&
+        secondUrl.isNotEmpty) {
+      return firstUrl == secondUrl;
+    }
+
+    final String? firstName = first.name?.trim();
+    final String? secondName = second.name?.trim();
+    return firstName != null &&
+        secondName != null &&
+        firstName.isNotEmpty &&
+        secondName.isNotEmpty &&
+        firstName == secondName;
   }
 }
 

@@ -18,6 +18,7 @@ class GameIconWithBanner extends StatelessWidget {
     required this.game,
     required this.requiresSubscription,
     this.activeActionLabel,
+    this.actionMode = GameIconWithBannerActionMode.playOrSubscribe,
     this.onTap,
     this.onSecondaryTap,
   });
@@ -25,13 +26,14 @@ class GameIconWithBanner extends StatelessWidget {
   final Games game;
   final bool requiresSubscription;
   final String? activeActionLabel;
+  final GameIconWithBannerActionMode actionMode;
   final Function(bool)? onTap;
   final VoidCallback? onSecondaryTap;
 
   @override
   Widget build(BuildContext context) {
-    final double cardWidth = AppResponsive.value(155, tablet: 300);
-    final double cardHeight = AppResponsive.value(165, tablet: 340);
+    final double cardWidth = AppResponsive.value(180, tablet: 300);
+    final double cardHeight = AppResponsive.value(180, tablet: 300);
 
     return SizedBox(
       width: cardWidth,
@@ -100,39 +102,27 @@ class GameIconWithBanner extends StatelessWidget {
                     ],
                   ),
                   Gap(AppResponsive.space(12)),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CommonButton(
-                          height: AppResponsive.space(25),
-                          onPressed: () {
-                            onTap?.call(requiresSubscription);
-                          },
-                          borderRadius: 5,
-                          btnText: requiresSubscription
-                              ? 'Subscribe'.tr
-                              : (activeActionLabel ?? 'Play Now').tr,
-                          icon: requiresSubscription
-                              ? Assets.svg.icSubscribe
-                              : Assets.svg.icPlay,
-                          btnTxtColor: requiresSubscription
-                              ? AppColors.color00002F
-                              : AppColors.white,
-                          btnBgColor: requiresSubscription
-                              ? AppColors.colorF8AB0F
-                              : AppColors.color5820CB,
-                          style: poppinsW500.copyWith(
-                            fontSize: AppResponsive.font(8),
-                            color: requiresSubscription
-                                ? AppColors.color00002F
-                                : AppColors.white,
-                          ),
+                  actionMode == GameIconWithBannerActionMode.hourglassOnly
+                      ? const _HourglassIndicator()
+                      : Row(
+                          children: [
+                            Expanded(
+                              child: CommonButton(
+                                height: AppResponsive.value(30, tablet: 35),
+                                onPressed: _handlePrimaryTap,
+                                borderRadius: 5,
+                                btnText: _buttonText,
+                                icon: _buttonIcon,
+                                btnTxtColor: _buttonTextColor,
+                                btnBgColor: _buttonBackgroundColor,
+                                style: poppinsW500.copyWith(
+                                  fontSize: AppResponsive.font(9, tablet: 13),
+                                  color: _buttonTextColor,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      // Gap(AppResponsive.space(10)),
-                      // _SecondaryActionButton(onTap: onSecondaryTap ?? onTap),
-                    ],
-                  ),
                 ],
               ),
             ),
@@ -193,6 +183,82 @@ class GameIconWithBanner extends StatelessWidget {
 
     return game.name ?? '';
   }
+
+  void _handlePrimaryTap() {
+    if (actionMode == GameIconWithBannerActionMode.downloadOnly) {
+      onSecondaryTap?.call();
+      return;
+    }
+
+    onTap?.call(requiresSubscription);
+  }
+
+  String get _buttonText {
+    if (actionMode == GameIconWithBannerActionMode.downloadOnly) {
+      return 'Download'.tr;
+    }
+
+    if (requiresSubscription) {
+      return 'Subscribe'.tr;
+    }
+
+    return (activeActionLabel ?? 'Play Now').tr;
+  }
+
+  String? get _buttonIcon {
+    if (actionMode == GameIconWithBannerActionMode.downloadOnly) {
+      return null;
+    }
+
+    return requiresSubscription ? Assets.svg.icSubscribe : Assets.svg.icPlay;
+  }
+
+  Color get _buttonTextColor {
+    if (actionMode == GameIconWithBannerActionMode.downloadOnly) {
+      return AppColors.white;
+    }
+
+    return requiresSubscription ? AppColors.color00002F : AppColors.white;
+  }
+
+  Color get _buttonBackgroundColor {
+    if (actionMode == GameIconWithBannerActionMode.downloadOnly) {
+      return AppColors.color5820CB;
+    }
+
+    return requiresSubscription ? AppColors.colorF8AB0F : AppColors.color5820CB;
+  }
+}
+
+enum GameIconWithBannerActionMode {
+  playOrSubscribe,
+  downloadOnly,
+  hourglassOnly,
+}
+
+class _HourglassIndicator extends StatelessWidget {
+  const _HourglassIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: AppResponsive.value(30, tablet: 35),
+      decoration: BoxDecoration(
+        color: AppColors.color2A1B59.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(
+          color: AppColors.color8752FF.withValues(alpha: 0.28),
+        ),
+      ),
+      alignment: Alignment.center,
+      child: Icon(
+        Icons.hourglass_empty_rounded,
+        size: AppResponsive.value(18, tablet: 22),
+        color: AppColors.white,
+      ),
+    );
+  }
 }
 
 class _GameMiniThumb extends StatelessWidget {
@@ -207,6 +273,7 @@ class _GameMiniThumb extends StatelessWidget {
         : null;
 
     if (imageUrl == null) {
+      debugPrint("milan url=>$imageUrl");
       return HomeImagePlaceholderWidget(
         width: AppResponsive.space(23),
         height: AppResponsive.space(23),
