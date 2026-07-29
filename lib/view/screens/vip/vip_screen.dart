@@ -8,6 +8,7 @@ import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
+import 'package:magic_games/routes/route_helper.dart';
 import 'package:magic_games/view/base/bottom_navigation_bar.dart';
 import 'package:magic_games/view/base/common_button.dart';
 import 'package:magic_games/view/screens/vip/controller/vip_controller.dart';
@@ -27,146 +28,100 @@ class VipScreen extends StatelessWidget {
           return Scaffold(
             backgroundColor: AppColors.screenGgColor,
             bottomNavigationBar: BottomNavigation(selectedIndex: 1),
-            body: SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Image.asset(
-                    Assets.png.icHomeHeader.path,
-                    height: AppResponsive.value(35, tablet: 70),
-                    width: AppResponsive.value(140, tablet: 200),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Gap(AppResponsive.space(40)),
-                                    Text(
-                                      'Upgrade to VIP'.tr,
-                                      style: poppinsW700.copyWith(
-                                        fontSize: AppResponsive.font(18),
-                                        color: AppColors.white,
-                                      ),
-                                    ),
-                                    Gap(AppResponsive.space(5)),
-                                    Text(
-                                      'Get ultimate gaming experience with ultimate access and zero ads.'
-                                          .tr,
-                                      style: poppinsW300.copyWith(
-                                        fontSize: AppResponsive.font(12),
-                                        color: AppColors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ).paddingSymmetric(horizontal: 5),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Image.asset(
-                                  Assets.png.icVipShield.path,
-                                  height: AppResponsive.value(150, tablet: 280),
-                                  width: AppResponsive.value(200, tablet: 280),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _SparkIcon(1),
-                              Text(
-                                'VIP Members Benefits'.tr,
-                                style: poppinsW700.copyWith(
-                                  fontSize: AppResponsive.font(18),
-                                  color: AppColors.colorED2EAA,
-                                ),
-                              ),
-                              _SparkIcon(2),
-                            ],
-                          ),
-                          Gap(AppResponsive.space(10)),
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                              horizontal: AppResponsive.space(5),
-                            ),
-                            padding: EdgeInsets.all(AppResponsive.space(16)),
-                            decoration: BoxDecoration(
-                              color: AppColors.color0F0939,
-                              borderRadius: BorderRadius.circular(
-                                AppResponsive.space(10),
-                              ),
-                              border: Border.all(
-                                width: 1,
-                                color: AppColors.color1F1653,
-                              ),
-                            ),
-                            child: Column(
+            body: PopScope(
+              canPop: false,
+              onPopInvokedWithResult:
+                  (final bool didPop, final Object? result) async {
+                    if (didPop) {
+                      return;
+                    }
+
+                    if (Get.currentRoute != RouteHelper.home) {
+                      Get.offAndToNamed(RouteHelper.home);
+                    }
+                  },
+              child: SafeArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Image.asset(
+                      Assets.png.icHomeHeader.path,
+                      height: AppResponsive.value(35, tablet: 70),
+                      width: AppResponsive.value(140, tablet: 200),
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                OfferBenefitRow(
-                                  prefixIcon: Assets.png.icNoAds.path,
-                                  name: 'Remove All Ads'.tr,
-                                  desc:
-                                      'Enjoy uninterrupted gaming with zero ads.'
-                                          .tr,
-                                  suffixIcon: Assets.png.icTick.path,
+                                Expanded(
+                                  flex: 2,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Gap(AppResponsive.space(40)),
+                                      Text(
+                                        'Upgrade to VIP'.tr,
+                                        style: poppinsW700.copyWith(
+                                          fontSize: AppResponsive.font(18),
+                                          color: AppColors.white,
+                                        ),
+                                      ),
+                                      Gap(AppResponsive.space(5)),
+                                      Text(
+                                        'Get ultimate gaming experience with ultimate access and zero ads.'
+                                            .tr,
+                                        style: poppinsW300.copyWith(
+                                          fontSize: AppResponsive.font(12),
+                                          color: AppColors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ).paddingSymmetric(horizontal: 5),
                                 ),
-                                Gap(AppResponsive.space(10)),
-                                Divider(
-                                  thickness: 1,
-                                  color: AppColors.color211557,
-                                ),
-                                Gap(AppResponsive.space(10)),
-                                OfferBenefitRow(
-                                  prefixIcon: Assets.png.icUnlock.path,
-                                  name: 'Unlock All Games',
-                                  desc:
-                                      'Get Full access to 100+ games and all Future Releases.',
-                                  suffixIcon: Assets.png.icTick.path,
+                                Expanded(
+                                  flex: 1,
+                                  child: Image.asset(
+                                    Assets.png.icVipShield.path,
+                                    height: AppResponsive.value(
+                                      150,
+                                      tablet: 280,
+                                    ),
+                                    width: AppResponsive.value(
+                                      200,
+                                      tablet: 280,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                          Gap(10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _SparkIcon(1),
-                              Text(
-                                'Choose your Plan'.tr,
-                                style: poppinsW700.copyWith(
-                                  fontSize: 18,
-                                  color: AppColors.colorED2EAA,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _SparkIcon(1),
+                                Text(
+                                  'VIP Members Benefits'.tr,
+                                  style: poppinsW700.copyWith(
+                                    fontSize: AppResponsive.font(18),
+                                    color: AppColors.colorED2EAA,
+                                  ),
                                 ),
-                              ),
-                              _SparkIcon(2),
-                            ],
-                          ),
-                          Gap(AppResponsive.space(10)),
-                          PlanPriceWidget(
-                            controller: controller,
-                          ).paddingSymmetric(
-                            horizontal: AppResponsive.space(5),
-                          ),
-                          if (controller.hasPremiumAccess) ...[
-                            Gap(AppResponsive.space(14)),
+                                _SparkIcon(2),
+                              ],
+                            ),
+                            Gap(AppResponsive.space(10)),
                             Container(
                               margin: EdgeInsets.symmetric(
                                 horizontal: AppResponsive.space(5),
                               ),
-                              padding: EdgeInsets.all(AppResponsive.space(12)),
+                              padding: EdgeInsets.all(AppResponsive.space(16)),
                               decoration: BoxDecoration(
                                 color: AppColors.color0F0939,
                                 borderRadius: BorderRadius.circular(
@@ -174,58 +129,126 @@ class VipScreen extends StatelessWidget {
                                 ),
                                 border: Border.all(
                                   width: 1,
-                                  color: AppColors.colorF5BD48,
+                                  color: AppColors.color1F1653,
                                 ),
                               ),
-                              child: Text(
-                                'Premium access is already active on this device.'
-                                    .tr,
-                                style: poppinsW500.copyWith(
-                                  fontSize: AppResponsive.font(14),
-                                  color: AppColors.colorF5BD48,
-                                ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  OfferBenefitRow(
+                                    prefixIcon: Assets.png.icNoAds.path,
+                                    name: 'Remove All Ads'.tr,
+                                    desc:
+                                        'Enjoy uninterrupted gaming with zero ads.'
+                                            .tr,
+                                    suffixIcon: Assets.png.icTick.path,
+                                  ),
+                                  Gap(AppResponsive.space(10)),
+                                  Divider(
+                                    thickness: 1,
+                                    color: AppColors.color211557,
+                                  ),
+                                  Gap(AppResponsive.space(10)),
+                                  OfferBenefitRow(
+                                    prefixIcon: Assets.png.icUnlock.path,
+                                    name: 'Unlock All Games',
+                                    desc:
+                                        'Get Full access to 100+ games and all Future Releases.',
+                                    suffixIcon: Assets.png.icTick.path,
+                                  ),
+                                ],
                               ),
                             ),
+                            Gap(10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _SparkIcon(1),
+                                Text(
+                                  'Choose your Plan'.tr,
+                                  style: poppinsW700.copyWith(
+                                    fontSize: 18,
+                                    color: AppColors.colorED2EAA,
+                                  ),
+                                ),
+                                _SparkIcon(2),
+                              ],
+                            ),
+                            Gap(AppResponsive.space(10)),
+                            PlanPriceWidget(
+                              controller: controller,
+                            ).paddingSymmetric(
+                              horizontal: AppResponsive.space(5),
+                            ),
+                            if (controller.hasPremiumAccess) ...[
+                              Gap(AppResponsive.space(14)),
+                              Container(
+                                margin: EdgeInsets.symmetric(
+                                  horizontal: AppResponsive.space(5),
+                                ),
+                                padding: EdgeInsets.all(
+                                  AppResponsive.space(12),
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.color0F0939,
+                                  borderRadius: BorderRadius.circular(
+                                    AppResponsive.space(10),
+                                  ),
+                                  border: Border.all(
+                                    width: 1,
+                                    color: AppColors.colorF5BD48,
+                                  ),
+                                ),
+                                child: Text(
+                                  'Premium access is already active on this device.'
+                                      .tr,
+                                  style: poppinsW500.copyWith(
+                                    fontSize: AppResponsive.font(14),
+                                    color: AppColors.colorF5BD48,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                  Gap(30),
-                  if (!controller.hasPremiumAccess) ...[
-                    CommonButton(
-                      onPressed: controller.canStartPurchase
-                          ? controller.startPurchase
-                          : null,
-                      btnText: controller.purchaseButtonLabel,
-                      btnBgColor: AppColors.colorF5BD48,
-                      btnTxtColor: AppColors.black,
-                      height: AppResponsive.space(45),
-                    ),
-                    Gap(AppResponsive.space(4)),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(
-                          Assets.svg.icShield,
-                          height: AppResponsive.space(15),
-                          width: AppResponsive.space(15),
-                        ),
-                        Gap(AppResponsive.space(5)),
-                        Expanded(
-                          child: Text(
-                            controller.selectedPlanNote,
-                            style: poppinsW400.copyWith(
-                              fontSize: AppResponsive.font(14),
-                              color: AppColors.color9794B0,
+                    Gap(30),
+                    if (!controller.hasPremiumAccess) ...[
+                      CommonButton(
+                        onPressed: controller.canStartPurchase
+                            ? controller.startPurchase
+                            : null,
+                        btnText: controller.purchaseButtonLabel,
+                        btnBgColor: AppColors.colorF5BD48,
+                        btnTxtColor: AppColors.black,
+                        height: AppResponsive.space(45),
+                      ),
+                      Gap(AppResponsive.space(4)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            Assets.svg.icShield,
+                            height: AppResponsive.space(15),
+                            width: AppResponsive.space(15),
+                          ),
+                          Gap(AppResponsive.space(5)),
+                          Expanded(
+                            child: Text(
+                              controller.selectedPlanNote,
+                              style: poppinsW400.copyWith(
+                                fontSize: AppResponsive.font(14),
+                                color: AppColors.color9794B0,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    ],
                   ],
-                ],
-              ).paddingSymmetric(horizontal: 10),
+                ).paddingSymmetric(horizontal: 10),
+              ),
             ),
           );
         },

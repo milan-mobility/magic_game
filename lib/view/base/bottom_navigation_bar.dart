@@ -14,6 +14,15 @@ class BottomNavigation extends StatelessWidget {
 
   final int? selectedIndex;
 
+  Future<void> _openLeaderboard() async {
+    if (Get.currentRoute != RouteHelper.home) {
+      Get.offAndToNamed(RouteHelper.home);
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+    }
+
+    await GoogleLeaderboardService.instance.showLeaderboard();
+  }
+
   @override
   Widget build(final BuildContext context) {
     return Container(
@@ -106,7 +115,7 @@ class BottomNavigation extends StatelessWidget {
                 }
                 break;
               case 2:
-                await GoogleLeaderboardService.instance.showLeaderboard();
+                await _openLeaderboard();
                 break;
               default:
                 if (Get.currentRoute != RouteHelper.profile) {
