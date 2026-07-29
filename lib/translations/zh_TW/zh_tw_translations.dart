@@ -128,4 +128,11 @@ final Map<String, String> zhTw = <String, String>{
   'Premium access is already active on this device.': "此裝置上的高級權限已啟用。",
   'Restoring purchases...': "正在還原購買...",
   'Restore Purchases': "還原購買",
+  'Subscribe': "訂閱",
+  'Score': "分數",
+  'Leaderboard': "排行榜",
+  'View All': "查看全部",
+  'Upgrade to VIP': "升級到 VIP",
+  'Download': "下載",
+  'Continue': "繼續",
 };

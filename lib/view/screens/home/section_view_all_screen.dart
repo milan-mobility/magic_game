@@ -5,6 +5,7 @@ import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
 import 'package:magic_games/routes/route_helper.dart';
+import 'package:magic_games/view/base/common_app_bar.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 import 'package:magic_games/view/screens/home/widgets/game_cards/game_collection_item.dart';
 import 'package:magic_games/view/screens/search_games/widgets/search_game_list_item_widget.dart';
@@ -14,6 +15,7 @@ class SectionViewAllScreen extends GetView<HomeController> {
     super.key,
     required this.title,
     required this.layoutType,
+    this.showHourglassIndicator = false,
     this.subtitle,
     this.activeActionLabel,
     this.games = const <Games>[],
@@ -23,6 +25,7 @@ class SectionViewAllScreen extends GetView<HomeController> {
   final String title;
   final String? subtitle;
   final HomeSectionLayoutType layoutType;
+  final bool showHourglassIndicator;
   final String? activeActionLabel;
   final List<Games> games;
   final List<HomeCollectionCardData> collections;
@@ -31,17 +34,10 @@ class SectionViewAllScreen extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.screenGgColor,
-      appBar: AppBar(
+      appBar: CommonAppbar(
         backgroundColor: AppColors.screenGgColor,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          title,
-          style: poppinsW600.copyWith(
-            fontSize: AppResponsive.font(20),
-            color: AppColors.white,
-          ),
-        ),
+        titleColor: Colors.white,
+        title: title,
       ),
       body: SafeArea(
         top: false,
@@ -78,6 +74,7 @@ class SectionViewAllScreen extends GetView<HomeController> {
         final Games game = games[index];
         return SearchGameListItemWidget(
           game: game,
+          showHourglassAction: showHourglassIndicator,
           showInstallAction: _shouldShowInstall(game),
           showPlayAction: _shouldShowPlay(game),
           showSubscribeAction: _shouldShowSubscribe(game),
@@ -115,13 +112,15 @@ class SectionViewAllScreen extends GetView<HomeController> {
             runSpacing: 12,
             children: collections
                 .map(
-                  (final HomeCollectionCardData collection) => GameCollectionItem(
-                    title: collection.title,
-                    subtitle: collection.subtitle,
-                    imageUrl: collection.imageUrl,
-                    leadingLabel: collection.leadingLabel,
-                    onTap: () => controller.openCollectionSearch(collection),
-                  ),
+                  (final HomeCollectionCardData collection) =>
+                      GameCollectionItem(
+                        title: collection.title,
+                        subtitle: collection.subtitle,
+                        imageUrl: collection.imageUrl,
+                        leadingLabel: collection.leadingLabel,
+                        onTap: () =>
+                            controller.openCollectionSearch(collection),
+                      ),
                 )
                 .toList(),
           ),

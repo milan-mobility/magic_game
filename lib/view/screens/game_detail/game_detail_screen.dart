@@ -40,9 +40,7 @@ class GameDetailScreen extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    WebViewWidget(
-                      controller: controller.webViewController,
-                    ),
+                    WebViewWidget(controller: controller.webViewController),
                     if (!controller.isExitOverlayVisible)
                       Positioned(
                         top: 8,
@@ -115,7 +113,7 @@ class GameDetailScreen extends StatelessWidget {
                           requiresSubscriptionForGame:
                               controller.requiresSubscriptionForGame,
                           onRecommendedTap: controller.openRecommendedGame,
-                          onBack: () => Get.back<void>(),
+                          onBack: controller.closeGameDetailScreen,
                           onContinuePlaying: controller.hideExitOverlay,
                           onDownload: controller.canDownloadCurrentGame
                               ? controller.openCurrentGameStore

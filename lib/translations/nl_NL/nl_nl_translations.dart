@@ -145,4 +145,11 @@ final Map<String, String> nlNl = <String, String>{
       "Premiumtoegang is al actief op dit apparaat.",
   'Restoring purchases...': "Aankopen herstellen...",
   'Restore Purchases': "Aankopen herstellen",
+  'Subscribe': "Abonneren",
+  'Score': "Score",
+  'Leaderboard': "Ranglijst",
+  'View All': "Alles bekijken",
+  'Upgrade to VIP': "Upgraden naar VIP",
+  'Download': "Downloaden",
+  'Continue': "Doorgaan",
 };

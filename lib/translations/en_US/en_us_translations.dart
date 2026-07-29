@@ -144,9 +144,13 @@ final Map<String, String> enUs = <String, String>{
   'Restoring purchases...': 'Restoring purchases...',
   'Restore Purchases': 'Restore Purchases',
   'count_day_free_trial': '@count day Free Trial',
-
-  //New
   'Subscribe': 'Subscribe',
   'Score': 'Score',
-  'LeaderBoard': 'LeaderBoard',
+  'Leaderboard': 'Leaderboard',
+  'View All': 'View All',
+  'Upgrade to VIP': 'Upgrade to VIP',
+
+  //New
+  'Download': 'Download',
+  'Continue': 'Continue',
 };

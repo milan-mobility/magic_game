@@ -143,4 +143,11 @@ final Map<String, String> thTh = <String, String>{
       "สิทธิ์พรีเมียมเปิดใช้งานบนอุปกรณ์นี้แล้ว",
   'Restoring purchases...': "กำลังกู้คืนการซื้อ...",
   'Restore Purchases': "กู้คืนการซื้อ",
+  'Subscribe': "สมัครสมาชิก",
+  'Score': "คะแนน",
+  'Leaderboard': "ลีดเดอร์บอร์ด",
+  'View All': "ดูทั้งหมด",
+  'Upgrade to VIP': "อัปเกรดเป็น VIP",
+  'Download': "ดาวน์โหลด",
+  'Continue': "ดำเนินการต่อ",
 };

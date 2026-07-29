@@ -24,6 +24,7 @@ class LanguageScreen extends StatelessWidget {
             backgroundColor: AppColors.screenGgColor,
             appBar: CommonAppbar(
               title: 'Choose Your Language'.tr,
+              titleColor: AppColors.white,
               backgroundColor: AppColors.screenGgColor,
             ),
             bottomNavigationBar: SafeArea(

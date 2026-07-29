@@ -142,4 +142,11 @@ final Map<String, String> bnBd = <String, String>{
       "এই ডিভাইসে প্রিমিয়াম অ্যাক্সেস ইতোমধ্যেই সক্রিয়।",
   'Restoring purchases...': "কেনাকাটা পুনরুদ্ধার করা হচ্ছে...",
   'Restore Purchases': "কেনাকাটা পুনরুদ্ধার করুন",
+  'Subscribe': "সাবস্ক্রাইব",
+  'Score': "স্কোর",
+  'Leaderboard': "লিডারবোর্ড",
+  'View All': "সব দেখুন",
+  'Upgrade to VIP': "VIP-এ আপগ্রেড করুন",
+  'Download': "ডাউনলোড",
+  'Continue': "চালিয়ে যান",
 };

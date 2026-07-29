@@ -145,4 +145,11 @@ final Map<String, String> urPk = <String, String>{
       "اس ڈیوائس پر پریمیم رسائی پہلے سے فعال ہے۔",
   'Restoring purchases...': "خریداریاں بحال کی جا رہی ہیں...",
   'Restore Purchases': "خریداریاں بحال کریں",
+  'Subscribe': "سبسکرائب کریں",
+  'Score': "اسکور",
+  'Leaderboard': "لیڈر بورڈ",
+  'View All': "سب دیکھیں",
+  'Upgrade to VIP': "VIP میں اپ گریڈ کریں",
+  'Download': "ڈاؤن لوڈ",
+  'Continue': "جاری رکھیں",
 };

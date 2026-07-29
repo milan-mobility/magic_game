@@ -149,4 +149,11 @@ final Map<String, String> deDe = <String, String>{
       "Premium-Zugang ist auf diesem Gerät bereits aktiv.",
   'Restoring purchases...': "Käufe werden wiederhergestellt...",
   'Restore Purchases': "Käufe wiederherstellen",
+  'Subscribe': "Abonnieren",
+  'Score': "Punktzahl",
+  'Leaderboard': "Bestenliste",
+  'View All': "Alle ansehen",
+  'Upgrade to VIP': "Auf VIP upgraden",
+  'Download': "Herunterladen",
+  'Continue': "Fortfahren",
 };

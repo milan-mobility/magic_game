@@ -144,4 +144,11 @@ final Map<String, String> ruRu = <String, String>{
       "Премиум-доступ уже активен на этом устройстве.",
   'Restoring purchases...': "Восстановление покупок...",
   'Restore Purchases': "Восстановить покупки",
+  'Subscribe': "Подписаться",
+  'Score': "Счет",
+  'Leaderboard': "Таблица лидеров",
+  'View All': "Смотреть все",
+  'Upgrade to VIP': "Перейти на VIP",
+  'Download': "Скачать",
+  'Continue': "Продолжить",
 };

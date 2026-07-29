@@ -1,19 +1,21 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
 import 'package:magic_games/helpers/styles.dart';
+import 'package:magic_games/view/base/common_button.dart';
 import 'package:magic_games/view/screens/home/widgets/home_image_placeholder_widget.dart';
 
 class SearchGameListItemWidget extends StatelessWidget {
   const SearchGameListItemWidget({
     super.key,
     required this.game,
+    required this.showHourglassAction,
     required this.showInstallAction,
     required this.showPlayAction,
     required this.showSubscribeAction,
@@ -24,6 +26,7 @@ class SearchGameListItemWidget extends StatelessWidget {
   });
 
   final Games game;
+  final bool showHourglassAction;
   final bool showInstallAction;
   final bool showPlayAction;
   final bool showSubscribeAction;
@@ -34,71 +37,68 @@ class SearchGameListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppResponsive.space(12),
-          vertical: AppResponsive.space(12),
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.color170B3B,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.color2A1B59, width: 1),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _SearchGameThumb(iconUrl: game.icon),
-            Gap(AppResponsive.space(10)),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppResponsive.space(12),
+        vertical: AppResponsive.space(12),
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.color170B3B,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.color2A1B59, width: 1),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _SearchGameThumb(iconUrl: game.icon),
+          Gap(AppResponsive.space(10)),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _displayTitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: poppinsW600.copyWith(
+                    fontSize: AppResponsive.font(16),
+                    color: AppColors.white,
+                  ),
+                ),
+                if (_hasText(_subtitleText))
                   Text(
-                    _displayTitle,
-                    maxLines: 1,
+                    _subtitleText!,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: poppinsW600.copyWith(
-                      fontSize: AppResponsive.font(16),
-                      color: AppColors.white,
+                    style: poppinsW400.copyWith(
+                      fontSize: AppResponsive.font(13),
+                      height: 1.35,
+                      color: AppColors.white.withValues(alpha: 0.85),
                     ),
                   ),
-                  if (_hasText(_subtitleText))
-                    Text(
-                      _subtitleText!,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: poppinsW400.copyWith(
-                        fontSize: AppResponsive.font(13),
-                        height: 1.35,
-                        color: AppColors.white.withValues(alpha: 0.85),
-                      ),
-                    ),
-                  Gap(AppResponsive.space(8)),
-                  Wrap(
-                    spacing: AppResponsive.space(6),
-                    runSpacing: AppResponsive.space(6),
-                    children: _tags
-                        .map((final String tag) => _GameTag(label: tag))
-                        .toList(),
-                  ),
-                ],
-              ),
+                Gap(AppResponsive.space(8)),
+                Wrap(
+                  spacing: AppResponsive.space(6),
+                  runSpacing: AppResponsive.space(6),
+                  children: _tags
+                      .map((final String tag) => _GameTag(label: tag))
+                      .toList(),
+                ),
+              ],
             ),
-            Gap(AppResponsive.space(12)),
-            _SearchGameActions(
-              showInstallAction: showInstallAction,
-              showPlayAction: showPlayAction,
-              showSubscribeAction: showSubscribeAction,
-              onInstallTap: onInstallTap,
-              onPlayTap: onPlayTap,
-              onSubscribeTap: onSubscribeTap,
-            ),
-          ],
-        ),
+          ),
+          Gap(AppResponsive.space(12)),
+          _SearchGameActions(
+            showHourglassAction: showHourglassAction,
+            showInstallAction: showInstallAction,
+            showPlayAction: showPlayAction,
+            showSubscribeAction: showSubscribeAction,
+            onInstallTap: onInstallTap,
+            onPlayTap: onPlayTap,
+            onSubscribeTap: onSubscribeTap,
+          ),
+        ],
       ),
     );
   }
@@ -182,10 +182,7 @@ class _SearchGameThumb extends StatelessWidget {
 }
 
 class _SearchGameActionButton extends StatelessWidget {
-  const _SearchGameActionButton({
-    required this.icon,
-    required this.onTap,
-  });
+  const _SearchGameActionButton({required this.icon, required this.onTap});
 
   final IconData icon;
   final VoidCallback onTap;
@@ -216,6 +213,7 @@ class _SearchGameActionButton extends StatelessWidget {
 
 class _SearchGameActions extends StatelessWidget {
   const _SearchGameActions({
+    required this.showHourglassAction,
     required this.showInstallAction,
     required this.showPlayAction,
     required this.showSubscribeAction,
@@ -224,6 +222,7 @@ class _SearchGameActions extends StatelessWidget {
     required this.onSubscribeTap,
   });
 
+  final bool showHourglassAction;
   final bool showInstallAction;
   final bool showPlayAction;
   final bool showSubscribeAction;
@@ -233,11 +232,29 @@ class _SearchGameActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (showHourglassAction) {
+      return Container(
+        width: AppResponsive.space(42),
+        height: AppResponsive.space(42),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.color5820CB, width: 1),
+          color: AppColors.color170B3B,
+        ),
+        alignment: Alignment.center,
+        child: Icon(
+          Icons.hourglass_empty_rounded,
+          color: AppColors.white,
+          size: AppResponsive.space(22),
+        ),
+      );
+    }
+
     final bool hasPrimaryActions = showInstallAction || showPlayAction;
 
     return ConstrainedBox(
       constraints: BoxConstraints(
-        maxWidth: AppResponsive.value(100, tablet: 120),
+        maxWidth: AppResponsive.value(100, tablet: 140),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -263,36 +280,19 @@ class _SearchGameActions extends StatelessWidget {
             ),
           if (showSubscribeAction) ...[
             if (hasPrimaryActions) Gap(AppResponsive.space(8)),
-            InkWell(
-              onTap: onSubscribeTap,
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppResponsive.space(10),
-                  vertical: AppResponsive.space(8),
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.colorF8AB0F,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset(
-                      Assets.svg.icSubscribe,
-                      width: AppResponsive.space(12),
-                      height: AppResponsive.space(12),
-                    ),
-                    Gap(AppResponsive.space(6)),
-                    Text(
-                      'Subscribe',
-                      style: poppinsW600.copyWith(
-                        fontSize: AppResponsive.font(10),
-                        color: AppColors.color00002F,
-                      ),
-                    ),
-                  ],
-                ),
+
+            CommonButton(
+              height: AppResponsive.value(30, tablet: 35),
+              width: AppResponsive.value(120, tablet: 140),
+              btnText: 'Subscribe'.tr,
+              onPressed: () => onSubscribeTap,
+              fontSize: 12,
+              icon: Assets.svg.icSubscribe,
+              btnTxtColor: AppColors.color00002F,
+              btnBgColor: AppColors.colorF8AB0F,
+              style: poppinsW500.copyWith(
+                fontSize: AppResponsive.font(9, tablet: 13),
+                color: AppColors.color00002F,
               ),
             ),
           ],

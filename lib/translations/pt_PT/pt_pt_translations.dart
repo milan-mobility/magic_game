@@ -148,4 +148,11 @@ final Map<String, String> ptPt = <String, String>{
       "O acesso premium já está ativo neste dispositivo.",
   'Restoring purchases...': "A restaurar compras...",
   'Restore Purchases': "Restaurar compras",
+  'Subscribe': "Subscrever",
+  'Score': "Pontuação",
+  'Leaderboard': "Classificação",
+  'View All': "Ver tudo",
+  'Upgrade to VIP': "Fazer upgrade para VIP",
+  'Download': "Transferir",
+  'Continue': "Continuar",
 };

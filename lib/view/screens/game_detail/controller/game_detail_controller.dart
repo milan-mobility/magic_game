@@ -230,28 +230,34 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
 
   Future<bool> handleSystemBack() async {
     if (isExitOverlayVisible) {
-      Get.back<void>();
-      return false;
+      await hideExitOverlay();
     }
 
-    await showExitOverlay();
     return false;
   }
 
   Future<void> openCurrentGameStore() async {
+    await _prepareForScreenExit();
     await _openStoreForGame(games);
   }
 
   void openRecommendedGame(final Games game, final bool isSubscribe) {
     if (isSubscribe) {
+      unawaited(_prepareForScreenExit());
       Get.offAllNamed(RouteHelper.vip);
       return;
     }
 
+    unawaited(_prepareForScreenExit());
     Get.toNamed(
       RouteHelper.gameDetail,
       arguments: <String, dynamic>{'game': game},
     );
+  }
+
+  Future<void> closeGameDetailScreen() async {
+    await _prepareForScreenExit();
+    Get.back<void>();
   }
 
   Future<void> _handleWebMessage(final String message) async {
@@ -318,6 +324,9 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
         );
         if (!shownR) {
           _isShowingRewarded = false;
+          _showToastMessage(
+            'Reward is currently unavailable. Please try again later.',
+          );
           _scheduleImmersiveModeRestore();
           _sendCallbackToJs('GameResume');
         }
@@ -574,6 +583,13 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
       SystemUiMode.manual,
       overlays: SystemUiOverlay.values,
     );
+  }
+
+  Future<void> _prepareForScreenExit() async {
+    isExitOverlayVisible = false;
+    update();
+    await _restoreDefaultSystemUi();
+    await _resetPreferredOrientation();
   }
 
   Future<void> _applyPreferredOrientation() async {

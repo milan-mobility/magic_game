@@ -135,4 +135,11 @@ final Map<String, String> koKr = <String, String>{
       "이 기기에서는 이미 프리미엄 이용 권한이 활성화되어 있습니다.",
   'Restoring purchases...': "구매 내역 복원 중...",
   'Restore Purchases': "구매 복원",
+  'Subscribe': "구독",
+  'Score': "점수",
+  'Leaderboard': "리더보드",
+  'View All': "모두 보기",
+  'Upgrade to VIP': "VIP로 업그레이드",
+  'Download': "다운로드",
+  'Continue': "계속",
 };

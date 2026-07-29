@@ -148,4 +148,11 @@ final Map<String, String> esEs = <String, String>{
       "El acceso premium ya está activo en este dispositivo.",
   'Restoring purchases...': "Restaurando compras...",
   'Restore Purchases': "Restaurar compras",
+  'Subscribe': "Suscribirse",
+  'Score': "Puntuación",
+  'Leaderboard': "Clasificación",
+  'View All': "Ver todo",
+  'Upgrade to VIP': "Mejorar a VIP",
+  'Download': "Descargar",
+  'Continue': "Continuar",
 };

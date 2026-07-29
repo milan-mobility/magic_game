@@ -8,6 +8,8 @@ import 'package:magic_games/utils/connection.dart';
 import 'package:magic_games/view/base/offline_retry_dialog.dart';
 
 class NetworkController extends GetxController implements GetxService {
+  static const Duration _resumeNetworkGracePeriod = Duration(seconds: 2);
+
   final RxBool isConnected = true.obs;
 
   final Completer<void> _startupCheckCompleter = Completer<void>();
@@ -15,6 +17,10 @@ class NetworkController extends GetxController implements GetxService {
 
   bool _shouldRouteToHomeOnReconnect = false;
   bool _isOfflineDialogVisible = false;
+  bool _shouldRecheckConnectionAfterResume = false;
+  AppLifecycleState _appLifecycleState = AppLifecycleState.resumed;
+  DateTime? _lastResumedAt;
+  Timer? _resumeConnectionTimer;
 
   bool get shouldBlockStartupNavigation =>
       _shouldRouteToHomeOnReconnect && !isConnected.value;
@@ -24,6 +30,12 @@ class NetworkController extends GetxController implements GetxService {
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(_lifecycleObserver);
+    _appLifecycleState =
+        WidgetsBinding.instance.lifecycleState ?? AppLifecycleState.resumed;
+    if (_appLifecycleState == AppLifecycleState.resumed) {
+      _lastResumedAt = DateTime.now();
+    }
     _listenToNetworkChanges();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       unawaited(_runStartupCheck());
@@ -32,7 +44,9 @@ class NetworkController extends GetxController implements GetxService {
 
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(_lifecycleObserver);
     _connectionSubscription?.cancel();
+    _resumeConnectionTimer?.cancel();
     super.onClose();
   }
 
@@ -52,9 +66,7 @@ class NetworkController extends GetxController implements GetxService {
 
   void _listenToNetworkChanges() {
     _connectionSubscription = ConnectionUtils.onStatusChange.listen((status) {
-      unawaited(
-        _handleNetworkStatusChange(status == InternetStatus.connected),
-      );
+      unawaited(_handleNetworkStatusChange(status == InternetStatus.connected));
     });
   }
 
@@ -64,7 +76,14 @@ class NetworkController extends GetxController implements GetxService {
     isConnected.value = connected;
 
     if (connected) {
+      _shouldRecheckConnectionAfterResume = false;
       await _handleConnectionRestored();
+      return;
+    }
+
+    if (_shouldSuppressOfflineDialog) {
+      _shouldRecheckConnectionAfterResume = true;
+      _scheduleResumeConnectionCheck();
       return;
     }
 
@@ -126,5 +145,77 @@ class NetworkController extends GetxController implements GetxService {
       Get.back<void>();
       await Future<void>.delayed(const Duration(milliseconds: 120));
     }
+  }
+
+  bool get _shouldSuppressOfflineDialog =>
+      _appLifecycleState != AppLifecycleState.resumed ||
+      _isWithinResumeGracePeriod;
+
+  bool get _isWithinResumeGracePeriod {
+    final DateTime? lastResumedAt = _lastResumedAt;
+    if (lastResumedAt == null) {
+      return false;
+    }
+
+    return DateTime.now().difference(lastResumedAt) < _resumeNetworkGracePeriod;
+  }
+
+  void _scheduleResumeConnectionCheck() {
+    _resumeConnectionTimer?.cancel();
+    if (!_shouldRecheckConnectionAfterResume ||
+        _appLifecycleState != AppLifecycleState.resumed) {
+      return;
+    }
+
+    // Give the OS a moment to restore networking after unlock/resume.
+    _resumeConnectionTimer = Timer(_resumeNetworkGracePeriod, () {
+      unawaited(_runResumeConnectionCheck());
+    });
+  }
+
+  Future<void> _runResumeConnectionCheck() async {
+    if (_appLifecycleState != AppLifecycleState.resumed) {
+      return;
+    }
+
+    _shouldRecheckConnectionAfterResume = false;
+    final bool connected = await ConnectionUtils.isNetworkConnected();
+    final bool wasConnected = isConnected.value;
+    isConnected.value = connected;
+
+    if (connected) {
+      await _handleConnectionRestored();
+      return;
+    }
+
+    if (wasConnected || !_isOfflineDialogVisible) {
+      await _showOfflineDialogIfNeeded();
+    }
+  }
+
+  late final WidgetsBindingObserver _lifecycleObserver =
+      _NetworkLifecycleObserver(this);
+
+  void _handleAppLifecycleStateChanged(AppLifecycleState state) {
+    _appLifecycleState = state;
+
+    if (state == AppLifecycleState.resumed) {
+      _lastResumedAt = DateTime.now();
+      _scheduleResumeConnectionCheck();
+      return;
+    }
+
+    _resumeConnectionTimer?.cancel();
+  }
+}
+
+class _NetworkLifecycleObserver with WidgetsBindingObserver {
+  _NetworkLifecycleObserver(this._controller);
+
+  final NetworkController _controller;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _controller._handleAppLifecycleStateChanged(state);
   }
 }

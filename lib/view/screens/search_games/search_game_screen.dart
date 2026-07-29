@@ -92,12 +92,14 @@ class SearchGameScreen extends StatelessWidget {
                               final game = controller.filteredGames[index];
                               return SearchGameListItemWidget(
                                 game: game,
+                                showHourglassAction: controller
+                                    .shouldShowHourglass(game),
                                 showInstallAction: controller.shouldShowInstall(
                                   game,
                                 ),
                                 showPlayAction: controller.shouldShowPlay(game),
-                                showSubscribeAction:
-                                    controller.shouldShowSubscribe(game),
+                                showSubscribeAction: controller
+                                    .shouldShowSubscribe(game),
                                 onTap: () => controller.openGame(game),
                                 onInstallTap: () =>
                                     controller.openStoreForGame(game),

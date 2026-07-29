@@ -176,6 +176,17 @@ class HomeController extends GetxController implements GetxService {
       );
   }
 
+  Set<int> get comingSoonGameIds {
+    return homeSections
+        .where(
+          (final HomeSectionData section) => section.showHourglassIndicator,
+        )
+        .expand((final HomeSectionData section) => section.games)
+        .map((final Games game) => game.id)
+        .whereType<int>()
+        .toSet();
+  }
+
   Future<void> recordRecentlyPlayedGame(final Games game) async {
     final String? gameKey = _recentlyPlayedKeyForGame(game);
     if (!_hasText(gameKey)) {
@@ -254,7 +265,8 @@ class HomeController extends GetxController implements GetxService {
       gamesByKey[gameKey!] = game;
     }
 
-    final List<Games> orderedGames = _sharedPreferenceHelper.recentlyPlayedGameKeys
+    final List<Games> orderedGames = _sharedPreferenceHelper
+        .recentlyPlayedGameKeys
         .map((final String key) => gamesByKey[key])
         .whereType<Games>()
         .toList();
@@ -682,6 +694,7 @@ class HomeController extends GetxController implements GetxService {
       arguments: <String, dynamic>{
         'categories': homeCategories,
         'games': allGames,
+        'comingSoonGameIds': comingSoonGameIds.toList(growable: false),
         if (_hasText(selectedCategoryId))
           'selectedCategoryId': selectedCategoryId,
       },

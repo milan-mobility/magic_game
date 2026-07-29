@@ -10,6 +10,7 @@ class CommonAppbar extends StatelessWidget implements PreferredSize {
     this.onLeading,
     this.backgroundColor,
     this.iconStr,
+    this.titleColor = Colors.black,
     this.showLeading = true,
     this.isTitleInCenter = true,
   });
@@ -18,6 +19,7 @@ class CommonAppbar extends StatelessWidget implements PreferredSize {
   final List<Widget>? actions;
   final VoidCallback? onLeading;
   final Color? backgroundColor;
+  final Color? titleColor;
   final String? iconStr;
   final bool? showLeading;
   final bool? isTitleInCenter;
@@ -39,7 +41,7 @@ class CommonAppbar extends StatelessWidget implements PreferredSize {
                     },
                 child: Padding(
                   padding: const EdgeInsets.only(left: 10.0, top: 5, bottom: 5),
-                  child: Icon(Icons.arrow_back_ios),
+                  child: Icon(Icons.arrow_back_ios, color: Colors.white),
                 ),
               ),
             )
@@ -48,7 +50,7 @@ class CommonAppbar extends StatelessWidget implements PreferredSize {
       titleSpacing: (isTitleInCenter ?? false) ? 0 : 20,
       title: Text(
         title,
-        style: poppinsW500.copyWith(fontSize: 22, color: Colors.black),
+        style: poppinsW500.copyWith(fontSize: 22, color: titleColor),
       ),
       actions: actions,
     );

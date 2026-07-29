@@ -334,7 +334,7 @@ class ProfileController extends GetxController {
       }
     }
 
-    return 'Guest Player';
+    return 'Guest Player'.tr;
   }
 
   String get _initialDialogName {
@@ -375,7 +375,9 @@ class ProfileController extends GetxController {
   }
 
   String? _resolveAvatarImageUrl() {
-    final String? googlePhotoUrl = _normalizedValue(_authService.currentPhotoUrl);
+    final String? googlePhotoUrl = _normalizedValue(
+      _authService.currentPhotoUrl,
+    );
 
     if (_prefersStoredProfileData) {
       if (_normalizedValue(avatarFilePath) != null ||

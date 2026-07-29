@@ -133,4 +133,11 @@ final Map<String, String> jaJp = <String, String>{
       "この端末ではすでにプレミアムアクセスが有効です。",
   'Restoring purchases...': "購入を復元中...",
   'Restore Purchases': "購入を復元",
+  'Subscribe': "登録",
+  'Score': "スコア",
+  'Leaderboard': "ランキング",
+  'View All': "すべて見る",
+  'Upgrade to VIP': "VIPにアップグレード",
+  'Download': "ダウンロード",
+  'Continue': "続ける",
 };

@@ -203,6 +203,7 @@ class SectionWidget extends StatelessWidget {
         title: title,
         subtitle: subtitle,
         layoutType: layoutType,
+        showHourglassIndicator: showHourglassIndicator,
         games: games,
         collections: collections,
       ),

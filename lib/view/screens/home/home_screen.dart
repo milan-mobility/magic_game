@@ -42,17 +42,7 @@ class HomeScreen extends GetView<HomeController> {
             return Column(
               children: [
                 const SizedBox(height: 12),
-                HomeHeader(
-                  onSearchTap: () {
-                    Get.toNamed(
-                      RouteHelper.searchGames,
-                      arguments: {
-                        'categories': categories,
-                        'games': controller.allGames,
-                      },
-                    );
-                  },
-                ),
+                HomeHeader(onSearchTap: controller.openSearch),
                 if (categories.isNotEmpty) ...[
                   const SizedBox(height: 20),
                   HomeCategoryListWidget(
@@ -89,16 +79,17 @@ class HomeScreen extends GetView<HomeController> {
                           games: recentPlayedGames,
                           requiresSubscriptionForGame:
                               controller.requiresSubscriptionForGame,
-                          onGameTap: (final Games game, final bool isSubscribe) {
-                            if (isSubscribe) {
-                              Get.offAllNamed(RouteHelper.vip);
-                            } else {
-                              Get.toNamed(
-                                RouteHelper.gameDetail,
-                                arguments: <String, dynamic>{'game': game},
-                              );
-                            }
-                          },
+                          onGameTap:
+                              (final Games game, final bool isSubscribe) {
+                                if (isSubscribe) {
+                                  Get.offAllNamed(RouteHelper.vip);
+                                } else {
+                                  Get.toNamed(
+                                    RouteHelper.gameDetail,
+                                    arguments: <String, dynamic>{'game': game},
+                                  );
+                                }
+                              },
                         ),
                       ],
                       if (sections.isEmpty && recentPlayedGames.isEmpty)
