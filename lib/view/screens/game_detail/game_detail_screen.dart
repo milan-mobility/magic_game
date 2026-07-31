@@ -18,6 +18,7 @@ class GameDetailScreen extends StatelessWidget {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
+        backgroundColor: AppColors.themeColor,
         body: GetBuilder<GameDetailController>(
           init: GameDetailController(),
           builder: (final GameDetailController controller) {
