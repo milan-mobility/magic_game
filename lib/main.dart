@@ -18,18 +18,18 @@ Future<void> main() async {
   // await ConsentManager.instance.resetForTesting(); //TODO development only for testing a consent
   await ConsentManager.instance.init(
     debugGeography:
-        true, //TODO MAKE SURE YOU SHOULD HAVE TO MARK AS FALSE BEFORE YOU GO LIVE
-    testDeviceIds: const <String>[
-      '9F158A55589AAC6782B4FC31799463AC',
-      '27A90922BF70C3EF357BF5E7465783A0',
-    ], //TODO development only
+        false, //TODO MAKE SURE YOU SHOULD HAVE TO MARK AS FALSE BEFORE YOU GO LIVE
+    // testDeviceIds: const <String>[
+    //   '9F158A55589AAC6782B4FC31799463AC',
+    //   '27A90922BF70C3EF357BF5E7465783A0',
+    // ], //TODO development only
   );
 
   final RequestConfiguration requestConfig = RequestConfiguration(
-    testDeviceIds: <String>[
-      '9F158A55589AAC6782B4FC31799463AC',
-      '27A90922BF70C3EF357BF5E7465783A0',
-    ], //TODO development only
+    // testDeviceIds: <String>[
+    //   '9F158A55589AAC6782B4FC31799463AC',
+    //   '27A90922BF70C3EF357BF5E7465783A0',
+    // ], //TODO development only
     tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.no,
   );
   await MobileAds.instance.updateRequestConfiguration(requestConfig);
