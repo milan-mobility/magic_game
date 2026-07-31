@@ -75,7 +75,7 @@ class FeaturedBannerItemWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: RadialGradient(
                     center: const Alignment(1.0, 0.0),
-                    radius: isPhone ? 1.5 : 1.8,
+                    radius: isPhone ? 1.35 : 2.6,
                     stops: const <double>[0.5, 0.81],
                     colors: [
                       AppColors.white.withValues(alpha: 0),

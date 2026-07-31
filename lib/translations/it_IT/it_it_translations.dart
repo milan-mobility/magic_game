@@ -155,4 +155,12 @@ final Map<String, String> itIt = <String, String>{
   'Upgrade to VIP': "Passa a VIP",
   'Download': "Scarica",
   'Continue': "Continua",
+
+  //New
+  'Continue Playing': 'Continua a giocare',
+  'Jump back into your recently played favorites.':
+      'Torna ai tuoi preferiti giocati di recente.',
+  'Explore': 'Esplora',
+  'Choose your language': 'Scegli la tua lingua',
+  'Save Language': 'Salva lingua',
 };

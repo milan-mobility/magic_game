@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get/get.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:magic_games/routes/route_helper.dart';
@@ -9,11 +10,13 @@ import 'package:magic_games/view/base/offline_retry_dialog.dart';
 
 class NetworkController extends GetxController implements GetxService {
   static const Duration _resumeNetworkGracePeriod = Duration(seconds: 2);
+  static const Duration _networkStatusPollInterval = Duration(seconds: 5);
 
   final RxBool isConnected = true.obs;
 
   final Completer<void> _startupCheckCompleter = Completer<void>();
   StreamSubscription<InternetStatus>? _connectionSubscription;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
   bool _shouldRouteToHomeOnReconnect = false;
   bool _isOfflineDialogVisible = false;
@@ -21,6 +24,8 @@ class NetworkController extends GetxController implements GetxService {
   AppLifecycleState _appLifecycleState = AppLifecycleState.resumed;
   DateTime? _lastResumedAt;
   Timer? _resumeConnectionTimer;
+  Timer? _networkStatusPollTimer;
+  bool _isPollingConnection = false;
 
   bool get shouldBlockStartupNavigation =>
       _shouldRouteToHomeOnReconnect && !isConnected.value;
@@ -37,6 +42,7 @@ class NetworkController extends GetxController implements GetxService {
       _lastResumedAt = DateTime.now();
     }
     _listenToNetworkChanges();
+    _startConnectionPolling();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       unawaited(_runStartupCheck());
     });
@@ -45,13 +51,24 @@ class NetworkController extends GetxController implements GetxService {
   @override
   void onClose() {
     WidgetsBinding.instance.removeObserver(_lifecycleObserver);
+    _connectivitySubscription?.cancel();
     _connectionSubscription?.cancel();
     _resumeConnectionTimer?.cancel();
+    _networkStatusPollTimer?.cancel();
     super.onClose();
   }
 
+  Future<bool> _checkNetworkAccess() async {
+    final List<ConnectivityResult> results =
+        await Connectivity().checkConnectivity();
+    if (results.contains(ConnectivityResult.none) || results.isEmpty) {
+      return false;
+    }
+    return ConnectionUtils.isNetworkConnected();
+  }
+
   Future<void> _runStartupCheck() async {
-    final bool connected = await ConnectionUtils.isNetworkConnected();
+    final bool connected = await _checkNetworkAccess();
     isConnected.value = connected;
 
     if (!connected) {
@@ -65,17 +82,55 @@ class NetworkController extends GetxController implements GetxService {
   }
 
   void _listenToNetworkChanges() {
+    _connectivitySubscription =
+        Connectivity().onConnectivityChanged.listen((results) async {
+      final bool hasHardwareConnection =
+          !results.contains(ConnectivityResult.none) && results.isNotEmpty;
+
+      if (!hasHardwareConnection) {
+        unawaited(_handleNetworkStatusChange(false));
+      } else {
+        final bool connected = await _checkNetworkAccess();
+        unawaited(_handleNetworkStatusChange(connected));
+      }
+    });
+
     _connectionSubscription = ConnectionUtils.onStatusChange.listen((status) {
       unawaited(_handleNetworkStatusChange(status == InternetStatus.connected));
     });
   }
 
-  Future<void> _handleNetworkStatusChange(bool streamConnected) async {
-    final bool connected = await ConnectionUtils.isNetworkConnected();
-    final bool wasConnected = isConnected.value;
-    isConnected.value = connected;
+  void _startConnectionPolling() {
+    _networkStatusPollTimer?.cancel();
+    _networkStatusPollTimer = Timer.periodic(_networkStatusPollInterval, (_) {
+      unawaited(_pollConnectionStatus());
+    });
+  }
 
-    if (connected) {
+  Future<void> _pollConnectionStatus() async {
+    if (_isPollingConnection) {
+      return;
+    }
+
+    _isPollingConnection = true;
+    try {
+      final bool connected = await _checkNetworkAccess();
+      if (connected == isConnected.value &&
+          (connected || _isOfflineDialogVisible)) {
+        return;
+      }
+
+      await _handleNetworkStatusChange(connected);
+    } finally {
+      _isPollingConnection = false;
+    }
+  }
+
+  Future<void> _handleNetworkStatusChange(bool streamConnected) async {
+    final bool wasConnected = isConnected.value;
+    isConnected.value = streamConnected;
+
+    if (streamConnected) {
       _shouldRecheckConnectionAfterResume = false;
       await _handleConnectionRestored();
       return;
@@ -87,25 +142,31 @@ class NetworkController extends GetxController implements GetxService {
       return;
     }
 
-    if (!streamConnected && (wasConnected || !_isOfflineDialogVisible)) {
-      await _showOfflineDialogIfNeeded();
+    if (wasConnected || !_isOfflineDialogVisible) {
+      await _showOfflineDialogIfNeeded(skipConnectionCheck: true);
     }
   }
 
-  Future<void> _showOfflineDialogIfNeeded() async {
+  Future<void> _showOfflineDialogIfNeeded({
+    bool skipConnectionCheck = false,
+  }) async {
     if (_isOfflineDialogVisible) {
       return;
     }
 
-    final bool connected = await ConnectionUtils.isNetworkConnected();
-    if (connected) {
-      isConnected.value = true;
-      return;
+    if (!skipConnectionCheck) {
+      final bool connected = await _checkNetworkAccess();
+      if (connected) {
+        isConnected.value = true;
+        return;
+      }
     }
 
     if (Get.context == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        unawaited(_showOfflineDialogIfNeeded());
+        unawaited(
+          _showOfflineDialogIfNeeded(skipConnectionCheck: skipConnectionCheck),
+        );
       });
       return;
     }
@@ -114,7 +175,7 @@ class NetworkController extends GetxController implements GetxService {
 
     await showOfflineRetryDialog(
       onRetry: () async {
-        final bool connected = await ConnectionUtils.isNetworkConnected();
+        final bool connected = await _checkNetworkAccess();
         if (connected) {
           await _handleConnectionRestored();
         }
@@ -124,7 +185,7 @@ class NetworkController extends GetxController implements GetxService {
 
     _isOfflineDialogVisible = false;
 
-    final bool stillConnected = await ConnectionUtils.isNetworkConnected();
+    final bool stillConnected = await _checkNetworkAccess();
     isConnected.value = stillConnected;
     if (stillConnected) {
       await _handleConnectionRestored();
@@ -179,7 +240,7 @@ class NetworkController extends GetxController implements GetxService {
     }
 
     _shouldRecheckConnectionAfterResume = false;
-    final bool connected = await ConnectionUtils.isNetworkConnected();
+    final bool connected = await _checkNetworkAccess();
     final bool wasConnected = isConnected.value;
     isConnected.value = connected;
 

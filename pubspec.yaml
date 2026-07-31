@@ -50,6 +50,7 @@ dependencies:
   path_provider: ^2.1.5
   games_services: ^5.0.0
   wakelock_plus: ^1.3.3
+  connectivity_plus: ^7.3.1
 
 
 dev_dependencies:

@@ -152,4 +152,12 @@ final Map<String, String> nlNl = <String, String>{
   'Upgrade to VIP': "Upgraden naar VIP",
   'Download': "Downloaden",
   'Continue': "Doorgaan",
+
+  //New
+  'Continue Playing': 'Verder spelen',
+  'Jump back into your recently played favorites.':
+      'Ga terug naar je onlangs gespeelde favorieten.',
+  'Explore': 'Ontdekken',
+  'Choose your language': 'Kies je taal',
+  'Save Language': 'Taal opslaan',
 };

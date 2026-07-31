@@ -151,4 +151,12 @@ final Map<String, String> ruRu = <String, String>{
   'Upgrade to VIP': "Перейти на VIP",
   'Download': "Скачать",
   'Continue': "Продолжить",
+
+  //New
+  'Continue Playing': 'Продолжить игру',
+  'Jump back into your recently played favorites.':
+      'Вернитесь к своим недавно сыгранным любимым играм.',
+  'Explore': 'Исследовать',
+  'Choose your language': 'Выберите ваш язык',
+  'Save Language': 'Сохранить язык',
 };

@@ -149,4 +149,12 @@ final Map<String, String> arSa = <String, String>{
   'Upgrade to VIP': "الترقية إلى VIP",
   'Download': "تنزيل",
   'Continue': "متابعة",
+
+  //New
+  'Continue Playing': 'مواصلة اللعب',
+  'Jump back into your recently played favorites.':
+      'عد مباشرة إلى ألعابك المفضلة التي لعبتها مؤخرًا.',
+  'Explore': 'استكشف',
+  'Choose your language': 'اختر لغتك',
+  'Save Language': 'احفظ اللغة',
 };

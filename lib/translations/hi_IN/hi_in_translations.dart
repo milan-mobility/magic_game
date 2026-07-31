@@ -149,4 +149,12 @@ final Map<String, String> hiIn = <String, String>{
   'Upgrade to VIP': "VIP में अपग्रेड करें",
   'Download': "डाउनलोड",
   'Continue': "जारी रखें",
+
+  //New
+  'Continue Playing': 'खेलना जारी रखें',
+  'Jump back into your recently played favorites.':
+      'अपने हाल ही में खेले गए पसंदीदा गेम में वापस जाएं।',
+  'Explore': 'खोजें',
+  'Choose your language': 'अपनी भाषा चुनें',
+  'Save Language': 'भाषा सहेजें',
 };

@@ -142,4 +142,11 @@ final Map<String, String> koKr = <String, String>{
   'Upgrade to VIP': "VIP로 업그레이드",
   'Download': "다운로드",
   'Continue': "계속",
+
+  //New
+  'Continue Playing': '계속 플레이하기',
+  'Jump back into your recently played favorites.': '최근에 플레이한 즐겨찾기 게임으로 돌아가기.',
+  'Explore': '탐색',
+  'Choose your language': '언어를 선택하세요',
+  'Save Language': '언어 저장',
 };

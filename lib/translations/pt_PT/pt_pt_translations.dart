@@ -155,4 +155,12 @@ final Map<String, String> ptPt = <String, String>{
   'Upgrade to VIP': "Fazer upgrade para VIP",
   'Download': "Transferir",
   'Continue': "Continuar",
+
+  //New
+  'Continue Playing': 'Continuar a jogar',
+  'Jump back into your recently played favorites.':
+      'Volte aos seus favoritos jogados recentemente.',
+  'Explore': 'Explorar',
+  'Choose your language': 'Escolha o seu idioma',
+  'Save Language': 'Guardar idioma',
 };

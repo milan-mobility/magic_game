@@ -151,4 +151,12 @@ final Map<String, String> trTr = <String, String>{
   'Upgrade to VIP': "VIP'e Yükselt",
   'Download': "İndir",
   'Continue': "Devam Et",
+
+  //New
+  'Continue Playing': 'Oynamaya Devam Et',
+  'Jump back into your recently played favorites.':
+      'Son oynadığınız favorilerinize geri dönün.',
+  'Explore': 'Keşfet',
+  'Choose your language': 'Dilini seç',
+  'Save Language': 'Dili Kaydet',
 };

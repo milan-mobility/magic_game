@@ -149,8 +149,12 @@ final Map<String, String> enUs = <String, String>{
   'Leaderboard': 'Leaderboard',
   'View All': 'View All',
   'Upgrade to VIP': 'Upgrade to VIP',
-
-  //New
   'Download': 'Download',
   'Continue': 'Continue',
+  'Continue Playing': 'Continue Playing',
+  'Jump back into your recently played favorites.':
+      'Jump back into your recently played favorites.',
+  'Explore': 'Explore',
+  'Choose your language': 'Choose your language',
+  'Save Language': 'Save Language',
 };

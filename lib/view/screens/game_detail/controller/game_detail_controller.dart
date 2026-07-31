@@ -373,6 +373,7 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
         break;
 
       case 'gameStart':
+        _sendCallbackToJs(Get.locale?.languageCode.toLowerCase() ?? '');
         await _recordCurrentGameAsRecentlyPlayed();
         break;
 

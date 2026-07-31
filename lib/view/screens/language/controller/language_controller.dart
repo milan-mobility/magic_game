@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
+import 'package:magic_games/routes/route_helper.dart';
 import 'package:magic_games/utils/app_enums.dart';
+import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 
 class LanguageController extends GetxController {
   final SharedPreferenceHelper _sharedPreferenceHelper =
@@ -27,6 +29,11 @@ class LanguageController extends GetxController {
       selectedLanguage.languageCode,
     );
     await Get.updateLocale(selectedLanguage.locale);
-    Get.back(result: true);
+
+    if (Get.isRegistered<HomeController>()) {
+      await Get.find<HomeController>().reloadForLanguageChange();
+    }
+
+    await Get.offAllNamed(RouteHelper.home);
   }
 }

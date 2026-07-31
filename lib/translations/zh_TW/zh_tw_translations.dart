@@ -135,4 +135,11 @@ final Map<String, String> zhTw = <String, String>{
   'Upgrade to VIP': "升級到 VIP",
   'Download': "下載",
   'Continue': "繼續",
+
+  //New
+  'Continue Playing': '繼續遊戲',
+  'Jump back into your recently played favorites.': '重溫您最近玩過的最愛遊戲。',
+  'Explore': '探索',
+  'Choose your language': '選擇你的語言',
+  'Save Language': '儲存語言',
 };

@@ -156,4 +156,12 @@ final Map<String, String> deDe = <String, String>{
   'Upgrade to VIP': "Auf VIP upgraden",
   'Download': "Herunterladen",
   'Continue': "Fortfahren",
+
+  //New
+  'Continue Playing': 'Weiterspielen',
+  'Jump back into your recently played favorites.':
+      'Kehre zu deinen kürzlich gespielten Favoriten zurück.',
+  'Explore': 'Entdecken',
+  'Choose your language': 'Wähle deine Sprache',
+  'Save Language': 'Sprache speichern',
 };

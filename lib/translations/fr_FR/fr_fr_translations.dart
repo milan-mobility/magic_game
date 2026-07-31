@@ -157,4 +157,12 @@ final Map<String, String> frFr = <String, String>{
   'Upgrade to VIP': "Passer à VIP",
   'Download': "Télécharger",
   'Continue': "Continuer",
+
+  //New
+  'Continue Playing': 'Continuer à jouer',
+  'Jump back into your recently played favorites.':
+      'Retournez à vos favoris récemment joués.',
+  'Explore': 'Explorer',
+  'Choose your language': 'Choisissez votre langue',
+  'Save Language': 'Enregistrer la langue',
 };

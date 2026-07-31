@@ -285,7 +285,7 @@ class _SearchGameActions extends StatelessWidget {
               height: AppResponsive.value(30, tablet: 35),
               width: AppResponsive.value(120, tablet: 140),
               btnText: 'Subscribe'.tr,
-              onPressed: () => onSubscribeTap,
+              onPressed: onSubscribeTap,
               fontSize: 12,
               icon: Assets.svg.icSubscribe,
               btnTxtColor: AppColors.color00002F,

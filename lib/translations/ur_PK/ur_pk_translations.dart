@@ -152,4 +152,12 @@ final Map<String, String> urPk = <String, String>{
   'Upgrade to VIP': "VIP میں اپ گریڈ کریں",
   'Download': "ڈاؤن لوڈ",
   'Continue': "جاری رکھیں",
+
+  //New
+  'Continue Playing': 'کھیلنا جاری رکھیں',
+  'Jump back into your recently played favorites.':
+      'اپنے حال ہی میں کھیلے گئے پسندیدہ گیمز پر واپس جائیں۔',
+  'Explore': 'دریافت کریں',
+  'Choose your language': 'اپنی زبان منتخب کریں',
+  'Save Language': 'زبان محفوظ کریں',
 };

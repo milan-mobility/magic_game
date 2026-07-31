@@ -150,4 +150,12 @@ final Map<String, String> thTh = <String, String>{
   'Upgrade to VIP': "อัปเกรดเป็น VIP",
   'Download': "ดาวน์โหลด",
   'Continue': "ดำเนินการต่อ",
+
+  //New
+  'Continue Playing': 'เล่นต่อ',
+  'Jump back into your recently played favorites.':
+      'กลับไปเล่นเกมโปรดที่คุณเล่นล่าสุด',
+  'Explore': 'สำรวจ',
+  'Choose your language': 'เลือกภาษาของคุณ',
+  'Save Language': 'บันทึกภาษา',
 };

@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:magic_games/data/api/api_end_points.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 import 'package:magic_games/data/repositories/api_repo.dart';
+import 'package:magic_games/helpers/services/auth_service.dart';
 import 'package:magic_games/helpers/services/google_leaderboard_service.dart';
 import 'package:magic_games/helpers/services/premium_access_service.dart';
 import 'package:magic_games/helpers/services/remote_config.dart';
@@ -30,6 +32,7 @@ class HomeController extends GetxController implements GetxService {
 
   final ApiRepo apiRepo;
   final Upgrader _upgrader;
+  final AuthService _authService = Get.find<AuthService>();
   final PremiumAccessService _premiumAccessService =
       Get.find<PremiumAccessService>();
   final SharedPreferenceHelper _sharedPreferenceHelper =
@@ -39,8 +42,10 @@ class HomeController extends GetxController implements GetxService {
   final RxBool isLoading = false.obs;
   final RxBool hasPremiumAccess = false.obs;
   final RxString selectedCategoryId = ''.obs;
+  final RxString signedInUserEmail = ''.obs;
   final RxList<Games> recentPlayedGames = <Games>[].obs;
   StreamSubscription<UpgraderEvaluateNeed>? _upgradeSubscription;
+  StreamSubscription<User?>? _authSubscription;
   Worker? _premiumAccessWorker;
   bool _isUpgradeDialogVisible = false;
 
@@ -48,12 +53,16 @@ class HomeController extends GetxController implements GetxService {
   void onInit() {
     super.onInit();
     hasPremiumAccess.value = _premiumAccessService.hasPremiumAccess;
+    _syncSignedInUserEmail();
     _premiumAccessWorker = ever<bool>(
       _premiumAccessService.hasPremiumAccessRx,
       (final bool value) {
         hasPremiumAccess.value = value;
       },
     );
+    _authSubscription = _authService.authStateChanges().listen((_) {
+      _syncSignedInUserEmail();
+    });
 
     GoogleLeaderboardService.instance.signIn();
     _syncPremiumAccess();
@@ -69,6 +78,7 @@ class HomeController extends GetxController implements GetxService {
   @override
   void onClose() {
     _upgradeSubscription?.cancel();
+    _authSubscription?.cancel();
     _premiumAccessWorker?.dispose();
     _upgrader.dispose();
     super.onClose();
@@ -83,6 +93,13 @@ class HomeController extends GetxController implements GetxService {
     }
 
     await _loadGames();
+  }
+
+  Future<void> reloadForLanguageChange() async {
+    selectedCategoryId.value = '';
+    recentPlayedGames.clear();
+    gameModel.value = null;
+    await fetchGames();
   }
 
   Future<void> _loadGames() async {
@@ -552,6 +569,10 @@ class HomeController extends GetxController implements GetxService {
     final GameModel model,
     final Map<int, Games> gamesById,
   ) {
+    if (!_canShowSection(section)) {
+      return null;
+    }
+
     final HomeSectionConfig? config = _resolveSectionConfig(section);
     if (config != null && !config.isVisible) {
       return null;
@@ -615,6 +636,29 @@ class HomeController extends GetxController implements GetxService {
       games: games,
       collections: collections,
     );
+  }
+
+  bool _canShowSection(final Sections section) {
+    if (_normalizeText(section.type) != '203') {
+      return true;
+    }
+
+    final List<String> allowedEmails = (section.emails ?? <String>[])
+        .map((final String value) => value.trim().toLowerCase())
+        .where((final String value) => value.isNotEmpty)
+        .toList();
+    if (allowedEmails.isEmpty) {
+      return false;
+    }
+
+    final String normalizedSignedInEmail = signedInUserEmail.value
+        .trim()
+        .toLowerCase();
+    if (normalizedSignedInEmail.isEmpty) {
+      return false;
+    }
+
+    return allowedEmails.contains(normalizedSignedInEmail);
   }
 
   HomeSectionLayoutType _resolveSectionLayoutType(
@@ -842,6 +886,12 @@ class HomeController extends GetxController implements GetxService {
     }
 
     return value!.trim();
+  }
+
+  void _syncSignedInUserEmail() {
+    signedInUserEmail.value = (_authService.currentUser?.email ?? '')
+        .trim()
+        .toLowerCase();
   }
 
   bool _hasText(final String? value) {

@@ -35,98 +35,103 @@ class GameIconWithBanner extends StatelessWidget {
     final double cardWidth = AppResponsive.value(180, tablet: 300);
     final double cardHeight = AppResponsive.value(180, tablet: 300);
 
-    return SizedBox(
-      width: cardWidth,
-      height: cardHeight,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(5),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            _buildBackground(cardWidth, cardHeight),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              height: cardHeight * 1.0,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    stops: const <double>[0.0, 0.5, 1.0],
-                    colors: [
-                      AppColors.color5543AE.withValues(alpha: 0),
-                      AppColors.color5543AE.withValues(alpha: 0.38),
-                      AppColors.color0D0630.withValues(alpha: 1.0),
-                    ],
+    return GestureDetector(
+      onTap: actionMode == GameIconWithBannerActionMode.hourglassOnly
+          ? null
+          : _handlePrimaryTap,
+      child: SizedBox(
+        width: cardWidth,
+        height: cardHeight,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(5),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              _buildBackground(cardWidth, cardHeight),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: cardHeight * 1.0,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      stops: const <double>[0.0, 0.5, 1.0],
+                      colors: [
+                        AppColors.color5543AE.withValues(alpha: 0),
+                        AppColors.color5543AE.withValues(alpha: 0.38),
+                        AppColors.color0D0630.withValues(alpha: 1.0),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(AppResponsive.space(8)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Spacer(),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      _GameMiniThumb(iconUrl: game.icon),
-                      Gap(AppResponsive.space(10)),
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _displayTitle,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: poppinsW600.copyWith(
-                                fontSize: AppResponsive.font(10),
-                                color: AppColors.white,
-                              ),
-                            ),
-                            Text(
-                              game.categoryName ?? '',
-                              style: poppinsW500.copyWith(
-                                fontSize: AppResponsive.font(9),
-                                color: AppColors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  Gap(AppResponsive.space(12)),
-                  actionMode == GameIconWithBannerActionMode.hourglassOnly
-                      ? const _HourglassIndicator()
-                      : Row(
-                          children: [
-                            Expanded(
-                              child: CommonButton(
-                                height: AppResponsive.value(30, tablet: 35),
-                                onPressed: _handlePrimaryTap,
-                                borderRadius: 5,
-                                btnText: _buttonText,
-                                icon: _buttonIcon,
-                                btnTxtColor: _buttonTextColor,
-                                btnBgColor: _buttonBackgroundColor,
-                                style: poppinsW500.copyWith(
-                                  fontSize: AppResponsive.font(9, tablet: 13),
-                                  color: _buttonTextColor,
+              Padding(
+                padding: EdgeInsets.all(AppResponsive.space(8)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Spacer(),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        _GameMiniThumb(iconUrl: game.icon),
+                        Gap(AppResponsive.space(10)),
+                        Expanded(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _displayTitle,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: poppinsW600.copyWith(
+                                  fontSize: AppResponsive.value(10, tablet: 13),
+                                  color: AppColors.white,
                                 ),
                               ),
-                            ),
-                          ],
+                              Text(
+                                game.categoryName ?? '',
+                                style: poppinsW500.copyWith(
+                                  fontSize: AppResponsive.font(9),
+                                  color: AppColors.white,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                ],
+                      ],
+                    ),
+                    Gap(AppResponsive.space(12)),
+                    actionMode == GameIconWithBannerActionMode.hourglassOnly
+                        ? const _HourglassIndicator()
+                        : Row(
+                            children: [
+                              Expanded(
+                                child: CommonButton(
+                                  height: AppResponsive.value(30, tablet: 35),
+                                  onPressed: _handlePrimaryTap,
+                                  borderRadius: 5,
+                                  btnText: _buttonText,
+                                  icon: _buttonIcon,
+                                  btnTxtColor: _buttonTextColor,
+                                  btnBgColor: _buttonBackgroundColor,
+                                  style: poppinsW500.copyWith(
+                                    fontSize: AppResponsive.font(9, tablet: 13),
+                                    color: _buttonTextColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -273,7 +278,6 @@ class _GameMiniThumb extends StatelessWidget {
         : null;
 
     if (imageUrl == null) {
-      debugPrint("milan url=>$imageUrl");
       return HomeImagePlaceholderWidget(
         width: AppResponsive.space(23),
         height: AppResponsive.space(23),
@@ -287,8 +291,8 @@ class _GameMiniThumb extends StatelessWidget {
       imageBuilder:
           (final BuildContext context, final ImageProvider<Object> image) =>
               Container(
-                width: AppResponsive.space(23),
-                height: AppResponsive.space(23),
+                width: AppResponsive.value(30, tablet: 40),
+                height: AppResponsive.value(30, tablet: 40),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(3),
                   image: DecorationImage(image: image, fit: BoxFit.cover),

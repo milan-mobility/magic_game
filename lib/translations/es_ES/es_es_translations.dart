@@ -155,4 +155,12 @@ final Map<String, String> esEs = <String, String>{
   'Upgrade to VIP': "Mejorar a VIP",
   'Download': "Descargar",
   'Continue': "Continuar",
+
+  //New
+  'Continue Playing': 'Continuar jugando',
+  'Jump back into your recently played favorites.':
+      'Vuelve a tus favoritos jugados recientemente.',
+  'Explore': 'Explorar',
+  'Choose your language': 'Elige tu idioma',
+  'Save Language': 'Guardar idioma',
 };

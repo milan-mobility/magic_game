@@ -140,4 +140,12 @@ final Map<String, String> jaJp = <String, String>{
   'Upgrade to VIP': "VIPにアップグレード",
   'Download': "ダウンロード",
   'Continue': "続ける",
+
+  //New
+  'Continue Playing': 'プレイを続ける',
+  'Jump back into your recently played favorites.':
+      '最近プレイしたお気に入りの game に戻りましょう。',
+  'Explore': '探索',
+  'Choose your language': '言語を選択してください',
+  'Save Language': '言語を保存',
 };

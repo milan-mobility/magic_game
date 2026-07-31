@@ -135,4 +135,11 @@ final Map<String, String> zhCn = <String, String>{
   'Upgrade to VIP': "升级到 VIP",
   'Download': "下载",
   'Continue': "继续",
+
+  //New
+  'Continue Playing': '继续游戏',
+  'Jump back into your recently played favorites.': '重温你最近玩过的最爱游戏。',
+  'Explore': '探索',
+  'Choose your language': '选择你的语言',
+  'Save Language': '保存语言',
 };

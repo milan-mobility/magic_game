@@ -149,4 +149,12 @@ final Map<String, String> bnBd = <String, String>{
   'Upgrade to VIP': "VIP-এ আপগ্রেড করুন",
   'Download': "ডাউনলোড",
   'Continue': "চালিয়ে যান",
+
+  //New
+  'Continue Playing': 'খেলা চালিয়ে যান',
+  'Jump back into your recently played favorites.':
+      'আপনার সম্প্রতি খেলা প্রিয় গেমগুলিতে ফিরে যান।',
+  'Explore': 'অন্বেষণ করুন',
+  'Choose your language': 'আপনার ভাষা নির্বাচন করুন',
+  'Save Language': 'ভাষা সংরক্ষণ করুন',
 };

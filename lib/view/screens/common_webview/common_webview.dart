@@ -23,6 +23,7 @@ class CommonWebview extends StatelessWidget {
             appBar: CommonAppbar(
               backgroundColor: Colors.white,
               title: controller.title ?? '',
+              iconColor: AppColors.black,
             ),
             body: SafeArea(
               child: Column(

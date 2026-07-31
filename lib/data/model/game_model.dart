@@ -365,6 +365,7 @@ class Games {
 class Sections {
   String? id;
   String? title;
+  List<String>? emails;
   String? subtitle;
   String? description;
   String? type;
@@ -374,6 +375,7 @@ class Sections {
   Sections({
     this.id,
     this.title,
+    this.emails,
     this.subtitle,
     this.description,
     this.type,
@@ -384,10 +386,14 @@ class Sections {
   Sections.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     title = json['title'];
+    emails = (json['emails'] as List<dynamic>?)
+        ?.map((final dynamic value) => value.toString().trim())
+        .where((final String value) => value.isNotEmpty)
+        .toList();
     subtitle = json['subtitle'];
     description = json['description'];
     type = json['type'];
-    games = json['games'].cast<int>();
+    games = (json['games'] as List<dynamic>?)?.cast<int>();
     if (json['footerBanner'] != null) {
       footerBanner = <FooterBanner>[];
       json['footerBanner'].forEach((v) {
@@ -400,6 +406,7 @@ class Sections {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['title'] = title;
+    data['emails'] = emails;
     data['subtitle'] = subtitle;
     data['description'] = description;
     data['type'] = type;

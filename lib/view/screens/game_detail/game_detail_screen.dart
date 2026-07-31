@@ -44,7 +44,7 @@ class GameDetailScreen extends StatelessWidget {
                     if (!controller.isExitOverlayVisible)
                       Positioned(
                         top: 8,
-                        left: 8,
+                        right: 8,
                         child: GestureDetector(
                           onTap: controller.showExitOverlay,
                           child: Container(
