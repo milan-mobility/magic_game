@@ -128,4 +128,18 @@ final Map<String, String> zhCn = <String, String>{
   'Premium access is already active on this device.': "此设备上的高级权限已激活。",
   'Restoring purchases...': "正在恢复购买...",
   'Restore Purchases': "恢复购买",
+  'Subscribe': "订阅",
+  'Score': "分数",
+  'Leaderboard': "排行榜",
+  'View All': "查看全部",
+  'Upgrade to VIP': "升级到 VIP",
+  'Download': "下载",
+  'Continue': "继续",
+
+  //New
+  'Continue Playing': '继续游戏',
+  'Jump back into your recently played favorites.': '重温你最近玩过的最爱游戏。',
+  'Explore': '探索',
+  'Choose your language': '选择你的语言',
+  'Save Language': '保存语言',
 };

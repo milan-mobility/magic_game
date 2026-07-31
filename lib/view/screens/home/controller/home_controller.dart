@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:magic_games/data/api/api_end_points.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 import 'package:magic_games/data/repositories/api_repo.dart';
+import 'package:magic_games/helpers/services/auth_service.dart';
 import 'package:magic_games/helpers/services/google_leaderboard_service.dart';
 import 'package:magic_games/helpers/services/premium_access_service.dart';
 import 'package:magic_games/helpers/services/remote_config.dart';
@@ -30,6 +32,7 @@ class HomeController extends GetxController implements GetxService {
 
   final ApiRepo apiRepo;
   final Upgrader _upgrader;
+  final AuthService _authService = Get.find<AuthService>();
   final PremiumAccessService _premiumAccessService =
       Get.find<PremiumAccessService>();
   final SharedPreferenceHelper _sharedPreferenceHelper =
@@ -39,8 +42,10 @@ class HomeController extends GetxController implements GetxService {
   final RxBool isLoading = false.obs;
   final RxBool hasPremiumAccess = false.obs;
   final RxString selectedCategoryId = ''.obs;
+  final RxString signedInUserEmail = ''.obs;
   final RxList<Games> recentPlayedGames = <Games>[].obs;
   StreamSubscription<UpgraderEvaluateNeed>? _upgradeSubscription;
+  StreamSubscription<User?>? _authSubscription;
   Worker? _premiumAccessWorker;
   bool _isUpgradeDialogVisible = false;
 
@@ -48,12 +53,16 @@ class HomeController extends GetxController implements GetxService {
   void onInit() {
     super.onInit();
     hasPremiumAccess.value = _premiumAccessService.hasPremiumAccess;
+    _syncSignedInUserEmail();
     _premiumAccessWorker = ever<bool>(
       _premiumAccessService.hasPremiumAccessRx,
       (final bool value) {
         hasPremiumAccess.value = value;
       },
     );
+    _authSubscription = _authService.authStateChanges().listen((_) {
+      _syncSignedInUserEmail();
+    });
 
     GoogleLeaderboardService.instance.signIn();
     _syncPremiumAccess();
@@ -69,6 +78,7 @@ class HomeController extends GetxController implements GetxService {
   @override
   void onClose() {
     _upgradeSubscription?.cancel();
+    _authSubscription?.cancel();
     _premiumAccessWorker?.dispose();
     _upgrader.dispose();
     super.onClose();
@@ -83,6 +93,13 @@ class HomeController extends GetxController implements GetxService {
     }
 
     await _loadGames();
+  }
+
+  Future<void> reloadForLanguageChange() async {
+    selectedCategoryId.value = '';
+    recentPlayedGames.clear();
+    gameModel.value = null;
+    await fetchGames();
   }
 
   Future<void> _loadGames() async {
@@ -176,6 +193,17 @@ class HomeController extends GetxController implements GetxService {
       );
   }
 
+  Set<int> get comingSoonGameIds {
+    return homeSections
+        .where(
+          (final HomeSectionData section) => section.showHourglassIndicator,
+        )
+        .expand((final HomeSectionData section) => section.games)
+        .map((final Games game) => game.id)
+        .whereType<int>()
+        .toSet();
+  }
+
   Future<void> recordRecentlyPlayedGame(final Games game) async {
     final String? gameKey = _recentlyPlayedKeyForGame(game);
     if (!_hasText(gameKey)) {
@@ -254,7 +282,8 @@ class HomeController extends GetxController implements GetxService {
       gamesByKey[gameKey!] = game;
     }
 
-    final List<Games> orderedGames = _sharedPreferenceHelper.recentlyPlayedGameKeys
+    final List<Games> orderedGames = _sharedPreferenceHelper
+        .recentlyPlayedGameKeys
         .map((final String key) => gamesByKey[key])
         .whereType<Games>()
         .toList();
@@ -540,15 +569,26 @@ class HomeController extends GetxController implements GetxService {
     final GameModel model,
     final Map<int, Games> gamesById,
   ) {
+    if (!_canShowSection(section)) {
+      return null;
+    }
+
     final HomeSectionConfig? config = _resolveSectionConfig(section);
     if (config != null && !config.isVisible) {
       return null;
     }
 
-    final HomeSectionLayoutType layoutType = _resolveSectionLayoutType(
+    final HomeSectionLayoutType resolvedLayoutType = _resolveSectionLayoutType(
       section,
       model.sectiontype,
     );
+    final String? normalizedSectionId = _normalizeText(section.id);
+    final String? normalizedSectionType = _normalizeText(section.type);
+    final bool showHourglassIndicator =
+        normalizedSectionId == '207' || normalizedSectionType == '207';
+    final HomeSectionLayoutType layoutType = showHourglassIndicator
+        ? HomeSectionLayoutType.iconWithBanner
+        : resolvedLayoutType;
     final String? selectedCategoryIdValue = _normalizeText(
       selectedCategoryId.value,
     );
@@ -590,16 +630,45 @@ class HomeController extends GetxController implements GetxService {
       title: _resolveSectionTitle(section, model.sectiontype, config),
       subtitle: _resolveSectionSubtitle(section, config),
       layoutType: layoutType,
+      showHourglassIndicator: showHourglassIndicator,
+      showViewAll: section.type != '205',
       sortOrder: config?.sortOrder ?? 999,
       games: games,
       collections: collections,
     );
   }
 
+  bool _canShowSection(final Sections section) {
+    if (_normalizeText(section.type) != '203') {
+      return true;
+    }
+
+    final List<String> allowedEmails = (section.emails ?? <String>[])
+        .map((final String value) => value.trim().toLowerCase())
+        .where((final String value) => value.isNotEmpty)
+        .toList();
+    if (allowedEmails.isEmpty) {
+      return false;
+    }
+
+    final String normalizedSignedInEmail = signedInUserEmail.value
+        .trim()
+        .toLowerCase();
+    if (normalizedSignedInEmail.isEmpty) {
+      return false;
+    }
+
+    return allowedEmails.contains(normalizedSignedInEmail);
+  }
+
   HomeSectionLayoutType _resolveSectionLayoutType(
     final Sections section,
     final Sectiontype? sectiontype,
   ) {
+    if (section.type == '206') {
+      return HomeSectionLayoutType.iconWithBannerDownload;
+    }
+
     final String normalizedType = _normalizeSectionLayoutLabel(
       sectiontype?.labelForType(section.type),
     );
@@ -611,6 +680,8 @@ class HomeController extends GetxController implements GetxService {
         return HomeSectionLayoutType.iconWithIcon;
       case 'iconwithbanner':
         return HomeSectionLayoutType.iconWithBanner;
+      case 'iconwithbannerdownload':
+        return HomeSectionLayoutType.iconWithBannerDownload;
       case 'icon':
         return HomeSectionLayoutType.icon;
       case 'collection':
@@ -667,6 +738,7 @@ class HomeController extends GetxController implements GetxService {
       arguments: <String, dynamic>{
         'categories': homeCategories,
         'games': allGames,
+        'comingSoonGameIds': comingSoonGameIds.toList(growable: false),
         if (_hasText(selectedCategoryId))
           'selectedCategoryId': selectedCategoryId,
       },
@@ -816,6 +888,12 @@ class HomeController extends GetxController implements GetxService {
     return value!.trim();
   }
 
+  void _syncSignedInUserEmail() {
+    signedInUserEmail.value = (_authService.currentUser?.email ?? '')
+        .trim()
+        .toLowerCase();
+  }
+
   bool _hasText(final String? value) {
     return value != null && value.trim().isNotEmpty;
   }
@@ -827,6 +905,8 @@ class HomeSectionData {
     required this.title,
     required this.subtitle,
     required this.layoutType,
+    required this.showHourglassIndicator,
+    required this.showViewAll,
     required this.sortOrder,
     required this.games,
     required this.collections,
@@ -836,6 +916,8 @@ class HomeSectionData {
   final String title;
   final String? subtitle;
   final HomeSectionLayoutType layoutType;
+  final bool showHourglassIndicator;
+  final bool showViewAll;
   final int sortOrder;
   final List<Games> games;
   final List<HomeCollectionCardData> collections;
@@ -885,6 +967,7 @@ enum HomeSectionLayoutType {
   banner,
   iconWithIcon,
   iconWithBanner,
+  iconWithBannerDownload,
   icon,
   collection,
 }

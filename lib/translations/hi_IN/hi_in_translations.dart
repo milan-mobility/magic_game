@@ -142,4 +142,19 @@ final Map<String, String> hiIn = <String, String>{
       "इस डिवाइस पर प्रीमियम एक्सेस पहले से सक्रिय है।",
   'Restoring purchases...': "खरीदारियाँ पुनर्स्थापित की जा रही हैं...",
   'Restore Purchases': "खरीदारियाँ पुनर्स्थापित करें",
+  'Subscribe': "सब्सक्राइब",
+  'Score': "स्कोर",
+  'Leaderboard': "लीडरबोर्ड",
+  'View All': "सभी देखें",
+  'Upgrade to VIP': "VIP में अपग्रेड करें",
+  'Download': "डाउनलोड",
+  'Continue': "जारी रखें",
+
+  //New
+  'Continue Playing': 'खेलना जारी रखें',
+  'Jump back into your recently played favorites.':
+      'अपने हाल ही में खेले गए पसंदीदा गेम में वापस जाएं।',
+  'Explore': 'खोजें',
+  'Choose your language': 'अपनी भाषा चुनें',
+  'Save Language': 'भाषा सहेजें',
 };

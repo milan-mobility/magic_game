@@ -14,6 +14,15 @@ class BottomNavigation extends StatelessWidget {
 
   final int? selectedIndex;
 
+  Future<void> _openLeaderboard() async {
+    if (Get.currentRoute != RouteHelper.home) {
+      Get.offAndToNamed(RouteHelper.home);
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+    }
+
+    await GoogleLeaderboardService.instance.showLeaderboard();
+  }
+
   @override
   Widget build(final BuildContext context) {
     return Container(
@@ -73,11 +82,11 @@ class BottomNavigation extends StatelessWidget {
                 width: 22,
               ),
               activeIcon: SvgPicture.asset(
-                Assets.svg.icLeaderboard,
+                Assets.svg.icLeaderboardSelected,
                 height: 22,
                 width: 22,
               ),
-              label: 'LeaderBoard'.tr,
+              label: 'Leaderboard'.tr,
             ),
             BottomNavigationBarItem(
               icon: SvgPicture.asset(
@@ -106,7 +115,7 @@ class BottomNavigation extends StatelessWidget {
                 }
                 break;
               case 2:
-                await GoogleLeaderboardService.instance.showLeaderboard();
+                await _openLeaderboard();
                 break;
               default:
                 if (Get.currentRoute != RouteHelper.profile) {

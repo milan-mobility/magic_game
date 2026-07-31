@@ -40,13 +40,11 @@ class GameDetailScreen extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    WebViewWidget(
-                      controller: controller.webViewController,
-                    ),
+                    WebViewWidget(controller: controller.webViewController),
                     if (!controller.isExitOverlayVisible)
                       Positioned(
                         top: 8,
-                        left: 8,
+                        right: 8,
                         child: GestureDetector(
                           onTap: controller.showExitOverlay,
                           child: Container(
@@ -111,7 +109,11 @@ class GameDetailScreen extends StatelessWidget {
                           backgroundImageUrl: controller.backgroundImageUrl,
                           tags: controller.gameTags,
                           canDownload: controller.canDownloadCurrentGame,
-                          onBack: () => Get.back<void>(),
+                          recommendedGames: controller.recommendedGames,
+                          requiresSubscriptionForGame:
+                              controller.requiresSubscriptionForGame,
+                          onRecommendedTap: controller.openRecommendedGame,
+                          onBack: controller.closeGameDetailScreen,
                           onContinuePlaying: controller.hideExitOverlay,
                           onDownload: controller.canDownloadCurrentGame
                               ? controller.openCurrentGameStore

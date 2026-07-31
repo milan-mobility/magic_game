@@ -142,4 +142,19 @@ final Map<String, String> arSa = <String, String>{
       "الوصول المميز مفعل بالفعل على هذا الجهاز.",
   'Restoring purchases...': "جارٍ استعادة المشتريات...",
   'Restore Purchases': "استعادة المشتريات",
+  'Subscribe': "اشترك",
+  'Score': "النتيجة",
+  'Leaderboard': "لوحة المتصدرين",
+  'View All': "عرض الكل",
+  'Upgrade to VIP': "الترقية إلى VIP",
+  'Download': "تنزيل",
+  'Continue': "متابعة",
+
+  //New
+  'Continue Playing': 'مواصلة اللعب',
+  'Jump back into your recently played favorites.':
+      'عد مباشرة إلى ألعابك المفضلة التي لعبتها مؤخرًا.',
+  'Explore': 'استكشف',
+  'Choose your language': 'اختر لغتك',
+  'Save Language': 'احفظ اللغة',
 };

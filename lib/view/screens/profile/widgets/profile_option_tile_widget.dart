@@ -14,6 +14,8 @@ class ProfileOptionTileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isRtl = _isRtl(context);
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -31,6 +33,7 @@ class ProfileOptionTileWidget extends StatelessWidget {
                 width: AppResponsive.space(20),
                 height: AppResponsive.space(20),
               ),
+
               SizedBox(width: AppResponsive.space(14)),
               Expanded(
                 child: Column(
@@ -58,11 +61,21 @@ class ProfileOptionTileWidget extends StatelessWidget {
                 _OptionValue(item: item),
                 SizedBox(width: AppResponsive.space(10)),
               ],
-              SvgPicture.asset(
-                Assets.svg.icNext,
-                width: AppResponsive.space(9),
-                height: AppResponsive.space(14),
-              ),
+              isRtl
+                  ? Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.rotationY(3.1416),
+                      child: SvgPicture.asset(
+                        Assets.svg.icNext,
+                        width: AppResponsive.space(9),
+                        height: AppResponsive.space(14),
+                      ),
+                    )
+                  : SvgPicture.asset(
+                      Assets.svg.icNext,
+                      width: AppResponsive.space(9),
+                      height: AppResponsive.space(14),
+                    ),
             ],
           ),
         ),
@@ -111,4 +124,11 @@ class _OptionValue extends StatelessWidget {
         );
     }
   }
+}
+
+bool _isRtl(final BuildContext context) {
+  final String languageCode = Get.locale?.languageCode.toLowerCase() ?? '';
+  return Directionality.of(context) == TextDirection.rtl ||
+      languageCode == 'ar' ||
+      languageCode == 'ur';
 }

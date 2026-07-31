@@ -148,4 +148,19 @@ final Map<String, String> itIt = <String, String>{
       "L'accesso premium è già attivo su questo dispositivo.",
   'Restoring purchases...': "Ripristino degli acquisti...",
   'Restore Purchases': "Ripristina acquisti",
+  'Subscribe': "Abbonati",
+  'Score': "Punteggio",
+  'Leaderboard': "Classifica",
+  'View All': "Vedi tutto",
+  'Upgrade to VIP': "Passa a VIP",
+  'Download': "Scarica",
+  'Continue': "Continua",
+
+  //New
+  'Continue Playing': 'Continua a giocare',
+  'Jump back into your recently played favorites.':
+      'Torna ai tuoi preferiti giocati di recente.',
+  'Explore': 'Esplora',
+  'Choose your language': 'Scegli la tua lingua',
+  'Save Language': 'Salva lingua',
 };

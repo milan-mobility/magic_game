@@ -150,4 +150,19 @@ final Map<String, String> frFr = <String, String>{
       "L'accès premium est déjà actif sur cet appareil.",
   'Restoring purchases...': "Restauration des achats...",
   'Restore Purchases': "Restaurer les achats",
+  'Subscribe': "S'abonner",
+  'Score': "Score",
+  'Leaderboard': "Classement",
+  'View All': "Voir tout",
+  'Upgrade to VIP': "Passer à VIP",
+  'Download': "Télécharger",
+  'Continue': "Continuer",
+
+  //New
+  'Continue Playing': 'Continuer à jouer',
+  'Jump back into your recently played favorites.':
+      'Retournez à vos favoris récemment joués.',
+  'Explore': 'Explorer',
+  'Choose your language': 'Choisissez votre langue',
+  'Save Language': 'Enregistrer la langue',
 };

@@ -17,6 +17,7 @@ class SearchGameController extends GetxController {
   List<HomeCategoryData> categories = <HomeCategoryData>[];
   List<Games> allGames = <Games>[];
   List<Games> filteredGames = <Games>[];
+  Set<int> comingSoonGameIds = <int>{};
 
   String selectedCategoryId = '';
 
@@ -27,12 +28,22 @@ class SearchGameController extends GetxController {
     if (Get.arguments != null) {
       final dynamic rawCategories = Get.arguments['categories'];
       final dynamic rawGames = Get.arguments['games'];
+      final dynamic rawComingSoonGameIds = Get.arguments['comingSoonGameIds'];
       final dynamic rawSelectedCategoryId = Get.arguments['selectedCategoryId'];
 
       categories = rawCategories is List
           ? rawCategories.cast<HomeCategoryData>()
           : <HomeCategoryData>[];
       allGames = rawGames is List ? rawGames.cast<Games>() : <Games>[];
+      comingSoonGameIds = rawComingSoonGameIds is List
+          ? rawComingSoonGameIds
+                .map(
+                  (final dynamic value) =>
+                      value is int ? value : int.tryParse(value.toString()),
+                )
+                .whereType<int>()
+                .toSet()
+          : <int>{};
 
       if (rawSelectedCategoryId is String &&
           rawSelectedCategoryId.trim().isNotEmpty) {
@@ -86,8 +97,18 @@ class SearchGameController extends GetxController {
   bool shouldShowSubscribe(final Games game) =>
       requiresSubscriptionForGame(game);
 
+  bool shouldShowHourglass(final Games game) {
+    final int? gameId = game.id;
+    if (gameId == null) {
+      return false;
+    }
+
+    return comingSoonGameIds.contains(gameId);
+  }
+
   bool requiresSubscriptionForGame(final Games game) {
-    return (game.subscription ?? false) && !_premiumAccessService.hasPremiumAccess;
+    return (game.subscription ?? false) &&
+        !_premiumAccessService.hasPremiumAccess;
   }
 
   Future<void> onPlayTap(final Games game) async {
@@ -157,7 +178,8 @@ class SearchGameController extends GetxController {
     required final String selectedCategoryId,
     final String? selectedCategoryName,
   }) {
-    if (!_hasText(selectedCategoryId) || selectedCategoryId == _defaultCategoryId) {
+    if (!_hasText(selectedCategoryId) ||
+        selectedCategoryId == _defaultCategoryId) {
       return true;
     }
 
@@ -225,7 +247,9 @@ class SearchGameController extends GetxController {
 
   String _resolvedInitialCategoryId() {
     if (_hasText(selectedCategoryId) &&
-        categories.any((final HomeCategoryData item) => item.id == selectedCategoryId)) {
+        categories.any(
+          (final HomeCategoryData item) => item.id == selectedCategoryId,
+        )) {
       return selectedCategoryId;
     }
 

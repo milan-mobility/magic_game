@@ -20,6 +20,8 @@ class SearchGameScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isRtl = _isRtl(context);
+
     return AnnotatedRegion(
       value: SystemUiOverlayStyle.light,
       child: GetBuilder<SearchGameController>(
@@ -38,9 +40,12 @@ class SearchGameScreen extends StatelessWidget {
                       children: [
                         GestureDetector(
                           onTap: () => Get.back(),
-                          child: SvgPicture.asset(
-                            Assets.svg.icBack,
-                            height: AppResponsive.value(35, tablet: 45),
+                          child: Transform.flip(
+                            flipX: isRtl,
+                            child: SvgPicture.asset(
+                              Assets.svg.icBack,
+                              height: AppResponsive.value(35, tablet: 45),
+                            ),
                           ),
                         ),
                         Gap(AppResponsive.value(10, tablet: 15)),
@@ -92,12 +97,14 @@ class SearchGameScreen extends StatelessWidget {
                               final game = controller.filteredGames[index];
                               return SearchGameListItemWidget(
                                 game: game,
+                                showHourglassAction: controller
+                                    .shouldShowHourglass(game),
                                 showInstallAction: controller.shouldShowInstall(
                                   game,
                                 ),
                                 showPlayAction: controller.shouldShowPlay(game),
-                                showSubscribeAction:
-                                    controller.shouldShowSubscribe(game),
+                                showSubscribeAction: controller
+                                    .shouldShowSubscribe(game),
                                 onTap: () => controller.openGame(game),
                                 onInstallTap: () =>
                                     controller.openStoreForGame(game),
@@ -114,6 +121,13 @@ class SearchGameScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  bool _isRtl(final BuildContext context) {
+    final String languageCode = Get.locale?.languageCode.toLowerCase() ?? '';
+    return Directionality.of(context) == TextDirection.rtl ||
+        languageCode == 'ar' ||
+        languageCode == 'ur';
   }
 }
 

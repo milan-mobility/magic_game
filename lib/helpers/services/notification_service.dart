@@ -16,7 +16,7 @@ class NotificationService {
 
     FirebaseMessaging.onMessageOpenedApp.listen((final RemoteMessage message) {
       try {
-        redirectFromNotification(message.data);
+        handleNotificationPayload(message.data);
       } catch (e) {
         debugPrint(e.toString());
       }
@@ -65,25 +65,18 @@ class NotificationService {
       iOS: iOSSettings,
     );
 
-    flutterLocalNotificationsPlugin.initialize(
+    await flutterLocalNotificationsPlugin.initialize(
       settings: initSettings,
       onDidReceiveNotificationResponse: (final NotificationResponse details) {
         if ((details.payload ?? '').isNotEmpty) {
           final Map<String, dynamic> messagePayload = json.decode(
             (details.payload ?? ''),
           );
-          redirectFromNotification(messagePayload);
+          handleNotificationPayload(messagePayload);
         }
       },
       onDidReceiveBackgroundNotificationResponse:
-          (final NotificationResponse details) {
-            if ((details.payload ?? '').isNotEmpty) {
-              final Map<String, dynamic> messagePayload = json.decode(
-                details.payload ?? '',
-              );
-              redirectFromNotification(messagePayload);
-            }
-          },
+          notificationTapBackgroundHandler,
     );
 
     FirebaseMessaging.onMessage.listen((final RemoteMessage? message) async {
@@ -137,13 +130,34 @@ class NotificationService {
         importance: Importance.max,
       );
 
-  void redirectFromNotification(final Map<String, dynamic> payload) async {
+  static void handleNotificationPayload(final Map<String, dynamic> payload) {
+    if (!Get.isRegistered<SharedPreferenceHelper>()) {
+      return;
+    }
+
+    final SharedPreferenceHelper sharedPref =
+        Get.find<SharedPreferenceHelper>();
     if (sharedPref.isLoggedIn) {
       // final RedirectData redirectData = RedirectData.fromJson(payload);
     }
   }
+
+  void redirectFromNotification(final Map<String, dynamic> payload) async {
+    handleNotificationPayload(payload);
+  }
 }
 
+@pragma('vm:entry-point')
+void notificationTapBackgroundHandler(final NotificationResponse details) {
+  if ((details.payload ?? '').isEmpty) {
+    return;
+  }
+
+  final Map<String, dynamic> messagePayload = json.decode(details.payload!);
+  NotificationService.handleNotificationPayload(messagePayload);
+}
+
+@pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(
   final RemoteMessage message,
 ) async {

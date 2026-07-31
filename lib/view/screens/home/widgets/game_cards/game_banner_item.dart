@@ -26,7 +26,7 @@ class GameBannerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double cardWidth = AppResponsive.value(120, tablet: 214);
+    final double cardWidth = AppResponsive.value(130, tablet: 225);
     final double cardHeight = AppResponsive.value(150, tablet: 290);
 
     return SizedBox(
@@ -122,7 +122,7 @@ class GameBannerItem extends StatelessWidget {
                   ],
                   Gap(AppResponsive.space(5)),
                   CommonButton(
-                    height: AppResponsive.space(25),
+                    height: AppResponsive.value(30, tablet: 35),
                     onPressed: () {
                       onTap?.call(requiresSubscription);
                     },
@@ -140,7 +140,7 @@ class GameBannerItem extends StatelessWidget {
                         ? AppColors.colorF8AB0F
                         : AppColors.color5820CB,
                     style: poppinsW500.copyWith(
-                      fontSize: AppResponsive.font(8),
+                      fontSize: AppResponsive.font(9, tablet: 13),
                       color: requiresSubscription
                           ? AppColors.color00002F
                           : AppColors.white,

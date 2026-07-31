@@ -145,4 +145,19 @@ final Map<String, String> idId = <String, String>{
       "Akses premium sudah aktif di perangkat ini.",
   'Restoring purchases...': "Sedang memulihkan pembelian...",
   'Restore Purchases': "Pulihkan pembelian",
+  'Subscribe': "Berlangganan",
+  'Score': "Skor",
+  'Leaderboard': "Papan Peringkat",
+  'View All': "Lihat Semua",
+  'Upgrade to VIP': "Upgrade ke VIP",
+  'Download': "Unduh",
+  'Continue': "Lanjutkan",
+
+  //New
+  'Continue Playing': 'Lanjutkan Bermain',
+  'Jump back into your recently played favorites.':
+      'Kembali ke game favorit yang baru saja Anda mainkan.',
+  'Explore': 'Jelajahi',
+  'Choose your language': 'Pilih bahasa Anda',
+  'Save Language': 'Simpan bahasa',
 };

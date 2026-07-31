@@ -78,6 +78,7 @@ class AuthService extends GetxService {
         _lastGoogleDisplayName = null;
         unawaited(_sharedPreferenceHelper.saveGoogleProfilePhotoUrl(null));
         unawaited(_sharedPreferenceHelper.saveGoogleProfileDisplayName(null));
+        unawaited(_sharedPreferenceHelper.saveGoogleProfileUpdatedAt(null));
       }
     });
     return this;
@@ -126,6 +127,9 @@ class AuthService extends GetxService {
     await _sharedPreferenceHelper.saveGoogleProfileDisplayName(
       _lastGoogleDisplayName,
     );
+    await _sharedPreferenceHelper.saveGoogleProfileUpdatedAt(
+      DateTime.now().millisecondsSinceEpoch,
+    );
     return userCredential;
   }
 
@@ -138,6 +142,7 @@ class AuthService extends GetxService {
     _lastGoogleDisplayName = null;
     await _sharedPreferenceHelper.saveGoogleProfilePhotoUrl(null);
     await _sharedPreferenceHelper.saveGoogleProfileDisplayName(null);
+    await _sharedPreferenceHelper.saveGoogleProfileUpdatedAt(null);
     await _sharedPreferenceHelper.saveIsLoggedIn(false);
   }
 

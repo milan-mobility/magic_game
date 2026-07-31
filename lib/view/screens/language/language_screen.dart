@@ -23,7 +23,8 @@ class LanguageScreen extends StatelessWidget {
           return Scaffold(
             backgroundColor: AppColors.screenGgColor,
             appBar: CommonAppbar(
-              title: 'Choose Your Language'.tr,
+              title: 'Choose your language'.tr,
+              titleColor: AppColors.white,
               backgroundColor: AppColors.screenGgColor,
             ),
             bottomNavigationBar: SafeArea(

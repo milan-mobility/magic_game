@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 import 'package:magic_games/helpers/extensions/list_extension.dart';
+import 'package:magic_games/helpers/services/auth_service.dart';
 import 'package:magic_games/routes/route_helper.dart';
 import 'package:magic_games/utils/app_constants.dart';
 import 'package:magic_games/view/base/custom_snack_bar.dart';
@@ -227,6 +228,11 @@ class Utility {
     final Locale locale =
         Get.deviceLocale ?? WidgetsBinding.instance.platformDispatcher.locale;
     final String appVersion = await getPackageInfo();
+    final _EmailUserContext userContext = _resolveEmailUserContext(
+      userId: userId,
+      userEmail: userEmail,
+      userName: userName,
+    );
 
     await sendEmail(
       email: feedbackSupportEmail,
@@ -235,9 +241,9 @@ class Utility {
         gameName: gameName ?? AppConstants.appName,
         appVersion: appVersion,
         country: locale.countryCode ?? '',
-        userId: userId,
-        userEmail: userEmail,
-        userName: userName,
+        userId: userContext.userId,
+        userEmail: userContext.userEmail,
+        userName: userContext.userName,
       ),
     );
   }
@@ -251,6 +257,11 @@ class Utility {
         Get.deviceLocale ?? WidgetsBinding.instance.platformDispatcher.locale;
     final String deviceModel = await getDeviceModel();
     final String operatingSystem = await getOperatingSystemVersion();
+    final _EmailUserContext userContext = _resolveEmailUserContext(
+      userId: userId,
+      userEmail: userEmail,
+      userName: userName,
+    );
 
     await sendEmail(
       email: feedbackSupportEmail,
@@ -259,9 +270,42 @@ class Utility {
         deviceModel: deviceModel,
         operatingSystem: operatingSystem,
         country: locale.countryCode ?? '',
-        userId: userId,
-        userEmail: userEmail,
-        userName: userName,
+        userId: userContext.userId,
+        userEmail: userContext.userEmail,
+        userName: userContext.userName,
+      ),
+    );
+  }
+
+  static Future<void> sendHelpSupportEmailFromEvent({
+    String userId = '',
+    String userEmail = '',
+    String userName = '',
+    String gameName = '',
+  }) async {
+    final Locale locale =
+        Get.deviceLocale ?? WidgetsBinding.instance.platformDispatcher.locale;
+    final String deviceModel = await getDeviceModel();
+    final String operatingSystem = await getOperatingSystemVersion();
+    final _EmailUserContext userContext = _resolveEmailUserContext(
+      userId: userId,
+      userEmail: userEmail,
+      userName: userName,
+    );
+
+    await sendEmail(
+      email: feedbackSupportEmail,
+      subject:
+          'Support ${AppConstants.appName} ${GetPlatform.isAndroid ? 'Android (Play)' : 'iOS'} - ${userContext.userId}'
+              .tr,
+      body: buildHelpSupportEmailTemplate(
+        deviceModel: deviceModel,
+        operatingSystem: operatingSystem,
+        country: locale.countryCode ?? '',
+        userId: userContext.userId,
+        userEmail: userContext.userEmail,
+        userName: userContext.userName,
+        gameName: gameName,
       ),
     );
   }
@@ -274,9 +318,11 @@ class Utility {
     String userEmail = '',
     String userName = '',
   }) {
-    final String normalizedUserId = userId.trim();
-    final String normalizedUserEmail = userEmail.trim();
-    final String normalizedUserName = userName.trim();
+    final _EmailUserContext userContext = _resolveEmailUserContext(
+      userId: userId,
+      userEmail: userEmail,
+      userName: userName,
+    );
     final StringBuffer buffer = StringBuffer()
       ..writeln('Hello OneGame+ Team,'.tr)
       ..writeln()
@@ -309,18 +355,18 @@ class Utility {
       ..writeln()
       ..writeln('${'Country:'.tr} $country');
 
-    if (normalizedUserId.isNotEmpty) {
-      buffer.writeln('${'User ID:'.tr} $normalizedUserId');
+    if (userContext.userId.isNotEmpty) {
+      buffer.writeln('${'User ID:'.tr} ${userContext.userId}');
     }
 
-    if (normalizedUserEmail.isNotEmpty) {
-      buffer.writeln('${'Email:'.tr} $normalizedUserEmail');
+    if (userContext.userEmail.isNotEmpty) {
+      buffer.writeln('${'Email:'.tr} ${userContext.userEmail}');
     }
 
     buffer
       ..writeln()
       ..writeln('Best regards,'.tr)
-      ..writeln(normalizedUserName.isEmpty ? '</Your Name>'.tr : normalizedUserName);
+      ..writeln(userContext.userName.isEmpty ? '' : userContext.userName);
 
     return buffer.toString().trimRight();
   }
@@ -332,10 +378,13 @@ class Utility {
     String userId = '',
     String userEmail = '',
     String userName = '',
+    String gameName = '',
   }) {
-    final String normalizedUserId = userId.trim();
-    final String normalizedUserEmail = userEmail.trim();
-    final String normalizedUserName = userName.trim();
+    final _EmailUserContext userContext = _resolveEmailUserContext(
+      userId: userId,
+      userEmail: userEmail,
+      userName: userName,
+    );
     final StringBuffer buffer = StringBuffer()
       ..writeln('Hello OneGame+ Support Team,'.tr)
       ..writeln()
@@ -352,30 +401,71 @@ class Utility {
       ..writeln(
         'If possible, please attach screenshots or screen recordings.'.tr,
       )
-      ..writeln()
+      ..writeln('${'Game Name:'.tr} $gameName')
       ..writeln('${'Device Model:'.tr} $deviceModel')
       ..writeln('${'Operating System:'.tr} $operatingSystem')
       ..writeln('${'Country:'.tr} $country');
 
-    if (normalizedUserId.isNotEmpty) {
-      buffer.writeln('${'User ID:'.tr} $normalizedUserId');
+    if (userContext.userId.isNotEmpty) {
+      buffer.writeln('${'User ID:'.tr} ${userContext.userId}');
     }
 
-    if (normalizedUserEmail.isNotEmpty) {
-      buffer.writeln('${'Email:'.tr} $normalizedUserEmail');
+    if (userContext.userEmail.isNotEmpty) {
+      buffer.writeln('${'Email:'.tr} ${userContext.userEmail}');
     }
 
     buffer
       ..writeln()
       ..writeln('Thank you for your time and support.'.tr)
       ..writeln()
-      ..writeln('Best regards,'.tr)
-      ..writeln(
-        normalizedUserName.isEmpty
-            ? '</User Name if Login>'.tr
-            : normalizedUserName,
-      );
+      ..writeln(userContext.userName.isEmpty ? '' : 'Best regards,'.tr)
+      ..writeln(userContext.userName.isEmpty ? '' : userContext.userName);
 
     return buffer.toString().trimRight();
   }
+
+  static _EmailUserContext _resolveEmailUserContext({
+    String userId = '',
+    String userEmail = '',
+    String userName = '',
+  }) {
+    String resolvedUserId = userId.trim();
+    String resolvedUserEmail = userEmail.trim();
+    String resolvedUserName = userName.trim();
+
+    if (Get.isRegistered<AuthService>()) {
+      final AuthService authService = Get.find<AuthService>();
+      final bool isLoggedIn = authService.currentUser != null;
+
+      if (isLoggedIn) {
+        resolvedUserId = resolvedUserId.isNotEmpty
+            ? resolvedUserId
+            : (authService.currentUser?.uid ?? '').trim();
+        resolvedUserEmail = resolvedUserEmail.isNotEmpty
+            ? resolvedUserEmail
+            : (authService.currentUser?.email ?? '').trim();
+        resolvedUserName = resolvedUserName.isNotEmpty
+            ? resolvedUserName
+            : (authService.currentDisplayName ?? '').trim();
+      }
+    }
+
+    return _EmailUserContext(
+      userId: resolvedUserId,
+      userEmail: resolvedUserEmail,
+      userName: resolvedUserName,
+    );
+  }
+}
+
+class _EmailUserContext {
+  const _EmailUserContext({
+    required this.userId,
+    required this.userEmail,
+    required this.userName,
+  });
+
+  final String userId;
+  final String userEmail;
+  final String userName;
 }

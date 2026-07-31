@@ -4,8 +4,8 @@ import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
-import 'package:magic_games/view/screens/home/section_view_all_screen.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
+import 'package:magic_games/view/screens/home/section_view_all_screen.dart';
 import 'package:magic_games/view/screens/home/widgets/game_cards/game_banner_item.dart';
 import 'package:magic_games/view/screens/home/widgets/game_cards/game_collection_item.dart';
 import 'package:magic_games/view/screens/home/widgets/game_cards/game_icon_item.dart';
@@ -17,6 +17,8 @@ class SectionWidget extends StatelessWidget {
     super.key,
     required this.title,
     required this.layoutType,
+    required this.showHourglassIndicator,
+    required this.showViewAll,
     required this.games,
     required this.collections,
     required this.requiresSubscriptionForGame,
@@ -29,6 +31,8 @@ class SectionWidget extends StatelessWidget {
   final String title;
   final String? subtitle;
   final HomeSectionLayoutType layoutType;
+  final bool showHourglassIndicator;
+  final bool showViewAll;
   final List<Games> games;
   final List<HomeCollectionCardData> collections;
   final bool Function(Games game) requiresSubscriptionForGame;
@@ -81,20 +85,22 @@ class SectionWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
-                GestureDetector(
-                  onTap: _openViewAll,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      'View All'.tr,
-                      style: poppinsW500.copyWith(
-                        fontSize: AppResponsive.font(14),
-                        color: AppColors.color8752FF,
+                if (showViewAll) ...[
+                  const SizedBox(width: 12),
+                  GestureDetector(
+                    onTap: _openViewAll,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        'View All'.tr,
+                        style: poppinsW500.copyWith(
+                          fontSize: AppResponsive.font(14),
+                          color: AppColors.color8752FF,
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
@@ -121,9 +127,11 @@ class SectionWidget extends StatelessWidget {
       case HomeSectionLayoutType.banner:
         return AppResponsive.value(150, tablet: 290);
       case HomeSectionLayoutType.iconWithIcon:
-        return AppResponsive.value(150, tablet: 290);
+        return AppResponsive.value(150, tablet: 270);
       case HomeSectionLayoutType.iconWithBanner:
-        return AppResponsive.value(165, tablet: 225);
+        return AppResponsive.value(180, tablet: 300);
+      case HomeSectionLayoutType.iconWithBannerDownload:
+        return AppResponsive.value(180, tablet: 300);
       case HomeSectionLayoutType.icon:
         return AppResponsive.value(130, tablet: 200);
       case HomeSectionLayoutType.collection:
@@ -153,9 +161,19 @@ class SectionWidget extends StatelessWidget {
         return GameIconWithBanner(
           game: games[index],
           requiresSubscription: requiresSubscriptionForGame(games[index]),
+          actionMode: showHourglassIndicator
+              ? GameIconWithBannerActionMode.hourglassOnly
+              : GameIconWithBannerActionMode.playOrSubscribe,
           onTap: (final bool isSubscribe) {
             onGameTap?.call(games[index], isSubscribe);
           },
+          onSecondaryTap: () => onGameStoreTap?.call(games[index]),
+        );
+      case HomeSectionLayoutType.iconWithBannerDownload:
+        return GameIconWithBanner(
+          game: games[index],
+          requiresSubscription: requiresSubscriptionForGame(games[index]),
+          actionMode: GameIconWithBannerActionMode.downloadOnly,
           onSecondaryTap: () => onGameStoreTap?.call(games[index]),
         );
       case HomeSectionLayoutType.icon:
@@ -185,6 +203,7 @@ class SectionWidget extends StatelessWidget {
         title: title,
         subtitle: subtitle,
         layoutType: layoutType,
+        showHourglassIndicator: showHourglassIndicator,
         games: games,
         collections: collections,
       ),

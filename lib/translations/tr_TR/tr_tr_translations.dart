@@ -144,4 +144,19 @@ final Map<String, String> trTr = <String, String>{
       "Premium erişim bu cihazda zaten aktif.",
   'Restoring purchases...': "Satın alımlar geri yükleniyor...",
   'Restore Purchases': "Satın alımları geri yükle",
+  'Subscribe': "Abone Ol",
+  'Score': "Skor",
+  'Leaderboard': "Liderlik Tablosu",
+  'View All': "Tümünü Gör",
+  'Upgrade to VIP': "VIP'e Yükselt",
+  'Download': "İndir",
+  'Continue': "Devam Et",
+
+  //New
+  'Continue Playing': 'Oynamaya Devam Et',
+  'Jump back into your recently played favorites.':
+      'Son oynadığınız favorilerinize geri dönün.',
+  'Explore': 'Keşfet',
+  'Choose your language': 'Dilini seç',
+  'Save Language': 'Dili Kaydet',
 };

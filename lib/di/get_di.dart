@@ -39,7 +39,7 @@ Future<void> init() async {
   Get.put(ProfileController(), permanent: true);
   Get.lazyPut(() => DioClient(Dio(), Get.find()));
 
-  Get.lazyPut(() => ApiRepo(Get.find(), Get.find()), fenix: true);
+  Get.lazyPut(() => ApiRepo(Get.find(), Get.find(), Get.find()), fenix: true);
 
   Get.put(NetworkController(), permanent: true);
   Get.lazyPut(() => HomeController(Get.find()));
