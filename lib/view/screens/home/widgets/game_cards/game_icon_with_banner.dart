@@ -5,6 +5,7 @@ import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
+import 'package:magic_games/helpers/cache/app_image_cache_manager.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
 import 'package:magic_games/helpers/styles.dart';
@@ -150,6 +151,10 @@ class GameIconWithBanner extends StatelessWidget {
 
     return CachedNetworkImage(
       imageUrl: imageUrl,
+      cacheKey: imageUrl,
+      cacheManager: AppImageCacheManager.instance,
+      fadeInDuration: Duration.zero,
+      fadeOutDuration: Duration.zero,
       imageBuilder:
           (final BuildContext context, final ImageProvider<Object> image) =>
               Container(
@@ -160,6 +165,12 @@ class GameIconWithBanner extends StatelessWidget {
                   image: DecorationImage(image: image, fit: BoxFit.cover),
                 ),
               ),
+      placeholder: (_, _) => HomeImagePlaceholderWidget(
+        width: cardWidth,
+        height: cardHeight,
+        borderRadius: 15,
+        iconSize: AppResponsive.space(34),
+      ),
       errorWidget: (_, _, _) => HomeImagePlaceholderWidget(
         width: cardWidth,
         height: cardHeight,
@@ -288,6 +299,10 @@ class _GameMiniThumb extends StatelessWidget {
 
     return CachedNetworkImage(
       imageUrl: imageUrl,
+      cacheKey: imageUrl,
+      cacheManager: AppImageCacheManager.instance,
+      fadeInDuration: Duration.zero,
+      fadeOutDuration: Duration.zero,
       imageBuilder:
           (final BuildContext context, final ImageProvider<Object> image) =>
               Container(
@@ -298,6 +313,12 @@ class _GameMiniThumb extends StatelessWidget {
                   image: DecorationImage(image: image, fit: BoxFit.cover),
                 ),
               ),
+      placeholder: (_, _) => HomeImagePlaceholderWidget(
+        width: AppResponsive.space(23),
+        height: AppResponsive.space(23),
+        borderRadius: 5,
+        iconSize: AppResponsive.space(23),
+      ),
       errorWidget: (_, _, _) => HomeImagePlaceholderWidget(
         width: AppResponsive.space(23),
         height: AppResponsive.space(23),

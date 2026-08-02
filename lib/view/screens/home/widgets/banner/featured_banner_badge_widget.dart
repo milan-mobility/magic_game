@@ -6,9 +6,26 @@ import 'package:magic_games/data/api/api_end_points.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
+import 'package:magic_games/helpers/cache/app_image_cache_manager.dart';
 import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:magic_games/helpers/styles.dart';
 import 'package:magic_games/view/screens/home/widgets/home_image_placeholder_widget.dart';
+
+String? buildFeaturedBadgeImageUrl(final Featurebannerbagde? badge) {
+  final String? badgePath = badge?.url?.trim();
+  if (badgePath == null || badgePath.isEmpty) {
+    return null;
+  }
+
+  final String baseUrl = Get.isRegistered<RemoteConfigService>()
+      ? Get.find<RemoteConfigService>().baseUrl
+      : Endpoints.defaultBaseUrl;
+  final String normalizedBaseUrl = baseUrl.endsWith('/')
+      ? baseUrl
+      : '$baseUrl/';
+
+  return '$normalizedBaseUrl${badgePath.replaceFirst(RegExp(r'^/+'), '')}';
+}
 
 class FeaturedBannerBadgeWidget extends StatelessWidget {
   const FeaturedBannerBadgeWidget({
@@ -31,6 +48,7 @@ class FeaturedBannerBadgeWidget extends StatelessWidget {
         if (badge?.url != null && badge!.url!.trim().isNotEmpty)
           CachedNetworkImage(
             imageUrl: _badgeImageUrl!,
+            cacheManager: AppImageCacheManager.instance,
             imageBuilder:
                 (
                   final BuildContext context,
@@ -46,6 +64,8 @@ class FeaturedBannerBadgeWidget extends StatelessWidget {
                     ),
                   ),
                 ),
+            fadeInDuration: Duration.zero,
+            fadeOutDuration: Duration.zero,
             errorWidget: (_, _, _) => HomeImagePlaceholderWidget(
               width: AppResponsive.space(25),
               height: AppResponsive.space(25),
@@ -93,18 +113,6 @@ class FeaturedBannerBadgeWidget extends StatelessWidget {
   }
 
   String? get _badgeImageUrl {
-    final String? badgePath = badge?.url?.trim();
-    if (badgePath == null || badgePath.isEmpty) {
-      return null;
-    }
-
-    final String baseUrl = Get.isRegistered<RemoteConfigService>()
-        ? Get.find<RemoteConfigService>().baseUrl
-        : Endpoints.defaultBaseUrl;
-    final String normalizedBaseUrl = baseUrl.endsWith('/')
-        ? baseUrl
-        : '$baseUrl/';
-
-    return '$normalizedBaseUrl${badgePath.replaceFirst(RegExp(r'^/+'), '')}';
+    return buildFeaturedBadgeImageUrl(badge);
   }
 }

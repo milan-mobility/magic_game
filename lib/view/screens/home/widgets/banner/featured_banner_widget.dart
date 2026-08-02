@@ -1,21 +1,26 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:magic_games/helpers/cache/app_image_cache_manager.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
+import 'package:magic_games/view/screens/home/widgets/banner/featured_banner_badge_widget.dart';
 import 'package:magic_games/view/screens/home/widgets/banner/featured_banner_item_widget.dart';
 
 class FeaturedBannerWidget extends StatefulWidget {
   const FeaturedBannerWidget({
     super.key,
     required this.banners,
+    required this.refreshToken,
     required this.requiresSubscriptionForGame,
     required this.onBannerTap,
   });
 
   final List<HomeFeaturedBannerData> banners;
+  final int refreshToken;
   final bool Function(Games game) requiresSubscriptionForGame;
   final void Function(Games game, bool isSubscribe) onBannerTap;
 
@@ -33,6 +38,12 @@ class _FeaturedBannerWidgetState extends State<FeaturedBannerWidget> {
     super.initState();
     _pageController = PageController(viewportFraction: 1);
     _startAutoSlide();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _precacheBannerImages(forceRefresh: false);
+    });
   }
 
   @override
@@ -65,10 +76,98 @@ class _FeaturedBannerWidgetState extends State<FeaturedBannerWidget> {
   @override
   void didUpdateWidget(covariant final FeaturedBannerWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.banners.length != widget.banners.length) {
+    final bool didBannerCountChange =
+        oldWidget.banners.length != widget.banners.length;
+    final bool didRefreshTokenChange =
+        oldWidget.refreshToken != widget.refreshToken;
+    final bool didBannerUrlsChange = !_sameBannerUrls(
+      oldWidget.banners,
+      widget.banners,
+    );
+
+    if (didBannerCountChange) {
       _currentPage = 0;
       _startAutoSlide();
     }
+
+    if (didBannerCountChange || didRefreshTokenChange || didBannerUrlsChange) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        _precacheBannerImages(forceRefresh: didRefreshTokenChange);
+      });
+    }
+  }
+
+  Future<void> _precacheBannerImages({required bool forceRefresh}) async {
+    for (final HomeFeaturedBannerData bannerData in widget.banners) {
+      final String? bannerPath = bannerData.banner.banner?.trim();
+      if (bannerPath == null || bannerPath.isEmpty) {
+        continue;
+      }
+
+      final String imageUrl = buildFeaturedBannerImageUrl(bannerData);
+      if (forceRefresh) {
+        await AppImageCacheManager.removeImage(imageUrl);
+      }
+      await precacheImage(
+        CachedNetworkImageProvider(
+          imageUrl,
+          cacheManager: AppImageCacheManager.instance,
+        ),
+        context,
+      );
+
+      final String? iconUrl = buildFeaturedBannerThumbIconUrl(
+        bannerData.banner.icon,
+      );
+      if (iconUrl != null) {
+        if (forceRefresh) {
+          await AppImageCacheManager.removeImage(iconUrl);
+        }
+        await precacheImage(
+          CachedNetworkImageProvider(
+            iconUrl,
+            cacheManager: AppImageCacheManager.instance,
+          ),
+          context,
+        );
+      }
+
+      final String? badgeUrl = buildFeaturedBadgeImageUrl(bannerData.badge);
+      if (badgeUrl != null) {
+        if (forceRefresh) {
+          await AppImageCacheManager.removeImage(badgeUrl);
+        }
+        await precacheImage(
+          CachedNetworkImageProvider(
+            badgeUrl,
+            cacheManager: AppImageCacheManager.instance,
+          ),
+          context,
+        );
+      }
+    }
+  }
+
+  bool _sameBannerUrls(
+    final List<HomeFeaturedBannerData> previous,
+    final List<HomeFeaturedBannerData> current,
+  ) {
+    if (previous.length != current.length) {
+      return false;
+    }
+
+    for (int index = 0; index < previous.length; index++) {
+      final String? previousPath = previous[index].banner.banner?.trim();
+      final String? currentPath = current[index].banner.banner?.trim();
+      if (previousPath != currentPath) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   @override

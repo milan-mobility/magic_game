@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
+import 'package:magic_games/helpers/cache/app_image_cache_manager.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
 import 'package:magic_games/helpers/styles.dart';
@@ -108,6 +109,10 @@ class GameCollectionItem extends StatelessWidget {
 
     return CachedNetworkImage(
       imageUrl: resolvedUrl,
+      cacheKey: resolvedUrl,
+      cacheManager: AppImageCacheManager.instance,
+      fadeInDuration: Duration.zero,
+      fadeOutDuration: Duration.zero,
       imageBuilder:
           (final BuildContext context, final ImageProvider<Object> image) =>
               Container(
@@ -118,6 +123,12 @@ class GameCollectionItem extends StatelessWidget {
                   image: DecorationImage(image: image, fit: BoxFit.cover),
                 ),
               ),
+      placeholder: (_, _) => HomeImagePlaceholderWidget(
+        width: cardWidth,
+        height: cardHeight,
+        borderRadius: 5,
+        iconSize: AppResponsive.space(30),
+      ),
       errorWidget: (_, _, _) => HomeImagePlaceholderWidget(
         width: cardWidth,
         height: cardHeight,
