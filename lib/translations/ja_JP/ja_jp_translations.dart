@@ -148,4 +148,8 @@ final Map<String, String> jaJp = <String, String>{
   'Explore': '探索',
   'Choose your language': '言語を選択してください',
   'Save Language': '言語を保存',
+  'About This Game': 'このゲームについて',
+  'You May Like This': 'あなたへのおすすめ',
+  'Rate Us': '評価してください',
+  'Support us with 5 stars!': '星5つで応援してください！ ⭐',
 };

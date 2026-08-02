@@ -41,4 +41,23 @@ class AdHelper {
 
     return rewardedAdUnitId;
   }
+
+  static String get bannerAdUnitId {
+    if (GetPlatform.isAndroid) {
+      return AppConstants.bannerAndroid;
+    } else if (Platform.isIOS) {
+      return AppConstants.bannerIOS;
+    } else {
+      throw UnsupportedError('Unsupported platform');
+    }
+  }
+
+  static String resolveBannerAdUnitId(final String? customAdUnitId) {
+    final String? trimmedId = customAdUnitId?.trim();
+    if (trimmedId != null && trimmedId.isNotEmpty) {
+      return trimmedId;
+    }
+
+    return bannerAdUnitId;
+  }
 }

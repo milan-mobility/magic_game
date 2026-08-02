@@ -219,10 +219,7 @@ class FeaturedBannerItemWidget extends StatelessWidget {
   String get _featuredBannerImageUrl {
     final String bannerPath = bannerData.banner.banner!.trim();
     final String baseUrl = Get.isRegistered<RemoteConfigService>()
-        ? Get.find<RemoteConfigService>().getString(
-            RemoteConfigService.baseUrlKey,
-            fallback: Endpoints.defaultBaseUrl,
-          )
+        ? Get.find<RemoteConfigService>().baseUrl
         : Endpoints.defaultBaseUrl;
     final String normalizedBaseUrl = baseUrl.endsWith('/')
         ? baseUrl
@@ -302,10 +299,7 @@ class _BannerGameThumb extends StatelessWidget {
     }
 
     final String baseUrl = Get.isRegistered<RemoteConfigService>()
-        ? Get.find<RemoteConfigService>().getString(
-            RemoteConfigService.baseUrlKey,
-            fallback: Endpoints.defaultBaseUrl,
-          )
+        ? Get.find<RemoteConfigService>().baseUrl
         : Endpoints.defaultBaseUrl;
     final String normalizedBaseUrl = baseUrl.endsWith('/')
         ? baseUrl

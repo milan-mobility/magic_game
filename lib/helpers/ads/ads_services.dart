@@ -26,6 +26,8 @@ class AdService {
     return Get.find<PremiumAccessService>().hasPremiumAccess;
   }
 
+  static bool get shouldSuppressAds => _shouldSuppressAds;
+
   static Future<void> preloadInterstitial({String? adUnitId}) async {
     debugPrint("MILAN ADD UNIT ID=> $adUnitId");
     if (_shouldSuppressAds) {

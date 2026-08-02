@@ -424,6 +424,16 @@ class Utility {
     return buffer.toString().trimRight();
   }
 
+  static Future<void> rateUs() async {
+    if (Platform.isAndroid) {
+      await InAppReview.instance.openStoreListing(
+        appStoreId: 'com.oneup.onegameplus',
+      );
+    } else if (Platform.isIOS) {
+      await InAppReview.instance.openStoreListing(appStoreId: '1622599607');
+    }
+  }
+
   static _EmailUserContext _resolveEmailUserContext({
     String userId = '',
     String userEmail = '',

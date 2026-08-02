@@ -159,4 +159,8 @@ final Map<String, String> trTr = <String, String>{
   'Explore': 'Keşfet',
   'Choose your language': 'Dilini seç',
   'Save Language': 'Dili Kaydet',
+  'About This Game': 'Bu Oyun Hakkında',
+  'You May Like This': 'Bunları da Beğenebilirsiniz',
+  'Rate Us': 'Bizi Değerlendir',
+  'Support us with 5 stars!': 'Bizi 5 yıldızla destekleyin! ⭐',
 };

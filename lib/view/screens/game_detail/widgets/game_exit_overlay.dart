@@ -72,8 +72,9 @@ class GameExitOverlay extends StatelessWidget {
             ),
           ),
           SafeArea(
-            bottom: false,
+            minimum: EdgeInsets.only(bottom: AppResponsive.space(20)),
             child: SingleChildScrollView(
+              padding: EdgeInsets.only(bottom: AppResponsive.space(24)),
               child: Center(
                 child: SizedBox(
                   width: double.infinity,

@@ -50,14 +50,18 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
   late final TextEditingController _nameController;
   late String? _selectedAssetPath;
   late String? _selectedFilePath;
+
   bool _isPickingImage = false;
 
   @override
   void initState() {
     super.initState();
+
     _nameController = TextEditingController(text: widget.initialName)
       ..addListener(_refresh);
+
     _selectedAssetPath = _normalizeValue(widget.initialSelectedAssetPath);
+
     _selectedFilePath = _normalizeValue(widget.initialSelectedFilePath);
   }
 
@@ -66,24 +70,38 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
     _nameController
       ..removeListener(_refresh)
       ..dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.sizeOf(context);
+    final EdgeInsets viewInsets = MediaQuery.viewInsetsOf(context);
+    final EdgeInsets safeAreaPadding = MediaQuery.paddingOf(context);
+
+    final double calculatedHeight =
+        screenSize.height -
+        viewInsets.bottom -
+        safeAreaPadding.vertical -
+        AppResponsive.space(36);
+
+    final double maxDialogHeight = calculatedHeight > 240
+        ? calculatedHeight
+        : 240;
+
     return Dialog(
       elevation: 0,
       backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.symmetric(horizontal: AppResponsive.space(18)),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: AppResponsive.space(18),
+        vertical: AppResponsive.space(18),
+      ),
       child: Container(
+        width: double.infinity,
         constraints: BoxConstraints(
           maxWidth: AppResponsive.value(360, tablet: 430, largeTablet: 480),
-        ),
-        padding: EdgeInsets.fromLTRB(
-          AppResponsive.space(14),
-          AppResponsive.space(18),
-          AppResponsive.space(14),
-          AppResponsive.space(18),
+          maxHeight: maxDialogHeight,
         ),
         decoration: BoxDecoration(
           color: AppColors.color1C153F,
@@ -99,163 +117,181 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
             ),
           ],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                const Spacer(),
-                Expanded(
-                  flex: 5,
-                  child: Column(
-                    children: <Widget>[
-                      Text(
-                        'Edit Profile'.tr,
-                        textAlign: TextAlign.center,
-                        style: poppinsW700.copyWith(
-                          fontSize: AppResponsive.font(24),
-                          color: AppColors.white,
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          physics: const ClampingScrollPhysics(),
+          padding: EdgeInsets.fromLTRB(
+            AppResponsive.space(14),
+            AppResponsive.space(18),
+            AppResponsive.space(14),
+            AppResponsive.space(18),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  const Spacer(),
+                  Expanded(
+                    flex: 5,
+                    child: Column(
+                      children: <Widget>[
+                        Text(
+                          'Edit Profile'.tr,
+                          textAlign: TextAlign.center,
+                          style: poppinsW700.copyWith(
+                            fontSize: AppResponsive.font(24),
+                            color: AppColors.white,
+                          ),
                         ),
-                      ),
-                      Gap(AppResponsive.space(4)),
-                      Text(
-                        'Change your avatar and name'.tr,
-                        textAlign: TextAlign.center,
-                        style: poppinsW500.copyWith(
-                          fontSize: AppResponsive.font(12.5),
-                          color: AppColors.white.withValues(alpha: 0.92),
+                        Gap(AppResponsive.space(4)),
+                        Text(
+                          'Change your avatar and name'.tr,
+                          textAlign: TextAlign.center,
+                          style: poppinsW500.copyWith(
+                            fontSize: AppResponsive.font(12.5),
+                            color: AppColors.white.withValues(alpha: 0.92),
+                          ),
                         ),
-                      ),
-                      Gap(AppResponsive.space(6)),
-                      Container(
-                        width: AppResponsive.value(170, tablet: 210),
-                        height: 3,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF22AEFF),
-                          borderRadius: BorderRadius.circular(999),
+                        Gap(AppResponsive.space(6)),
+                        Container(
+                          width: AppResponsive.value(170, tablet: 210),
+                          height: 3,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF22AEFF),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: InkWell(
-                    onTap: () => Get.back<void>(),
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      width: AppResponsive.space(46),
-                      height: AppResponsive.space(46),
-                      decoration: BoxDecoration(
-                        color: AppColors.color2A1B59,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Icon(
-                        Icons.close_rounded,
-                        color: AppColors.white,
-                        size: AppResponsive.space(28),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: InkWell(
+                      onTap: () {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        Get.back<void>();
+                      },
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        width: AppResponsive.space(46),
+                        height: AppResponsive.space(46),
+                        decoration: BoxDecoration(
+                          color: AppColors.color2A1B59,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(
+                          Icons.close_rounded,
+                          color: AppColors.white,
+                          size: AppResponsive.space(28),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            Gap(AppResponsive.space(14)),
-            Container(
-              height: 1,
-              color: AppColors.color6B35F5.withValues(alpha: 0.28),
-            ),
-            Gap(AppResponsive.space(14)),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Choose your Avatar.'.tr,
-                style: poppinsW600.copyWith(
-                  fontSize: AppResponsive.font(14),
-                  color: AppColors.white,
-                ),
+                ],
               ),
-            ),
-            Gap(AppResponsive.space(12)),
-            Wrap(
-              spacing: AppResponsive.space(12),
-              runSpacing: AppResponsive.space(14),
-              children: <Widget>[
-                ...widget.avatarAssetPaths.map((final String assetPath) {
-                  return _AvatarOptionTile(
-                    image: Image.asset(assetPath, fit: BoxFit.cover),
-                    isSelected: _selectedAssetPath == assetPath,
-                    onTap: () {
-                      setState(() {
-                        _selectedAssetPath = assetPath;
-                        _selectedFilePath = null;
-                      });
-                    },
-                  );
-                }),
-                _GalleryOptionTile(
-                  isSelected: _selectedFilePath != null,
-                  isLoading: _isPickingImage,
-                  imageFilePath: _selectedFilePath,
-                  onTap: _pickImageFromGallery,
-                ),
-              ],
-            ),
-            Gap(AppResponsive.space(18)),
-            Container(
-              height: 1,
-              color: AppColors.color6B35F5.withValues(alpha: 0.28),
-            ),
-            Gap(AppResponsive.space(14)),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Set your Name'.tr,
-                style: poppinsW600.copyWith(
-                  fontSize: AppResponsive.font(14),
-                  color: AppColors.white,
-                ),
+              Gap(AppResponsive.space(14)),
+              Container(
+                height: 1,
+                color: AppColors.color6B35F5.withValues(alpha: 0.28),
               ),
-            ),
-            Gap(AppResponsive.space(10)),
-            _NameInputField(controller: _nameController),
-            Gap(AppResponsive.space(8)),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'This name will be visible to other players.'.tr,
-                style: poppinsW400.copyWith(
-                  fontSize: AppResponsive.font(11.5),
-                  color: AppColors.white.withValues(alpha: 0.58),
-                ),
-              ),
-            ),
-            Gap(AppResponsive.space(18)),
-            CommonButton(
-              btnText: 'Save'.tr,
-              onPressed: _submit,
-              height: AppResponsive.value(48, tablet: 54),
-              borderRadius: 10,
-              style: poppinsW600.copyWith(
-                fontSize: AppResponsive.font(16),
-                color: AppColors.white,
-              ),
-            ),
-            Gap(AppResponsive.space(10)),
-            InkWell(
-              onTap: () => Get.back<void>(),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: AppResponsive.space(4)),
+              Gap(AppResponsive.space(14)),
+              Align(
+                alignment: Alignment.centerLeft,
                 child: Text(
-                  'Cancel'.tr,
+                  'Choose your Avatar.'.tr,
                   style: poppinsW600.copyWith(
                     fontSize: AppResponsive.font(14),
-                    color: AppColors.color9B57FF,
+                    color: AppColors.white,
                   ),
                 ),
               ),
-            ),
-          ],
+              Gap(AppResponsive.space(12)),
+              Wrap(
+                spacing: AppResponsive.space(12),
+                runSpacing: AppResponsive.space(14),
+                children: <Widget>[
+                  ...widget.avatarAssetPaths.map((final String assetPath) {
+                    return _AvatarOptionTile(
+                      image: Image.asset(assetPath, fit: BoxFit.cover),
+                      isSelected: _selectedAssetPath == assetPath,
+                      onTap: () {
+                        setState(() {
+                          _selectedAssetPath = assetPath;
+                          _selectedFilePath = null;
+                        });
+                      },
+                    );
+                  }),
+                  _GalleryOptionTile(
+                    isSelected: _selectedFilePath != null,
+                    isLoading: _isPickingImage,
+                    imageFilePath: _selectedFilePath,
+                    onTap: _pickImageFromGallery,
+                  ),
+                ],
+              ),
+              Gap(AppResponsive.space(18)),
+              Container(
+                height: 1,
+                color: AppColors.color6B35F5.withValues(alpha: 0.28),
+              ),
+              Gap(AppResponsive.space(14)),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Set your Name'.tr,
+                  style: poppinsW600.copyWith(
+                    fontSize: AppResponsive.font(14),
+                    color: AppColors.white,
+                  ),
+                ),
+              ),
+              Gap(AppResponsive.space(10)),
+              _NameInputField(controller: _nameController),
+              Gap(AppResponsive.space(8)),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'This name will be visible to other players.'.tr,
+                  style: poppinsW400.copyWith(
+                    fontSize: AppResponsive.font(11.5),
+                    color: AppColors.white.withValues(alpha: 0.58),
+                  ),
+                ),
+              ),
+              Gap(AppResponsive.space(18)),
+              CommonButton(
+                btnText: 'Save'.tr,
+                onPressed: _submit,
+                height: AppResponsive.value(48, tablet: 54),
+                borderRadius: 10,
+                style: poppinsW600.copyWith(
+                  fontSize: AppResponsive.font(16),
+                  color: AppColors.white,
+                ),
+              ),
+              Gap(AppResponsive.space(10)),
+              InkWell(
+                onTap: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  Get.back<void>();
+                },
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: AppResponsive.space(4),
+                  ),
+                  child: Text(
+                    'Cancel'.tr,
+                    style: poppinsW600.copyWith(
+                      fontSize: AppResponsive.font(14),
+                      color: AppColors.color9B57FF,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -266,13 +302,16 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
       return;
     }
 
+    FocusManager.instance.primaryFocus?.unfocus();
+
     setState(() {
       _isPickingImage = true;
     });
 
     try {
       final List<String> images = await Utility.getPhotos(isMultiple: false);
-      if (images.isNotEmpty) {
+
+      if (images.isNotEmpty && mounted) {
         setState(() {
           _selectedFilePath = images.first;
           _selectedAssetPath = null;
@@ -288,6 +327,8 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
   }
 
   void _submit() {
+    FocusManager.instance.primaryFocus?.unfocus();
+
     Get.back<ProfileEditResult>(
       result: ProfileEditResult(
         name: _nameController.text.trim(),
@@ -309,6 +350,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
     }
 
     final String trimmedValue = value.trim();
+
     return trimmedValue.isEmpty ? null : trimmedValue;
   }
 }
@@ -327,6 +369,7 @@ class _AvatarOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double size = AppResponsive.value(70, tablet: 78);
+
     final double badgeSize = AppResponsive.space(28);
 
     return GestureDetector(
@@ -395,7 +438,11 @@ class _GalleryOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double tileSize = AppResponsive.value(78, tablet: 86);
+
     final double previewSize = AppResponsive.value(60, tablet: 68);
+
+    final bool hasSelectedImage =
+        imageFilePath != null && File(imageFilePath!).existsSync();
 
     return Material(
       color: Colors.transparent,
@@ -418,7 +465,7 @@ class _GalleryOptionTile extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              if (imageFilePath != null && File(imageFilePath!).existsSync())
+              if (hasSelectedImage)
                 Container(
                   width: previewSize,
                   height: previewSize,
@@ -493,8 +540,20 @@ class _NameInputField extends StatelessWidget {
             child: TextField(
               controller: controller,
               maxLength: 20,
+              maxLines: 1,
               textInputAction: TextInputAction.done,
               textAlignVertical: TextAlignVertical.center,
+              scrollPadding: EdgeInsets.only(
+                bottom:
+                    MediaQuery.viewInsetsOf(context).bottom +
+                    AppResponsive.space(100),
+              ),
+              onSubmitted: (_) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
+              onTapOutside: (_) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
               style: poppinsW500.copyWith(
                 fontSize: AppResponsive.font(14),
                 color: AppColors.white,

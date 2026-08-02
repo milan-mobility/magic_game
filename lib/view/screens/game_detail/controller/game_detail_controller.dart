@@ -4,9 +4,12 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
+import 'package:magic_games/helpers/ads/ads_helper.dart';
 import 'package:magic_games/helpers/ads/ads_services.dart';
+import 'package:magic_games/helpers/ads/consent_manager.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
@@ -14,7 +17,11 @@ import 'package:magic_games/helpers/services/google_leaderboard_service.dart';
 import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:magic_games/helpers/styles.dart';
 import 'package:magic_games/routes/route_helper.dart';
+import 'package:magic_games/utils/connection.dart';
+import 'package:magic_games/utils/message_constant.dart';
 import 'package:magic_games/utils/utility.dart';
+import 'package:magic_games/view/base/custom_snack_bar.dart';
+import 'package:magic_games/view/base/loader.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 import 'package:magic_games/view/screens/profile/controller/profile_controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -22,12 +29,18 @@ import 'package:webview_flutter/webview_flutter.dart';
 class GameDetailController extends GetxController with WidgetsBindingObserver {
   final SharedPreferenceHelper _sharedPreferenceHelper =
       Get.find<SharedPreferenceHelper>();
+  final Set<String> _preloadedExitPreviewImageUrls = <String>{};
 
   late WebViewController webViewController;
   bool _isShowingInterstitial = false;
   bool _isShowingRewarded = false;
+  bool _isBannerRequestedVisible = false;
+  bool _isBannerLoading = false;
+  bool isGameLoading = true;
   bool isExitOverlayVisible = false;
   Games? games;
+  BannerAd? _bannerAd;
+  _BannerAlignment _bannerAlignment = _BannerAlignment.bottom;
 
   final RemoteConfigService _remoteConfigService = RemoteConfigService();
 
@@ -35,6 +48,17 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
       _normalizedAdUnitId(games?.interstitialid);
 
   String? get _currentRewardedAdUnitId => _normalizedAdUnitId(games?.rewardid);
+
+  BannerAd? get bannerAd =>
+      _isBannerRequestedVisible && !_isBannerLoading && _bannerAd != null
+      ? _bannerAd
+      : null;
+
+  bool get isBannerVisible => bannerAd != null;
+
+  bool get isBannerAlignedTop => _bannerAlignment == _BannerAlignment.top;
+
+  double get bannerHeight => bannerAd?.size.height.toDouble() ?? 0;
 
   String get gameTitle {
     final String? name = games?.name?.trim();
@@ -151,6 +175,7 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
     _preloadGameAds();
     unawaited(_enterGameMode());
     webViewController = WebViewController();
+    _configureWebView();
     loadUrl();
   }
 
@@ -161,60 +186,46 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
     }
   }
 
-  void loadUrl() {
-    webViewController.setJavaScriptMode(JavaScriptMode.unrestricted);
-    webViewController.setOnConsoleMessage((JavaScriptConsoleMessage message) {
-      debugPrint(
-        '[WEBVIEW_JS]'
-        '[${message.level.name.toUpperCase()}] '
-        '${message.message}',
-      );
-    });
-    webViewController.setNavigationDelegate(
-      NavigationDelegate(
-        onProgress: (int progress) {},
-        onPageStarted: (String url) {
-          debugPrint('Page started: $url');
-        },
-        onPageFinished: (String url) async {
-          debugPrint('Page finished: $url — notifying JS');
-          _scheduleImmersiveModeRestore();
-          try {
-            await webViewController.runJavaScript(
-              "if (typeof onFlutterReady === 'function') onFlutterReady();",
-            );
-          } catch (e) {
-            debugPrint('onFlutterReady JS error: $e');
-          }
-        },
-        onHttpError: (HttpResponseError error) {},
-        onWebResourceError: (WebResourceError error) {},
-        onNavigationRequest: (NavigationRequest request) {
-          return NavigationDecision.navigate;
-        },
-      ),
-    );
+  Future<void> loadUrl() async {
+    try {
+      _setGameLoading(true);
+      final bool isInternetAvailable =
+          await ConnectionUtils.isNetworkConnected();
+      if (!isInternetAvailable) {
+        _setGameLoading(false);
+        showErrorSnackBar(
+          title: MessageConstant.netWorkTitle,
+          message: MessageConstant.networkError,
+        );
+        return;
+      }
 
-    webViewController.addJavaScriptChannel(
-      'FlutterChannel',
-      onMessageReceived: (final JavaScriptMessage message) {
-        _handleWebMessage(message.message);
-      },
-    );
+      final String? gameUrl = games?.gameurl?.trim();
+      if (gameUrl == null || gameUrl.isEmpty) {
+        _setGameLoading(false);
+        Loader.load(false);
+        _showToastMessage('Game URL is not available for this game.'.tr);
+        return;
+      }
 
-    debugPrint("GAME URL=>${games?.gameurl}");
-    webViewController.loadRequest(Uri.parse(games?.gameurl ?? ''));
+      Loader.load(true);
+      debugPrint("GAME URL=>$gameUrl");
+      await webViewController.loadRequest(Uri.parse(gameUrl));
+    } catch (e) {
+      _setGameLoading(false);
+      Loader.load(false);
+    }
   }
 
   Future<void> showExitOverlay() async {
     if (isExitOverlayVisible) {
       return;
     }
+    await _sendCallbackToJs('GamePause');
 
     isExitOverlayVisible = true;
     update();
     await _applyExitOverlayOrientation();
-    await _sendCallbackToJs('GamePause');
   }
 
   Future<void> hideExitOverlay() async {
@@ -242,22 +253,40 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   }
 
   void openRecommendedGame(final Games game, final bool isSubscribe) {
-    if (isSubscribe) {
-      unawaited(_prepareForScreenExit());
-      Get.offAllNamed(RouteHelper.vip);
-      return;
-    }
-
-    unawaited(_prepareForScreenExit());
-    Get.toNamed(
-      RouteHelper.gameDetail,
-      arguments: <String, dynamic>{'game': game},
-    );
+    unawaited(_openRecommendedGame(game, isSubscribe));
   }
 
   Future<void> closeGameDetailScreen() async {
     await _prepareForScreenExit();
     Get.back<void>();
+  }
+
+  Future<void> _openRecommendedGame(
+    final Games game,
+    final bool isSubscribe,
+  ) async {
+    if (isSubscribe) {
+      await _prepareForScreenExit();
+      Get.offNamed(RouteHelper.vip);
+      return;
+    }
+
+    if (_isSameGame(game, games)) {
+      await hideExitOverlay();
+      return;
+    }
+
+    _setGameLoading(true);
+    games = game;
+    isExitOverlayVisible = false;
+    _isShowingInterstitial = false;
+    _isShowingRewarded = false;
+    _hideBanner(resetAlignment: true);
+    update();
+
+    _preloadGameAds();
+    await _enterGameMode();
+    await loadUrl();
   }
 
   Future<void> _handleWebMessage(final String message) async {
@@ -332,6 +361,17 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
         }
         break;
 
+      case 'showBanner':
+        await _showBanner();
+        break;
+      case 'hideBanner':
+        _hideBanner();
+        break;
+
+      case 'setBannerAlign':
+        _setBannerAlign(webMessage.payload);
+        break;
+
       case 'addHeart':
         await _addCurrentGameToFavorites();
         await GoogleLeaderboardService.instance.submitScore(
@@ -373,7 +413,11 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
         break;
 
       case 'gameStart':
-        _sendCallbackToJs(Get.locale?.languageCode.toLowerCase() ?? '');
+        Loader.load(false);
+        _setGameLoading(false);
+        _sendCallbackToJs(
+          'appLanguage:${Get.locale?.languageCode.toLowerCase() ?? ''}',
+        );
         await _recordCurrentGameAsRecentlyPlayed();
         break;
 
@@ -555,6 +599,7 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   @override
   void onClose() {
     WidgetsBinding.instance.removeObserver(this);
+    _disposeBannerAd();
     unawaited(_restoreDefaultSystemUi());
     unawaited(_resetPreferredOrientation());
     AdService.dispose();
@@ -624,6 +669,159 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
     await _restoreImmersiveMode();
   }
 
+  void _configureWebView() {
+    webViewController.setJavaScriptMode(JavaScriptMode.unrestricted);
+    webViewController.setOnConsoleMessage((JavaScriptConsoleMessage message) {
+      debugPrint(
+        '[WEBVIEW_JS]'
+        '[${message.level.name.toUpperCase()}] '
+        '${message.message}',
+      );
+    });
+    webViewController.setNavigationDelegate(
+      NavigationDelegate(
+        onProgress: (int progress) {},
+        onPageStarted: (String url) {
+          debugPrint('Page started: $url');
+        },
+        onPageFinished: (String url) async {
+          debugPrint('Page finished: $url — notifying JS');
+          _setGameLoading(false);
+          _scheduleImmersiveModeRestore();
+          try {
+            await webViewController.runJavaScript(
+              "if (typeof onFlutterReady === 'function') onFlutterReady();",
+            );
+          } catch (e) {
+            debugPrint('onFlutterReady JS error: $e');
+          }
+        },
+        onHttpError: (HttpResponseError error) {},
+        onWebResourceError: (WebResourceError error) {
+          _setGameLoading(false);
+          Loader.load(false);
+        },
+        onNavigationRequest: (NavigationRequest request) {
+          return NavigationDecision.navigate;
+        },
+      ),
+    );
+
+    webViewController.addJavaScriptChannel(
+      'FlutterChannel',
+      onMessageReceived: (final JavaScriptMessage message) {
+        _handleWebMessage(message.message);
+      },
+    );
+  }
+
+  void _setGameLoading(final bool value) {
+    if (isGameLoading == value) {
+      return;
+    }
+
+    isGameLoading = value;
+    update();
+  }
+
+  void preloadExitPreviewAssets(final BuildContext context) {
+    final Set<String> imageUrls = <String>{
+      if (heroImageUrl != null && heroImageUrl!.trim().isNotEmpty)
+        heroImageUrl!.trim(),
+      if (backgroundImageUrl != null && backgroundImageUrl!.trim().isNotEmpty)
+        backgroundImageUrl!.trim(),
+    };
+
+    for (final String imageUrl in imageUrls) {
+      if (_preloadedExitPreviewImageUrls.contains(imageUrl)) {
+        continue;
+      }
+
+      _preloadedExitPreviewImageUrls.add(imageUrl);
+      unawaited(
+        precacheImage(NetworkImage(imageUrl), context).catchError((
+          final Object error,
+          final StackTrace stackTrace,
+        ) {
+          _preloadedExitPreviewImageUrls.remove(imageUrl);
+          debugPrint('Failed to preload exit preview image: $imageUrl');
+        }),
+      );
+    }
+  }
+
+  Future<void> _showBanner() async {
+    if (AdService.shouldSuppressAds) {
+      _disposeBannerAd();
+      update();
+      return;
+    }
+
+    _isBannerRequestedVisible = true;
+
+    if (_bannerAd != null) {
+      update();
+      return;
+    }
+
+    if (_isBannerLoading) {
+      return;
+    }
+
+    _isBannerLoading = true;
+    update();
+
+    final AdRequest request = await ConsentManager.instance.getAdRequest();
+    final BannerAd banner = BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      size: AdSize.banner,
+      request: request,
+      listener: BannerAdListener(
+        onAdLoaded: (final Ad ad) {
+          _isBannerLoading = false;
+          _bannerAd = ad as BannerAd;
+          update();
+        },
+        onAdFailedToLoad: (ad, error) {
+          _isBannerLoading = false;
+          _bannerAd?.dispose();
+          _bannerAd = null;
+          _isBannerRequestedVisible = false;
+          debugPrint('Banner ad failed to load: $error');
+          update();
+        },
+      ),
+    );
+
+    _bannerAd = banner;
+    banner.load();
+  }
+
+  void _hideBanner({bool resetAlignment = false}) {
+    _isBannerRequestedVisible = false;
+    if (resetAlignment) {
+      _bannerAlignment = _BannerAlignment.bottom;
+    }
+    update();
+  }
+
+  void _setBannerAlign(final String rawValue) {
+    final String alignment = rawValue.trim().toLowerCase();
+    if (alignment == 'top') {
+      _bannerAlignment = _BannerAlignment.top;
+    } else if (alignment == 'bottom' || alignment == 'botton') {
+      _bannerAlignment = _BannerAlignment.bottom;
+    }
+    update();
+  }
+
+  void _disposeBannerAd() {
+    _bannerAd?.dispose();
+    _bannerAd = null;
+    _isBannerLoading = false;
+    _isBannerRequestedVisible = false;
+  }
+
   Set<String> _tokenizeCategoryValues(final String? value) {
     final String? normalizedValue = value?.trim();
     if (normalizedValue == null || normalizedValue.isEmpty) {
@@ -671,3 +869,5 @@ class _WebMessage {
   final String command;
   final String payload;
 }
+
+enum _BannerAlignment { top, bottom }

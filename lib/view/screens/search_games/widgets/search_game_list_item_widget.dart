@@ -254,7 +254,7 @@ class _SearchGameActions extends StatelessWidget {
 
     return ConstrainedBox(
       constraints: BoxConstraints(
-        maxWidth: AppResponsive.value(100, tablet: 140),
+        maxWidth: AppResponsive.value(120, tablet: 140),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -280,10 +280,8 @@ class _SearchGameActions extends StatelessWidget {
             ),
           if (showSubscribeAction) ...[
             if (hasPrimaryActions) Gap(AppResponsive.space(8)),
-
             CommonButton(
               height: AppResponsive.value(30, tablet: 35),
-              width: AppResponsive.value(120, tablet: 140),
               btnText: 'Subscribe'.tr,
               onPressed: onSubscribeTap,
               fontSize: 12,

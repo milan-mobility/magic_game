@@ -157,4 +157,8 @@ final Map<String, String> hiIn = <String, String>{
   'Explore': 'खोजें',
   'Choose your language': 'अपनी भाषा चुनें',
   'Save Language': 'भाषा सहेजें',
+  'About This Game': 'इस गेम के बारे में',
+  'You May Like This': 'आपको यह पसंद आ सकता है',
+  'Rate Us': 'हमें रेट करें',
+  'Support us with 5 stars!': 'हमें 5 स्टार देकर समर्थन करें! ⭐',
 };

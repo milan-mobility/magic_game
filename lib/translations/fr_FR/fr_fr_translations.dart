@@ -165,4 +165,8 @@ final Map<String, String> frFr = <String, String>{
   'Explore': 'Explorer',
   'Choose your language': 'Choisissez votre langue',
   'Save Language': 'Enregistrer la langue',
+  'About This Game': 'À propos de ce jeu',
+  'You May Like This': 'Vous pourriez aimer ceci',
+  'Rate Us': 'Notez-nous',
+  'Support us with 5 stars!': 'Soutenez-nous avec 5 étoiles ! ⭐',
 };
