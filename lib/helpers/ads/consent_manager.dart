@@ -9,12 +9,14 @@ class ConsentManager {
   static final ConsentManager instance = ConsentManager._();
 
   bool _ready = false;
+  bool _hasInvokedConsentFlowComplete = false;
 
   /// Initialize consent flow. Call this at app startup BEFORE initializing MobileAds.
   /// Set [debugGeography] true and provide [testDeviceIds] only for local testing (remove in production).
   Future<void> init(
       {final bool debugGeography = false,
-      final List<String>? testDeviceIds}) async {
+      final List<String>? testDeviceIds,
+      final Future<void> Function()? onConsentFlowComplete}) async {
     if (_ready) return;
 
     final ConsentDebugSettings? debugSettings = debugGeography
@@ -47,6 +49,7 @@ class ConsentManager {
               debugPrint('Failed to read consent status: $e\n$st');
             }
 
+            await _notifyConsentFlowCompleted(onConsentFlowComplete);
             _ready = true;
             completer.complete();
           });
@@ -59,12 +62,14 @@ class ConsentManager {
               .getConsentStatus()
               .then((final ConsentStatus s) {})
               .catchError((final _) {});
+          unawaited(_notifyConsentFlowCompleted(onConsentFlowComplete));
           _ready = true;
           completer.complete();
         },
       );
     } catch (e, st) {
       debugPrint('Consent init exception: $e\n$st');
+      unawaited(_notifyConsentFlowCompleted(onConsentFlowComplete));
       _ready = true;
       completer.complete();
     }
@@ -102,5 +107,22 @@ class ConsentManager {
   Future<void> resetForTesting() async {
     ConsentInformation.instance.reset();
     _ready = false;
+    _hasInvokedConsentFlowComplete = false;
+  }
+
+  Future<void> _notifyConsentFlowCompleted(
+    final Future<void> Function()? onConsentFlowComplete,
+  ) async {
+    if (_hasInvokedConsentFlowComplete || onConsentFlowComplete == null) {
+      return;
+    }
+
+    _hasInvokedConsentFlowComplete = true;
+
+    try {
+      await onConsentFlowComplete();
+    } catch (e, st) {
+      debugPrint('Consent flow completion callback failed: $e\n$st');
+    }
   }
 }
