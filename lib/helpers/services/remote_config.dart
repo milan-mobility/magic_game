@@ -18,6 +18,7 @@ class RemoteConfigService {
   static const String moreGamesUrliOSKey = 'moregamesios';
 
   final FirebaseRemoteConfig _remoteConfig;
+  String? _activeBaseUrlOverride;
 
   Future<void> initialize() async {
     try {
@@ -51,14 +52,13 @@ class RemoteConfigService {
   void _setupRealTimeUpdates() {
     _remoteConfig.onConfigUpdated.listen((_) async {
       await _remoteConfig.activate();
+      _activeBaseUrlOverride = null;
       debugPrint('Remote Config updated instantly!');
     });
   }
 
   String get baseUrl => _normalizeBaseUrl(
-    _platformAwareBaseUrl(
-      getString(baseUrlKey, fallback: Endpoints.defaultBaseUrl),
-    ),
+    _activeBaseUrlOverride ?? requestBaseUrls.first,
   );
 
   String get secondaryBaseUrl => _normalizeBaseUrl(
@@ -69,6 +69,44 @@ class RemoteConfigService {
       ),
     ),
   );
+
+  List<String> get requestBaseUrls {
+    final List<String?> candidates = <String?>[
+      _remoteBaseUrl(baseUrlKey),
+      _remoteOrDefaultSecondaryBaseUrl,
+      Endpoints.defaultBaseUrl,
+    ];
+
+    final List<String> resolvedUrls = <String>[];
+    for (final String? candidate in candidates) {
+      final String? normalizedCandidate = _normalizedCandidateBaseUrl(
+        candidate,
+      );
+      if (normalizedCandidate == null ||
+          resolvedUrls.contains(normalizedCandidate)) {
+        continue;
+      }
+
+      resolvedUrls.add(normalizedCandidate);
+    }
+
+    if (resolvedUrls.isEmpty) {
+      return <String>[
+        _normalizeBaseUrl(_platformAwareBaseUrl(Endpoints.defaultBaseUrl)),
+      ];
+    }
+
+    return resolvedUrls;
+  }
+
+  void markWorkingBaseUrl(final String value) {
+    final String? normalizedValue = _normalizedCandidateBaseUrl(value);
+    if (normalizedValue == null) {
+      return;
+    }
+
+    _activeBaseUrlOverride = normalizedValue;
+  }
 
   String get configPath => _normalizeRelativePath(
     getString(configPathKey, fallback: Endpoints.defaultConfigPath),
@@ -165,6 +203,35 @@ class RemoteConfigService {
     }
 
     return <String, dynamic>{};
+  }
+
+  String? _remoteBaseUrl(final String key) {
+    final RemoteConfigValue value = _remoteConfig.getValue(key);
+    if (value.source != ValueSource.valueRemote) {
+      return null;
+    }
+
+    return value.asString().trim();
+  }
+
+  String? get _remoteOrDefaultSecondaryBaseUrl {
+    final RemoteConfigValue value = _remoteConfig.getValue(secondaryBaseUrlKey);
+    final String resolvedValue = value.asString().trim();
+
+    if (resolvedValue.isNotEmpty) {
+      return resolvedValue;
+    }
+
+    return Endpoints.defaultSecondaryBaseUrl;
+  }
+
+  String? _normalizedCandidateBaseUrl(final String? value) {
+    final String? trimmedValue = value?.trim();
+    if (trimmedValue == null || trimmedValue.isEmpty) {
+      return null;
+    }
+
+    return _normalizeBaseUrl(_platformAwareBaseUrl(trimmedValue));
   }
 
   String _normalizeBaseUrl(String value) {

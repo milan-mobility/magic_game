@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:magic_games/data/api/dio_client.dart';
 import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
@@ -42,5 +43,14 @@ Future<void> init() async {
   Get.lazyPut(() => ApiRepo(Get.find(), Get.find(), Get.find()), fenix: true);
 
   Get.put(NetworkController(), permanent: true);
+  // Get.lazyPut(() => LoaderController());
   Get.lazyPut(() => HomeController(Get.find()));
+
+  EasyLoading.instance
+    ..loadingStyle = EasyLoadingStyle.dark
+    ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+    ..maskType = EasyLoadingMaskType.none
+    ..toastPosition = EasyLoadingToastPosition.bottom
+    ..displayDuration = const Duration(seconds: 2)
+    ..animationDuration = const Duration(milliseconds: 200);
 }

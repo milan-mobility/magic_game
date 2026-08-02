@@ -504,10 +504,7 @@ class HomeController extends GetxController implements GetxService {
     }
 
     final String baseUrl = Get.isRegistered<RemoteConfigService>()
-        ? Get.find<RemoteConfigService>().getString(
-            RemoteConfigService.baseUrlKey,
-            fallback: Endpoints.defaultBaseUrl,
-          )
+        ? Get.find<RemoteConfigService>().baseUrl
         : Endpoints.defaultBaseUrl;
     final String normalizedBaseUrl = baseUrl.endsWith('/')
         ? baseUrl

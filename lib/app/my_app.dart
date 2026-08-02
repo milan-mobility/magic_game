@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
@@ -80,6 +81,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         GlobalCupertinoLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
+      builder: EasyLoading.init(),
+      // builder: (context, child) {
+      //   return MediaQuery.withNoTextScaling(child: GlobalLoader(child: child!));
+      // },
     );
   }
 

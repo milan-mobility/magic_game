@@ -159,4 +159,8 @@ final Map<String, String> ruRu = <String, String>{
   'Explore': 'Исследовать',
   'Choose your language': 'Выберите ваш язык',
   'Save Language': 'Сохранить язык',
+  'About This Game': 'Об этой игре',
+  'You May Like This': 'Вам может понравиться',
+  'Rate Us': 'Оцените нас',
+  'Support us with 5 stars!': 'Поддержите нас 5 звездами! ⭐',
 };

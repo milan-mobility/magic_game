@@ -1,282 +1,369 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:magic_games/routes/route_helper.dart';
-import 'package:magic_games/utils/connection.dart';
 import 'package:magic_games/view/base/offline_retry_dialog.dart';
 
-class NetworkController extends GetxController implements GetxService {
-  static const Duration _resumeNetworkGracePeriod = Duration(seconds: 2);
-  static const Duration _networkStatusPollInterval = Duration(seconds: 5);
-
+class NetworkController extends GetxController
+    with WidgetsBindingObserver
+    implements GetxService {
   final RxBool isConnected = true.obs;
 
+  final Connectivity _connectivity = Connectivity();
+  final InternetConnection _internetConnection = InternetConnection();
+
   final Completer<void> _startupCheckCompleter = Completer<void>();
-  StreamSubscription<InternetStatus>? _connectionSubscription;
+
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
+  StreamSubscription<InternetStatus>? _internetSubscription;
+
+  AppLifecycleState _lifecycleState = AppLifecycleState.resumed;
+
+  Route<void>? _offlineDialogRoute;
+  NavigatorState? _offlineDialogNavigator;
+
   bool _shouldRouteToHomeOnReconnect = false;
-  bool _isOfflineDialogVisible = false;
-  bool _shouldRecheckConnectionAfterResume = false;
-  AppLifecycleState _appLifecycleState = AppLifecycleState.resumed;
-  DateTime? _lastResumedAt;
-  Timer? _resumeConnectionTimer;
-  Timer? _networkStatusPollTimer;
-  bool _isPollingConnection = false;
+  bool _dialogPostFrameScheduled = false;
+  bool _isDisposed = false;
+
+  // Used to prevent an older async check from overriding a newer result.
+  int _networkCheckVersion = 0;
+
+  Future<void> get startupCheckCompleted => _startupCheckCompleter.future;
 
   bool get shouldBlockStartupNavigation =>
       _shouldRouteToHomeOnReconnect && !isConnected.value;
 
-  Future<void> get startupCheckCompleted => _startupCheckCompleter.future;
+  bool get _isApplicationActive => _lifecycleState == AppLifecycleState.resumed;
+
+  bool get _isOfflineDialogVisible => _offlineDialogRoute != null;
 
   @override
   void onInit() {
     super.onInit();
-    WidgetsBinding.instance.addObserver(_lifecycleObserver);
-    _appLifecycleState =
+
+    WidgetsBinding.instance.addObserver(this);
+
+    _lifecycleState =
         WidgetsBinding.instance.lifecycleState ?? AppLifecycleState.resumed;
-    if (_appLifecycleState == AppLifecycleState.resumed) {
-      _lastResumedAt = DateTime.now();
-    }
-    _listenToNetworkChanges();
-    _startConnectionPolling();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      unawaited(_runStartupCheck());
+      unawaited(_initializeNetworkController());
     });
   }
 
-  @override
-  void onClose() {
-    WidgetsBinding.instance.removeObserver(_lifecycleObserver);
-    _connectivitySubscription?.cancel();
-    _connectionSubscription?.cancel();
-    _resumeConnectionTimer?.cancel();
-    _networkStatusPollTimer?.cancel();
-    super.onClose();
-  }
+  Future<void> _initializeNetworkController() async {
+    try {
+      await _checkStartupConnection();
 
-  Future<bool> _checkNetworkAccess() async {
-    final List<ConnectivityResult> results =
-        await Connectivity().checkConnectivity();
-    if (results.contains(ConnectivityResult.none) || results.isEmpty) {
-      return false;
+      if (_isApplicationActive) {
+        _startNetworkListeners();
+
+        // Check once more after registering listeners. This covers a network
+        // change that happened between startup checking and listener setup.
+        unawaited(_verifyInternetConnection());
+      }
+    } finally {
+      if (!_startupCheckCompleter.isCompleted) {
+        _startupCheckCompleter.complete();
+      }
     }
-    return ConnectionUtils.isNetworkConnected();
   }
 
-  Future<void> _runStartupCheck() async {
-    final bool connected = await _checkNetworkAccess();
+  Future<void> _checkStartupConnection() async {
+    final bool connected = await _hasInternetAccess();
+
+    if (_isDisposed) {
+      return;
+    }
+
     isConnected.value = connected;
 
     if (!connected) {
       _shouldRouteToHomeOnReconnect = true;
-      unawaited(_showOfflineDialogIfNeeded());
+
+      if (_isApplicationActive) {
+        unawaited(_showOfflineDialog());
+      }
     }
+  }
+
+  void _startNetworkListeners() {
+    _stopNetworkListeners();
+
+    /*
+     * connectivity_plus is used only as an immediate trigger.
+     * Its value is not treated as the final internet status.
+     */
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
+      (_) {
+        unawaited(_verifyInternetConnection());
+      },
+      onError: (_) {
+        unawaited(_verifyInternetConnection());
+      },
+    );
+
+    /*
+     * Do not directly trust a potentially buffered status event after
+     * resume. Trigger a fresh internet verification instead.
+     */
+    _internetSubscription = _internetConnection.onStatusChange.listen(
+      (_) {
+        unawaited(_verifyInternetConnection());
+      },
+      onError: (_) {
+        unawaited(_verifyInternetConnection());
+      },
+    );
+  }
+
+  void _stopNetworkListeners() {
+    final connectivitySubscription = _connectivitySubscription;
+    final internetSubscription = _internetSubscription;
+
+    _connectivitySubscription = null;
+    _internetSubscription = null;
+
+    if (connectivitySubscription != null) {
+      unawaited(connectivitySubscription.cancel());
+    }
+
+    if (internetSubscription != null) {
+      unawaited(internetSubscription.cancel());
+    }
+  }
+
+  Future<bool> _hasInternetAccess() async {
+    try {
+      return await _internetConnection.hasInternetAccess;
+    } catch (error, stackTrace) {
+      debugPrint('Internet connection check failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      return false;
+    }
+  }
+
+  Future<void> _verifyInternetConnection() async {
+    if (_isDisposed || !_isApplicationActive) {
+      return;
+    }
+
+    final int currentCheckVersion = ++_networkCheckVersion;
+    final bool connected = await _hasInternetAccess();
+
+    /*
+     * Ignore this result when another network check started after it.
+     * This prevents an older "offline" result from overriding a newer
+     * "connected" result.
+     */
+    if (_isDisposed ||
+        !_isApplicationActive ||
+        currentCheckVersion != _networkCheckVersion) {
+      return;
+    }
+
+    await _applyConnectionStatus(connected);
+  }
+
+  Future<void> _applyConnectionStatus(bool connected) async {
+    if (_isDisposed) {
+      return;
+    }
+
+    isConnected.value = connected;
+
+    if (connected) {
+      _removeOfflineDialogImmediately();
+
+      if (_shouldRouteToHomeOnReconnect) {
+        _shouldRouteToHomeOnReconnect = false;
+
+        if (Get.currentRoute != RouteHelper.home) {
+          await Get.offAllNamed(RouteHelper.home);
+        }
+      }
+
+      return;
+    }
+
+    if (_isApplicationActive) {
+      await _showOfflineDialog();
+    }
+  }
+
+  Future<void> _showOfflineDialog() async {
+    if (_isDisposed ||
+        !_isApplicationActive ||
+        isConnected.value ||
+        _isOfflineDialogVisible) {
+      return;
+    }
+
+    final BuildContext? context = Get.overlayContext ?? Get.context;
+
+    if (context == null) {
+      _scheduleOfflineDialogAfterFrame();
+      return;
+    }
+
+    final NavigatorState navigator = Navigator.of(context, rootNavigator: true);
+
+    final RawDialogRoute<void> route = RawDialogRoute<void>(
+      settings: const RouteSettings(name: '__offline_network_dialog__'),
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+      barrierLabel: 'No internet connection',
+      transitionDuration: const Duration(milliseconds: 150),
+      pageBuilder:
+          (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) {
+            return PopScope(
+              canPop: false,
+              child: OfflineRetryDialog(
+                onRetry: () async {
+                  await _verifyInternetConnection();
+                  return isConnected.value;
+                },
+              ),
+            );
+          },
+    );
+
+    _offlineDialogRoute = route;
+    _offlineDialogNavigator = navigator;
+
+    try {
+      await navigator.push<void>(route);
+    } finally {
+      /*
+       * Do not clear a newer dialog route accidentally.
+       */
+      if (identical(_offlineDialogRoute, route)) {
+        _offlineDialogRoute = null;
+        _offlineDialogNavigator = null;
+      }
+    }
+  }
+
+  void _scheduleOfflineDialogAfterFrame() {
+    if (_dialogPostFrameScheduled || _isDisposed) {
+      return;
+    }
+
+    _dialogPostFrameScheduled = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _dialogPostFrameScheduled = false;
+
+      if (!_isDisposed && _isApplicationActive && !isConnected.value) {
+        unawaited(_showOfflineDialog());
+      }
+    });
+  }
+
+  void _removeOfflineDialogImmediately() {
+    final Route<void>? route = _offlineDialogRoute;
+    final NavigatorState? navigator = _offlineDialogNavigator;
+
+    if (route == null || navigator == null) {
+      return;
+    }
+
+    _offlineDialogRoute = null;
+    _offlineDialogNavigator = null;
+
+    void removeRoute() {
+      if (!navigator.mounted || !route.isActive) {
+        return;
+      }
+
+      try {
+        /*
+         * This removes only the network dialog.
+         * It does not close another dialog, page or game screen.
+         */
+        navigator.removeRoute<void>(route);
+      } catch (error) {
+        debugPrint('Unable to remove offline dialog: $error');
+      }
+    }
+
+    try {
+      removeRoute();
+    } catch (_) {
+      /*
+       * Navigator can briefly be locked during another navigation operation.
+       * Retry on the next frame in that case.
+       */
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        removeRoute();
+      });
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _lifecycleState = state;
+
+    if (state == AppLifecycleState.resumed) {
+      /*
+       * Restart subscriptions because a buffered stream may contain an old
+       * status. Then always perform a fresh internet check.
+       */
+      _startNetworkListeners();
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!_isDisposed && _isApplicationActive) {
+          unawaited(_verifyInternetConnection());
+        }
+      });
+
+      return;
+    }
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      /*
+       * Invalidate any currently running network request.
+       */
+      _networkCheckVersion++;
+
+      _stopNetworkListeners();
+
+      /*
+       * Remove the dialog while the app is backgrounded. On resume, a fresh
+       * connection check decides whether it should be shown again.
+       *
+       * This prevents an incorrect offline dialog flash after unlocking.
+       */
+      _removeOfflineDialogImmediately();
+    }
+  }
+
+  @override
+  void onClose() {
+    _isDisposed = true;
+    _networkCheckVersion++;
+
+    WidgetsBinding.instance.removeObserver(this);
+
+    _stopNetworkListeners();
+    _removeOfflineDialogImmediately();
 
     if (!_startupCheckCompleter.isCompleted) {
       _startupCheckCompleter.complete();
     }
-  }
 
-  void _listenToNetworkChanges() {
-    _connectivitySubscription =
-        Connectivity().onConnectivityChanged.listen((results) async {
-      final bool hasHardwareConnection =
-          !results.contains(ConnectivityResult.none) && results.isNotEmpty;
-
-      if (!hasHardwareConnection) {
-        unawaited(_handleNetworkStatusChange(false));
-      } else {
-        final bool connected = await _checkNetworkAccess();
-        unawaited(_handleNetworkStatusChange(connected));
-      }
-    });
-
-    _connectionSubscription = ConnectionUtils.onStatusChange.listen((status) {
-      unawaited(_handleNetworkStatusChange(status == InternetStatus.connected));
-    });
-  }
-
-  void _startConnectionPolling() {
-    _networkStatusPollTimer?.cancel();
-    _networkStatusPollTimer = Timer.periodic(_networkStatusPollInterval, (_) {
-      unawaited(_pollConnectionStatus());
-    });
-  }
-
-  Future<void> _pollConnectionStatus() async {
-    if (_isPollingConnection) {
-      return;
-    }
-
-    _isPollingConnection = true;
-    try {
-      final bool connected = await _checkNetworkAccess();
-      if (connected == isConnected.value &&
-          (connected || _isOfflineDialogVisible)) {
-        return;
-      }
-
-      await _handleNetworkStatusChange(connected);
-    } finally {
-      _isPollingConnection = false;
-    }
-  }
-
-  Future<void> _handleNetworkStatusChange(bool streamConnected) async {
-    final bool wasConnected = isConnected.value;
-    isConnected.value = streamConnected;
-
-    if (streamConnected) {
-      _shouldRecheckConnectionAfterResume = false;
-      await _handleConnectionRestored();
-      return;
-    }
-
-    if (_shouldSuppressOfflineDialog) {
-      _shouldRecheckConnectionAfterResume = true;
-      _scheduleResumeConnectionCheck();
-      return;
-    }
-
-    if (wasConnected || !_isOfflineDialogVisible) {
-      await _showOfflineDialogIfNeeded(skipConnectionCheck: true);
-    }
-  }
-
-  Future<void> _showOfflineDialogIfNeeded({
-    bool skipConnectionCheck = false,
-  }) async {
-    if (_isOfflineDialogVisible) {
-      return;
-    }
-
-    if (!skipConnectionCheck) {
-      final bool connected = await _checkNetworkAccess();
-      if (connected) {
-        isConnected.value = true;
-        return;
-      }
-    }
-
-    if (Get.context == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        unawaited(
-          _showOfflineDialogIfNeeded(skipConnectionCheck: skipConnectionCheck),
-        );
-      });
-      return;
-    }
-
-    _isOfflineDialogVisible = true;
-
-    await showOfflineRetryDialog(
-      onRetry: () async {
-        final bool connected = await _checkNetworkAccess();
-        if (connected) {
-          await _handleConnectionRestored();
-        }
-        return connected;
-      },
-    );
-
-    _isOfflineDialogVisible = false;
-
-    final bool stillConnected = await _checkNetworkAccess();
-    isConnected.value = stillConnected;
-    if (stillConnected) {
-      await _handleConnectionRestored();
-    }
-  }
-
-  Future<void> _handleConnectionRestored() async {
-    await _closeOfflineDialogIfNeeded();
-
-    if (_shouldRouteToHomeOnReconnect) {
-      _shouldRouteToHomeOnReconnect = false;
-      await Get.offAllNamed(RouteHelper.home);
-    }
-  }
-
-  Future<void> _closeOfflineDialogIfNeeded() async {
-    if (_isOfflineDialogVisible && (Get.isDialogOpen ?? false)) {
-      Get.back<void>();
-      await Future<void>.delayed(const Duration(milliseconds: 120));
-    }
-  }
-
-  bool get _shouldSuppressOfflineDialog =>
-      _appLifecycleState != AppLifecycleState.resumed ||
-      _isWithinResumeGracePeriod;
-
-  bool get _isWithinResumeGracePeriod {
-    final DateTime? lastResumedAt = _lastResumedAt;
-    if (lastResumedAt == null) {
-      return false;
-    }
-
-    return DateTime.now().difference(lastResumedAt) < _resumeNetworkGracePeriod;
-  }
-
-  void _scheduleResumeConnectionCheck() {
-    _resumeConnectionTimer?.cancel();
-    if (!_shouldRecheckConnectionAfterResume ||
-        _appLifecycleState != AppLifecycleState.resumed) {
-      return;
-    }
-
-    // Give the OS a moment to restore networking after unlock/resume.
-    _resumeConnectionTimer = Timer(_resumeNetworkGracePeriod, () {
-      unawaited(_runResumeConnectionCheck());
-    });
-  }
-
-  Future<void> _runResumeConnectionCheck() async {
-    if (_appLifecycleState != AppLifecycleState.resumed) {
-      return;
-    }
-
-    _shouldRecheckConnectionAfterResume = false;
-    final bool connected = await _checkNetworkAccess();
-    final bool wasConnected = isConnected.value;
-    isConnected.value = connected;
-
-    if (connected) {
-      await _handleConnectionRestored();
-      return;
-    }
-
-    if (wasConnected || !_isOfflineDialogVisible) {
-      await _showOfflineDialogIfNeeded();
-    }
-  }
-
-  late final WidgetsBindingObserver _lifecycleObserver =
-      _NetworkLifecycleObserver(this);
-
-  void _handleAppLifecycleStateChanged(AppLifecycleState state) {
-    _appLifecycleState = state;
-
-    if (state == AppLifecycleState.resumed) {
-      _lastResumedAt = DateTime.now();
-      _scheduleResumeConnectionCheck();
-      return;
-    }
-
-    _resumeConnectionTimer?.cancel();
-  }
-}
-
-class _NetworkLifecycleObserver with WidgetsBindingObserver {
-  _NetworkLifecycleObserver(this._controller);
-
-  final NetworkController _controller;
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    _controller._handleAppLifecycleStateChanged(state);
+    super.onClose();
   }
 }

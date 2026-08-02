@@ -142,4 +142,8 @@ final Map<String, String> zhCn = <String, String>{
   'Explore': '探索',
   'Choose your language': '选择你的语言',
   'Save Language': '保存语言',
+  'About This Game': '关于这款游戏',
+  'You May Like This': '你可能会喜欢这个',
+  'Rate Us': '给我们评分',
+  'Support us with 5 stars!': '用 5 星支持我们！ ⭐',
 };

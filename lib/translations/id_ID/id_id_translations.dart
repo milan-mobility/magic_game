@@ -160,4 +160,8 @@ final Map<String, String> idId = <String, String>{
   'Explore': 'Jelajahi',
   'Choose your language': 'Pilih bahasa Anda',
   'Save Language': 'Simpan bahasa',
+  'About This Game': 'Tentang Game Ini',
+  'You May Like This': 'Anda Mungkin Menyukai Ini',
+  'Rate Us': 'Beri Kami Nilai',
+  'Support us with 5 stars!': 'Dukung kami dengan 5 bintang! ⭐',
 };

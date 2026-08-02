@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
+import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/services/auth_service.dart';
 import 'package:magic_games/routes/route_helper.dart';
+import 'package:magic_games/utils/app_enums.dart';
 import 'package:magic_games/utils/utility.dart';
 import 'package:magic_games/view/base/custom_snack_bar.dart';
 import 'package:magic_games/view/screens/profile/widgets/profile_edit_dialog.dart';
@@ -33,7 +35,6 @@ class ProfileController extends GetxController {
   String playerType = 'Guest';
   String description = 'Play games, earn achievements and\nsave your progress';
   String appearanceLabel = 'Dark';
-  String languageLabel = 'English';
   String appVersionLabel = '1.0.0';
   bool isLoggedIn = false;
   bool isAuthActionInProgress = false;
@@ -41,10 +42,24 @@ class ProfileController extends GetxController {
   String? avatarFilePath;
   String? avatarImageUrl;
 
+  String get languageLabel => _currentLanguage.nativeTitle;
+
+  AppLanguages get _currentLanguage {
+    final Locale? locale = Get.locale;
+    if (locale == null) {
+      return _sharedPreferenceHelper.selectedLanguage;
+    }
+
+    final String languageCode = locale.countryCode == null
+        ? locale.languageCode
+        : '${locale.languageCode}-${locale.countryCode}';
+
+    return AppLanguages.fromLanguageCode(languageCode);
+  }
+
   @override
   void onInit() {
     super.onInit();
-    _loadSelectedLanguage();
     _loadAppVersion();
     _syncAuthState();
     _authSubscription = _authService.authStateChanges().listen((final User? _) {
@@ -86,7 +101,7 @@ class ProfileController extends GetxController {
             ProfileOptionItemData(
               title: 'Language',
               subtitle: 'Change app language',
-              iconAsset: 'assets/svg/ic_language.svg',
+              iconAsset: Assets.svg.icLanguage,
               valueText: languageLabel,
               onTap: onLanguageTap,
             ),
@@ -98,13 +113,13 @@ class ProfileController extends GetxController {
             ProfileOptionItemData(
               title: 'Help & Support',
               subtitle: 'Get help and contact us',
-              iconAsset: 'assets/svg/ic_help.svg',
+              iconAsset: Assets.svg.icHelp,
               onTap: onHelpTap,
             ),
             ProfileOptionItemData(
               title: 'Feedback',
               subtitle: 'Share your thoughts',
-              iconAsset: 'assets/svg/ic_feedback.svg',
+              iconAsset: Assets.svg.icFeedback,
               onTap: onFeedbackTap,
             ),
           ],
@@ -115,19 +130,27 @@ class ProfileController extends GetxController {
             ProfileOptionItemData(
               title: 'Terms of service',
               subtitle: 'Review the app usage terms',
-              iconAsset: 'assets/svg/ic_terms.svg',
+              iconAsset: Assets.svg.icTerms,
               onTap: onTermsTap,
             ),
             ProfileOptionItemData(
               title: 'Privacy Policy',
               subtitle: 'Learn how your data is handled',
-              iconAsset: 'assets/svg/ic_privacy.svg',
+              iconAsset: Assets.svg.icPrivacy,
               onTap: onPrivacyTap,
+            ),
+            ProfileOptionItemData(
+              title: 'Rate Us',
+              subtitle: 'Support us with 5 stars!',
+              iconAsset: Assets.svg.icRateUs,
+              onTap: () {
+                Utility.rateUs();
+              },
             ),
             ProfileOptionItemData(
               title: 'App Version',
               subtitle: 'Current installed release',
-              iconAsset: 'assets/svg/ic_app_version.svg',
+              iconAsset: Assets.svg.icAppVersion,
               valueText: appVersionLabel,
             ),
           ],
@@ -235,7 +258,7 @@ class ProfileController extends GetxController {
   Future<void> onLanguageTap() async {
     final dynamic result = await Get.toNamed(RouteHelper.language);
     if (result == true) {
-      _loadSelectedLanguage();
+      update();
       showSuccessSnackBar(
         message: 'Language changed to'.trParams(<String, String>{
           'value': languageLabel,
@@ -286,11 +309,6 @@ class ProfileController extends GetxController {
 
   Future<void> _loadAppVersion() async {
     appVersionLabel = await Utility.getPackageInfo();
-    update();
-  }
-
-  void _loadSelectedLanguage() {
-    languageLabel = _sharedPreferenceHelper.selectedLanguage.nativeTitle;
     update();
   }
 

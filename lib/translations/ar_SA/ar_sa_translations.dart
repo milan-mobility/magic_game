@@ -157,4 +157,8 @@ final Map<String, String> arSa = <String, String>{
   'Explore': 'استكشف',
   'Choose your language': 'اختر لغتك',
   'Save Language': 'احفظ اللغة',
+  'About This Game': 'حول هذه اللعبة',
+  'You May Like This': 'قد يعجبك هذا',
+  'Rate Us': 'قيّمنا',
+  'Support us with 5 stars!': 'ادعمنا بـ 5 نجوم! ⭐',
 };

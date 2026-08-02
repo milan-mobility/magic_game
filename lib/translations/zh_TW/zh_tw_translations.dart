@@ -142,4 +142,8 @@ final Map<String, String> zhTw = <String, String>{
   'Explore': '探索',
   'Choose your language': '選擇你的語言',
   'Save Language': '儲存語言',
+  'About This Game': '關於這款遊戲',
+  'You May Like This': '你可能會喜歡這個',
+  'Rate Us': '為我們評分',
+  'Support us with 5 stars!': '用 5 星支持我們！ ⭐',
 };

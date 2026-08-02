@@ -163,4 +163,8 @@ final Map<String, String> ptPt = <String, String>{
   'Explore': 'Explorar',
   'Choose your language': 'Escolha o seu idioma',
   'Save Language': 'Guardar idioma',
+  'About This Game': 'Sobre este jogo',
+  'You May Like This': 'Também poderá gostar disto',
+  'Rate Us': 'Avalie-nos',
+  'Support us with 5 stars!': 'Apoie-nos com 5 estrelas! ⭐',
 };

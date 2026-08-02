@@ -160,4 +160,8 @@ final Map<String, String> urPk = <String, String>{
   'Explore': 'دریافت کریں',
   'Choose your language': 'اپنی زبان منتخب کریں',
   'Save Language': 'زبان محفوظ کریں',
+  'About This Game': 'اس گیم کے بارے میں',
+  'You May Like This': 'آپ کو یہ پسند آ سکتا ہے',
+  'Rate Us': 'ہمیں ریٹ کریں',
+  'Support us with 5 stars!': 'ہماری 5 ستاروں کے ساتھ حمایت کریں! ⭐',
 };

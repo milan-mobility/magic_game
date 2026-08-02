@@ -157,4 +157,8 @@ final Map<String, String> enUs = <String, String>{
   'Explore': 'Explore',
   'Choose your language': 'Choose your language',
   'Save Language': 'Save Language',
+  'About This Game': 'About This Game',
+  'You May Like This': 'You May Like This',
+  'Rate Us': 'Rate Us',
+  'Support us with 5 stars!': 'Support us with 5 stars! ⭐',
 };

@@ -39,11 +39,11 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
-    dependencies {
-        implementation(platform("com.google.firebase:firebase-bom:34.10.0"))
-        implementation("com.google.firebase:firebase-analytics")
-        coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
-    }
+}
+dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:34.10.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }
 
 flutter {

@@ -164,4 +164,8 @@ final Map<String, String> deDe = <String, String>{
   'Explore': 'Entdecken',
   'Choose your language': 'Wähle deine Sprache',
   'Save Language': 'Sprache speichern',
+  'About This Game': 'Über dieses Spiel',
+  'You May Like This': 'Das könnte dir gefallen',
+  'Rate Us': 'Bewerte uns',
+  'Support us with 5 stars!': 'Unterstütze uns mit 5 Sternen! ⭐',
 };

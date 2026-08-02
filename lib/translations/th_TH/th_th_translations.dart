@@ -158,4 +158,8 @@ final Map<String, String> thTh = <String, String>{
   'Explore': 'สำรวจ',
   'Choose your language': 'เลือกภาษาของคุณ',
   'Save Language': 'บันทึกภาษา',
+  'About This Game': 'เกี่ยวกับเกมนี้',
+  'You May Like This': 'คุณอาจชอบสิ่งนี้',
+  'Rate Us': 'ให้คะแนนเรา',
+  'Support us with 5 stars!': 'สนับสนุนเราด้วย 5 ดาว! ⭐',
 };

@@ -157,4 +157,8 @@ final Map<String, String> bnBd = <String, String>{
   'Explore': 'অন্বেষণ করুন',
   'Choose your language': 'আপনার ভাষা নির্বাচন করুন',
   'Save Language': 'ভাষা সংরক্ষণ করুন',
+  'About This Game': 'এই গেম সম্পর্কে',
+  'You May Like This': 'আপনার এটি ভালো লাগতে পারে',
+  'Rate Us': 'আমাদের রেট দিন',
+  'Support us with 5 stars!': '৫ তারকা দিয়ে আমাদের সমর্থন করুন! ⭐',
 };

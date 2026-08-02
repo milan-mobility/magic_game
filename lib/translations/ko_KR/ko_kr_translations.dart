@@ -149,4 +149,8 @@ final Map<String, String> koKr = <String, String>{
   'Explore': '탐색',
   'Choose your language': '언어를 선택하세요',
   'Save Language': '언어 저장',
+  'About This Game': '이 게임 정보',
+  'You May Like This': '이것도 좋아할 수 있어요',
+  'Rate Us': '평가해 주세요',
+  'Support us with 5 stars!': '별 5개로 응원해 주세요! ⭐',
 };

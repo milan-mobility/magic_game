@@ -163,4 +163,8 @@ final Map<String, String> itIt = <String, String>{
   'Explore': 'Esplora',
   'Choose your language': 'Scegli la tua lingua',
   'Save Language': 'Salva lingua',
+  'About This Game': 'Informazioni su questo gioco',
+  'You May Like This': 'Ti potrebbe piacere',
+  'Rate Us': 'Valutaci',
+  'Support us with 5 stars!': 'Supportaci con 5 stelle! ⭐',
 };

@@ -160,4 +160,8 @@ final Map<String, String> nlNl = <String, String>{
   'Explore': 'Ontdekken',
   'Choose your language': 'Kies je taal',
   'Save Language': 'Taal opslaan',
+  'About This Game': 'Over dit spel',
+  'You May Like This': 'Misschien vind je dit ook leuk',
+  'Rate Us': 'Beoordeel ons',
+  'Support us with 5 stars!': 'Steun ons met 5 sterren! ⭐',
 };

@@ -163,4 +163,8 @@ final Map<String, String> esEs = <String, String>{
   'Explore': 'Explorar',
   'Choose your language': 'Elige tu idioma',
   'Save Language': 'Guardar idioma',
+  'About This Game': 'Acerca de este juego',
+  'You May Like This': 'También te puede gustar',
+  'Rate Us': 'Califícanos',
+  'Support us with 5 stars!': '¡Apóyanos con 5 estrellas! ⭐',
 };
