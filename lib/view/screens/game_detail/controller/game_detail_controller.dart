@@ -21,7 +21,6 @@ import 'package:magic_games/utils/connection.dart';
 import 'package:magic_games/utils/message_constant.dart';
 import 'package:magic_games/utils/utility.dart';
 import 'package:magic_games/view/base/custom_snack_bar.dart';
-import 'package:magic_games/view/base/loader.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 import 'package:magic_games/view/screens/profile/controller/profile_controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -36,11 +35,16 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   bool _isShowingRewarded = false;
   bool _isBannerRequestedVisible = false;
   bool _isBannerLoading = false;
+  int? _bannerWidth;
+  Orientation? _bannerOrientation;
+  int? _loadedBannerWidth;
+  Orientation? _loadedBannerOrientation;
+  bool _isClosingScreen = false;
   bool isGameLoading = true;
   bool isExitOverlayVisible = false;
   Games? games;
   BannerAd? _bannerAd;
-  _BannerAlignment _bannerAlignment = _BannerAlignment.bottom;
+  _BannerAlignment _bannerAlignment = _BannerAlignment.top;
 
   final RemoteConfigService _remoteConfigService = RemoteConfigService();
 
@@ -58,7 +62,30 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
 
   bool get isBannerAlignedTop => _bannerAlignment == _BannerAlignment.top;
 
-  double get bannerHeight => bannerAd?.size.height.toDouble() ?? 0;
+  bool get shouldShowLoadingOverlay => isGameLoading && !_isClosingScreen;
+
+  double get bannerHeight => (bannerAd?.size.height.toDouble() ?? 0) - 50;
+
+  void syncBannerViewport({
+    required final double width,
+    required final Orientation orientation,
+  }) {
+    final int normalizedWidth = width.truncate();
+    if (normalizedWidth <= 0) {
+      return;
+    }
+
+    if (_bannerWidth == normalizedWidth && _bannerOrientation == orientation) {
+      return;
+    }
+
+    _bannerWidth = normalizedWidth;
+    _bannerOrientation = orientation;
+
+    if (_isBannerRequestedVisible && !_hasBannerForCurrentViewport) {
+      unawaited(_loadAdaptiveBanner());
+    }
+  }
 
   String get gameTitle {
     final String? name = games?.name?.trim();
@@ -203,17 +230,14 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
       final String? gameUrl = games?.gameurl?.trim();
       if (gameUrl == null || gameUrl.isEmpty) {
         _setGameLoading(false);
-        Loader.load(false);
         _showToastMessage('Game URL is not available for this game.'.tr);
         return;
       }
 
-      Loader.load(true);
       debugPrint("GAME URL=>$gameUrl");
       await webViewController.loadRequest(Uri.parse(gameUrl));
     } catch (e) {
       _setGameLoading(false);
-      Loader.load(false);
     }
   }
 
@@ -248,7 +272,6 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> openCurrentGameStore() async {
-    await _prepareForScreenExit();
     await _openStoreForGame(games);
   }
 
@@ -257,7 +280,9 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> closeGameDetailScreen() async {
-    await _prepareForScreenExit();
+    _isClosingScreen = true;
+    _setGameLoading(false);
+    await _prepareForScreenExit(hideOverlay: false);
     Get.back<void>();
   }
 
@@ -413,7 +438,6 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
         break;
 
       case 'gameStart':
-        Loader.load(false);
         _setGameLoading(false);
         _sendCallbackToJs(
           'appLanguage:${Get.locale?.languageCode.toLowerCase() ?? ''}',
@@ -631,9 +655,11 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
     );
   }
 
-  Future<void> _prepareForScreenExit() async {
-    isExitOverlayVisible = false;
-    update();
+  Future<void> _prepareForScreenExit({bool hideOverlay = true}) async {
+    if (hideOverlay) {
+      isExitOverlayVisible = false;
+      update();
+    }
     await _restoreDefaultSystemUi();
     await _resetPreferredOrientation();
   }
@@ -699,7 +725,6 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
         onHttpError: (HttpResponseError error) {},
         onWebResourceError: (WebResourceError error) {
           _setGameLoading(false);
-          Loader.load(false);
         },
         onNavigationRequest: (NavigationRequest request) {
           return NavigationDecision.navigate;
@@ -758,33 +783,104 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
     }
 
     _isBannerRequestedVisible = true;
+    _bannerAlignment = _BannerAlignment.top;
 
-    if (_bannerAd != null) {
+    if (_hasBannerForCurrentViewport) {
       update();
       return;
     }
 
-    if (_isBannerLoading) {
+    await _loadAdaptiveBanner();
+  }
+
+  bool get _hasBannerForCurrentViewport =>
+      _bannerAd != null &&
+      _loadedBannerWidth == _bannerWidth &&
+      _loadedBannerOrientation == _bannerOrientation;
+
+  Future<void> _loadAdaptiveBanner() async {
+    if (_isBannerLoading || !_isBannerRequestedVisible) {
+      return;
+    }
+
+    final int? bannerWidth = _bannerWidth;
+    final Orientation? bannerOrientation = _bannerOrientation;
+    if (bannerWidth == null || bannerOrientation == null || bannerWidth <= 0) {
       return;
     }
 
     _isBannerLoading = true;
+    _loadedBannerWidth = null;
+    _loadedBannerOrientation = null;
+    _bannerAd?.dispose();
+    _bannerAd = null;
     update();
 
+    final AnchoredAdaptiveBannerAdSize? size =
+        await AdSize.getLargeAnchoredAdaptiveBannerAdSizeWithOrientation(
+          bannerOrientation,
+          bannerWidth,
+        );
+
+    if (!_isBannerRequestedVisible) {
+      _isBannerLoading = false;
+      update();
+      return;
+    }
+
+    if (size == null) {
+      _isBannerLoading = false;
+      _isBannerRequestedVisible = false;
+      debugPrint('Unable to resolve anchored adaptive banner size.');
+      update();
+      return;
+    }
+
+    if (_bannerWidth != bannerWidth ||
+        _bannerOrientation != bannerOrientation) {
+      _isBannerLoading = false;
+      update();
+      unawaited(_loadAdaptiveBanner());
+      return;
+    }
+
     final AdRequest request = await ConsentManager.instance.getAdRequest();
+
+    if (!_isBannerRequestedVisible) {
+      _isBannerLoading = false;
+      update();
+      return;
+    }
+
     final BannerAd banner = BannerAd(
       adUnitId: AdHelper.bannerAdUnitId,
-      size: AdSize.banner,
+      size: size,
       request: request,
       listener: BannerAdListener(
         onAdLoaded: (final Ad ad) {
+          final BannerAd loadedBanner = ad as BannerAd;
+
+          if (!_isBannerRequestedVisible ||
+              _bannerWidth != bannerWidth ||
+              _bannerOrientation != bannerOrientation) {
+            _isBannerLoading = false;
+            loadedBanner.dispose();
+            update();
+            if (_isBannerRequestedVisible) {
+              unawaited(_loadAdaptiveBanner());
+            }
+            return;
+          }
+
           _isBannerLoading = false;
-          _bannerAd = ad as BannerAd;
+          _bannerAd = loadedBanner;
+          _loadedBannerWidth = bannerWidth;
+          _loadedBannerOrientation = bannerOrientation;
           update();
         },
-        onAdFailedToLoad: (ad, error) {
+        onAdFailedToLoad: (final Ad ad, final LoadAdError error) {
           _isBannerLoading = false;
-          _bannerAd?.dispose();
+          ad.dispose();
           _bannerAd = null;
           _isBannerRequestedVisible = false;
           debugPrint('Banner ad failed to load: $error');
@@ -793,25 +889,19 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
       ),
     );
 
-    _bannerAd = banner;
     banner.load();
   }
 
   void _hideBanner({bool resetAlignment = false}) {
     _isBannerRequestedVisible = false;
     if (resetAlignment) {
-      _bannerAlignment = _BannerAlignment.bottom;
+      _bannerAlignment = _BannerAlignment.top;
     }
     update();
   }
 
-  void _setBannerAlign(final String rawValue) {
-    final String alignment = rawValue.trim().toLowerCase();
-    if (alignment == 'top') {
-      _bannerAlignment = _BannerAlignment.top;
-    } else if (alignment == 'bottom' || alignment == 'botton') {
-      _bannerAlignment = _BannerAlignment.bottom;
-    }
+  void _setBannerAlign(final String _) {
+    _bannerAlignment = _BannerAlignment.top;
     update();
   }
 
@@ -870,4 +960,4 @@ class _WebMessage {
   final String payload;
 }
 
-enum _BannerAlignment { top, bottom }
+enum _BannerAlignment { top }

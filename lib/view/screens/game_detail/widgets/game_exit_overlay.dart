@@ -41,86 +41,124 @@ class GameExitOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
+    final double topInset = AppResponsive.space(88);
 
     return Container(
       color: AppColors.color040120.withValues(alpha: 0.95),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          if (backgroundImageUrl != null && backgroundImageUrl!.isNotEmpty)
-            Image.network(
-              backgroundImageUrl!,
-              fit: BoxFit.cover,
-              errorBuilder:
-                  (
-                    final BuildContext context,
-                    final Object error,
-                    final StackTrace? stackTrace,
-                  ) => const SizedBox.shrink(),
-            ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: <Color>[
-                  AppColors.color040120.withValues(alpha: 0.55),
-                  AppColors.color040120.withValues(alpha: 0.92),
-                  AppColors.color040120,
-                ],
-              ),
-            ),
-          ),
-          SafeArea(
-            minimum: EdgeInsets.only(bottom: AppResponsive.space(20)),
-            child: SingleChildScrollView(
-              padding: EdgeInsets.only(bottom: AppResponsive.space(24)),
-              child: Center(
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: _OverlayBackButton(onTap: onBack),
+      child: SafeArea(
+        top: false,
+        child: LayoutBuilder(
+          builder:
+              (final BuildContext context, final BoxConstraints constraints) {
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    SingleChildScrollView(
+                      padding: EdgeInsets.only(
+                        top: topInset,
+                        bottom: AppResponsive.space(24),
                       ),
-                      Gap(AppResponsive.space(18)),
-                      isLandscape
-                          ? _LandscapeHeroSection(
-                              title: title,
-                              description: description,
-                              heroImageUrl: heroImageUrl,
-                              tags: tags,
-                              canDownload: canDownload,
-                              onContinuePlaying: onContinuePlaying,
-                              onDownload: onDownload,
-                              recommendedGames: recommendedGames,
-                              requiresSubscriptionForGame:
-                                  requiresSubscriptionForGame,
-                              onRecommendedTap: onRecommendedTap,
-                            )
-                          : _PortraitHeroSection(
-                              title: title,
-                              description: description,
-                              heroImageUrl: heroImageUrl,
-                              tags: tags,
-                              canDownload: canDownload,
-                              onContinuePlaying: onContinuePlaying,
-                              onDownload: onDownload,
-                              recommendedGames: recommendedGames,
-                              requiresSubscriptionForGame:
-                                  requiresSubscriptionForGame,
-                              onRecommendedTap: onRecommendedTap,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              child: _OverlayBackground(
+                                backgroundImageUrl: backgroundImageUrl,
+                              ),
                             ),
-                    ],
-                  ),
-                ),
-              ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                left: 15,
+                                right: 15,
+                                bottom: AppResponsive.space(20),
+                              ),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: isLandscape
+                                    ? _LandscapeHeroSection(
+                                        title: title,
+                                        description: description,
+                                        heroImageUrl: heroImageUrl,
+                                        tags: tags,
+                                        canDownload: canDownload,
+                                        onContinuePlaying: onContinuePlaying,
+                                        onDownload: onDownload,
+                                        recommendedGames: recommendedGames,
+                                        requiresSubscriptionForGame:
+                                            requiresSubscriptionForGame,
+                                        onRecommendedTap: onRecommendedTap,
+                                      )
+                                    : _PortraitHeroSection(
+                                        title: title,
+                                        description: description,
+                                        heroImageUrl: heroImageUrl,
+                                        tags: tags,
+                                        canDownload: canDownload,
+                                        onContinuePlaying: onContinuePlaying,
+                                        onDownload: onDownload,
+                                        recommendedGames: recommendedGames,
+                                        requiresSubscriptionForGame:
+                                            requiresSubscriptionForGame,
+                                        onRecommendedTap: onRecommendedTap,
+                                      ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: AppResponsive.space(12),
+                      left: AppResponsive.space(12),
+                      child: _OverlayBackButton(onTap: onBack),
+                    ),
+                  ],
+                );
+              },
+        ),
+      ),
+    );
+  }
+}
+
+class _OverlayBackground extends StatelessWidget {
+  const _OverlayBackground({required this.backgroundImageUrl});
+
+  final String? backgroundImageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (backgroundImageUrl != null && backgroundImageUrl!.isNotEmpty)
+          Image.network(
+            backgroundImageUrl!,
+            fit: BoxFit.cover,
+            errorBuilder:
+                (
+                  final BuildContext context,
+                  final Object error,
+                  final StackTrace? stackTrace,
+                ) => const SizedBox.shrink(),
+          ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: <Color>[
+                AppColors.color040120.withValues(alpha: 0.55),
+                AppColors.color040120.withValues(alpha: 0.92),
+                AppColors.color040120,
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -157,17 +195,13 @@ class _PortraitHeroSection extends StatelessWidget {
       children: [
         Center(child: _HeroArtwork(imageUrl: heroImageUrl)),
         Gap(AppResponsive.space(20)),
-        _GameMetaBlock(
-          title: title,
-          description: description,
-          tags: tags,
-        ).paddingSymmetric(horizontal: 15),
+        _GameMetaBlock(title: title, description: description, tags: tags),
         Gap(AppResponsive.space(18)),
         _ActionRow(
           canDownload: canDownload,
           onContinuePlaying: onContinuePlaying,
           onDownload: onDownload,
-        ).paddingSymmetric(horizontal: 15),
+        ),
         if (recommendedGames.isNotEmpty) ...[
           Gap(AppResponsive.space(24)),
           _RecommendedGamesSection(

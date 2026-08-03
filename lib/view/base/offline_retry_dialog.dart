@@ -1,8 +1,7 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
@@ -77,7 +76,7 @@ class _OfflineRetryDialogState extends State<OfflineRetryDialog> {
             Gap(AppResponsive.space(16)),
             SizedBox(
               height: AppResponsive.value(150, tablet: 165),
-              child: const Center(child: _OfflineSignalIllustration()),
+              child: Center(child: Image.asset(Assets.png.icNoInternet.path)),
             ),
             Gap(AppResponsive.space(12)),
             ConstrainedBox(
@@ -186,135 +185,4 @@ class _RetryButton extends StatelessWidget {
       ),
     );
   }
-}
-
-class _OfflineSignalIllustration extends StatelessWidget {
-  const _OfflineSignalIllustration();
-
-  @override
-  Widget build(BuildContext context) {
-    final double size = AppResponsive.value(150, tablet: 165);
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.center,
-        children: <Widget>[
-          CustomPaint(
-            size: Size.square(size),
-            painter: _OfflineSignalPainter(),
-          ),
-          Positioned(
-            top: AppResponsive.value(6),
-            right: AppResponsive.value(12),
-            child: Container(
-              width: AppResponsive.value(54, tablet: 60),
-              height: AppResponsive.value(54, tablet: 60),
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: <Color>[Color(0xFFFDE068), Color(0xFFF79A1C)],
-                ),
-              ),
-              child: Center(
-                child: Text(
-                  '!',
-                  style: poppinsW800.copyWith(
-                    fontSize: AppResponsive.font(34),
-                    height: 1,
-                    color: const Color(0xFF0A6D97),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _OfflineSignalPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Offset center = Offset(size.width * 0.48, size.height * 0.58);
-    final double startAngle = math.pi * 1.06;
-    final double sweepAngle = math.pi * 0.72;
-
-    _drawArc(
-      canvas,
-      center,
-      size.width * 0.48,
-      startAngle,
-      sweepAngle,
-      const <Color>[Color(0xFFD2E7FF), Color(0xFF91C6FF)],
-      size.width * 0.12,
-    );
-    _drawArc(
-      canvas,
-      center,
-      size.width * 0.33,
-      startAngle,
-      sweepAngle,
-      const <Color>[Color(0xFFFFD35D), Color(0xFFFF9D00)],
-      size.width * 0.09,
-    );
-    _drawArc(
-      canvas,
-      center,
-      size.width * 0.20,
-      startAngle,
-      sweepAngle,
-      const <Color>[Color(0xFFFF9C5D), Color(0xFFFF6600)],
-      size.width * 0.065,
-    );
-
-    final Paint dotPaint = Paint()
-      ..shader =
-          const LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: <Color>[Color(0xFFFF2E86), Color(0xFFE5005B)],
-          ).createShader(
-            Rect.fromCircle(
-              center: Offset(size.width * 0.19, size.height * 0.77),
-              radius: size.width * 0.11,
-            ),
-          );
-
-    canvas.drawCircle(
-      Offset(size.width * 0.19, size.height * 0.77),
-      size.width * 0.11,
-      dotPaint,
-    );
-  }
-
-  void _drawArc(
-    Canvas canvas,
-    Offset center,
-    double radius,
-    double startAngle,
-    double sweepAngle,
-    List<Color> colors,
-    double strokeWidth,
-  ) {
-    final Rect rect = Rect.fromCircle(center: center, radius: radius);
-    final Paint paint = Paint()
-      ..shader = SweepGradient(
-        startAngle: startAngle,
-        endAngle: startAngle + sweepAngle,
-        colors: colors,
-      ).createShader(rect)
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = strokeWidth;
-
-    canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
