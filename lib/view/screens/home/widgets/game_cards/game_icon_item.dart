@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/helpers/app_colors.dart';
+import 'package:magic_games/helpers/cache/app_image_cache_manager.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
 import 'package:magic_games/helpers/styles.dart';
@@ -102,6 +103,10 @@ class GameIconItem extends StatelessWidget {
 
     return CachedNetworkImage(
       imageUrl: imageUrl,
+      cacheKey: imageUrl,
+      cacheManager: AppImageCacheManager.instance,
+      fadeInDuration: Duration.zero,
+      fadeOutDuration: Duration.zero,
       imageBuilder:
           (final BuildContext context, final ImageProvider<Object> image) =>
               Container(
@@ -112,6 +117,12 @@ class GameIconItem extends StatelessWidget {
                   image: DecorationImage(image: image, fit: BoxFit.cover),
                 ),
               ),
+      placeholder: (_, _) => HomeImagePlaceholderWidget(
+        width: imageSize,
+        height: imageSize,
+        borderRadius: 5,
+        iconSize: AppResponsive.space(26),
+      ),
       errorWidget: (_, _, _) => HomeImagePlaceholderWidget(
         width: imageSize,
         height: imageSize,

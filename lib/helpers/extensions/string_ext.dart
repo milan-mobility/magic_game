@@ -22,7 +22,7 @@ extension StringExt on String? {
   String imageUrl() {
     if (this == null) return '';
     final String baseUrl = Get.isRegistered<RemoteConfigService>()
-        ? Get.find<RemoteConfigService>().baseUrl
+        ? Get.find<RemoteConfigService>().imageBaseUrl
         : Endpoints.defaultBaseUrl;
     final String normalizedBaseUrl = baseUrl.endsWith('/')
         ? baseUrl

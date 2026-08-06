@@ -7,12 +7,48 @@ import 'package:magic_games/data/api/api_end_points.dart';
 import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
+import 'package:magic_games/helpers/cache/app_image_cache_manager.dart';
 import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:magic_games/helpers/styles.dart';
 import 'package:magic_games/view/base/common_button.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 import 'package:magic_games/view/screens/home/widgets/banner/featured_banner_badge_widget.dart';
 import 'package:magic_games/view/screens/home/widgets/home_image_placeholder_widget.dart';
+
+String buildFeaturedBannerImageUrl(final HomeFeaturedBannerData bannerData) {
+  final String bannerPath = bannerData.banner.banner!.trim();
+  final String baseUrl = Get.isRegistered<RemoteConfigService>()
+      ? Get.find<RemoteConfigService>().imageBaseUrl
+      : Endpoints.defaultBaseUrl;
+  final String normalizedBaseUrl = baseUrl.endsWith('/')
+      ? baseUrl
+      : '$baseUrl/';
+  final String targetFolder = AppResponsive.isTablet
+      ? 'texture/tablet/'
+      : 'texture/normal/';
+  final String resolvedPath = bannerPath.replaceFirst(RegExp(r'^/+'), '');
+
+  return '$normalizedBaseUrl$targetFolder$resolvedPath';
+}
+
+String? buildFeaturedBannerThumbIconUrl(final String? iconPath) {
+  if (iconPath == null || iconPath.trim().isEmpty) {
+    return null;
+  }
+
+  final String baseUrl = Get.isRegistered<RemoteConfigService>()
+      ? Get.find<RemoteConfigService>().imageBaseUrl
+      : Endpoints.defaultBaseUrl;
+  final String normalizedBaseUrl = baseUrl.endsWith('/')
+      ? baseUrl
+      : '$baseUrl/';
+  final String normalizedPath = iconPath.trim().replaceFirst(
+    RegExp(r'^/+'),
+    '',
+  );
+
+  return '$normalizedBaseUrl$normalizedPath';
+}
 
 class FeaturedBannerItemWidget extends StatelessWidget {
   const FeaturedBannerItemWidget({
@@ -50,24 +86,15 @@ class FeaturedBannerItemWidget extends StatelessWidget {
               if (banner.banner != null && banner.banner!.trim().isNotEmpty)
                 CachedNetworkImage(
                   imageUrl: _featuredBannerImageUrl,
-                  imageBuilder:
-                      (
-                        final BuildContext context,
-                        final ImageProvider<Object> image,
-                      ) => Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          image: DecorationImage(
-                            image: image,
-                            fit: isPhone ? BoxFit.cover : BoxFit.cover,
-                            alignment: isPhone
-                                ? Alignment.centerRight
-                                : Alignment.center,
-                          ),
-                        ),
-                      ),
-                  errorWidget: (_, _, _) => _bannerFallback(),
+                  cacheManager: AppImageCacheManager.instance,
+                  width: constraints.maxWidth,
+                  height: constraints.maxHeight,
+                  fit: BoxFit.cover,
+                  alignment: isPhone ? Alignment.centerRight : Alignment.center,
+                  placeholder: (_, __) => _bannerFallback(),
+                  errorWidget: (_, __, ___) => _bannerFallback(),
+                  fadeInDuration: Duration.zero,
+                  fadeOutDuration: Duration.zero,
                 )
               else
                 _bannerFallback(),
@@ -217,19 +244,7 @@ class FeaturedBannerItemWidget extends StatelessWidget {
   }
 
   String get _featuredBannerImageUrl {
-    final String bannerPath = bannerData.banner.banner!.trim();
-    final String baseUrl = Get.isRegistered<RemoteConfigService>()
-        ? Get.find<RemoteConfigService>().baseUrl
-        : Endpoints.defaultBaseUrl;
-    final String normalizedBaseUrl = baseUrl.endsWith('/')
-        ? baseUrl
-        : '$baseUrl/';
-    final String targetFolder = AppResponsive.isTablet
-        ? 'texture/tablet/'
-        : 'texture/normal/';
-    final String resolvedPath = bannerPath.replaceFirst(RegExp(r'^/+'), '');
-
-    return '$normalizedBaseUrl$targetFolder$resolvedPath';
+    return buildFeaturedBannerImageUrl(bannerData);
   }
 
   String get _displayTitle {
@@ -267,6 +282,7 @@ class _BannerGameThumb extends StatelessWidget {
             )
           : CachedNetworkImage(
               imageUrl: iconUrl,
+              cacheManager: AppImageCacheManager.instance,
               imageBuilder:
                   (
                     final BuildContext context,
@@ -283,6 +299,8 @@ class _BannerGameThumb extends StatelessWidget {
                     ),
                   ),
               fit: BoxFit.cover,
+              fadeInDuration: Duration.zero,
+              fadeOutDuration: Duration.zero,
               errorWidget: (_, _, _) => HomeImagePlaceholderWidget(
                 width: AppResponsive.space(25),
                 height: AppResponsive.space(25),
@@ -294,19 +312,7 @@ class _BannerGameThumb extends StatelessWidget {
   }
 
   String? get _resolvedIconUrl {
-    if (iconPath == null || iconPath!.trim().isEmpty) {
-      return null;
-    }
-
-    final String baseUrl = Get.isRegistered<RemoteConfigService>()
-        ? Get.find<RemoteConfigService>().baseUrl
-        : Endpoints.defaultBaseUrl;
-    final String normalizedBaseUrl = baseUrl.endsWith('/')
-        ? baseUrl
-        : '$baseUrl/';
-    final String normalizedPath = iconPath!.replaceFirst(RegExp(r'^/+'), '');
-
-    return '$normalizedBaseUrl$normalizedPath';
+    return buildFeaturedBannerThumbIconUrl(iconPath);
   }
 }
 

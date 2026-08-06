@@ -57,8 +57,13 @@ class RemoteConfigService {
     });
   }
 
-  String get baseUrl => _normalizeBaseUrl(
-    _activeBaseUrlOverride ?? requestBaseUrls.first,
+  String get baseUrl =>
+      _normalizeBaseUrl(_activeBaseUrlOverride ?? requestBaseUrls.first);
+
+  String get imageBaseUrl => _normalizeBaseUrl(
+    _remoteBaseUrl(baseUrlKey) ??
+        _remoteOrDefaultSecondaryBaseUrl ??
+        Endpoints.defaultBaseUrl,
   );
 
   String get secondaryBaseUrl => _normalizeBaseUrl(

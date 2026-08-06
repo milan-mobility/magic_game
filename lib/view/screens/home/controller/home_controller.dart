@@ -44,6 +44,7 @@ class HomeController extends GetxController implements GetxService {
   final RxString selectedCategoryId = ''.obs;
   final RxString signedInUserEmail = ''.obs;
   final RxList<Games> recentPlayedGames = <Games>[].obs;
+  final RxInt featuredBannerRefreshToken = 0.obs;
   StreamSubscription<UpgraderEvaluateNeed>? _upgradeSubscription;
   StreamSubscription<User?>? _authSubscription;
   Worker? _premiumAccessWorker;
@@ -106,6 +107,7 @@ class HomeController extends GetxController implements GetxService {
     try {
       isLoading.value = true;
       gameModel.value = await apiRepo.getGames();
+      featuredBannerRefreshToken.value++;
       final String? defaultCategoryId = _defaultCategoryIdFromModel(
         gameModel.value,
       );
@@ -504,7 +506,7 @@ class HomeController extends GetxController implements GetxService {
     }
 
     final String baseUrl = Get.isRegistered<RemoteConfigService>()
-        ? Get.find<RemoteConfigService>().baseUrl
+        ? Get.find<RemoteConfigService>().imageBaseUrl
         : Endpoints.defaultBaseUrl;
     final String normalizedBaseUrl = baseUrl.endsWith('/')
         ? baseUrl
