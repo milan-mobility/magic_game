@@ -64,7 +64,7 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
 
   bool get shouldShowLoadingOverlay => isGameLoading && !_isClosingScreen;
 
-  double get bannerHeight => (bannerAd?.size.height.toDouble() ?? 0) - 50;
+  double get bannerHeight => bannerAd?.size.height.toDouble() ?? 0;
 
   void syncBannerViewport({
     required final double width,
@@ -783,7 +783,6 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
     }
 
     _isBannerRequestedVisible = true;
-    _bannerAlignment = _BannerAlignment.top;
 
     if (_hasBannerForCurrentViewport) {
       update();
@@ -900,8 +899,13 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
     update();
   }
 
-  void _setBannerAlign(final String _) {
-    _bannerAlignment = _BannerAlignment.top;
+  void _setBannerAlign(final String rawValue) {
+    final String alignment = rawValue.trim().toLowerCase();
+    if (alignment == 'bottom' || alignment == 'botton') {
+      _bannerAlignment = _BannerAlignment.bottom;
+    } else {
+      _bannerAlignment = _BannerAlignment.top;
+    }
     update();
   }
 
@@ -960,4 +964,4 @@ class _WebMessage {
   final String payload;
 }
 
-enum _BannerAlignment { top }
+enum _BannerAlignment { top, bottom }

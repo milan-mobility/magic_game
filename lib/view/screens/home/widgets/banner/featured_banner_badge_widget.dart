@@ -18,7 +18,7 @@ String? buildFeaturedBadgeImageUrl(final Featurebannerbagde? badge) {
   }
 
   final String baseUrl = Get.isRegistered<RemoteConfigService>()
-      ? Get.find<RemoteConfigService>().baseUrl
+      ? Get.find<RemoteConfigService>().imageBaseUrl
       : Endpoints.defaultBaseUrl;
   final String normalizedBaseUrl = baseUrl.endsWith('/')
       ? baseUrl

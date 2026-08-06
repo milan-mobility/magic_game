@@ -18,7 +18,7 @@ import 'package:magic_games/view/screens/home/widgets/home_image_placeholder_wid
 String buildFeaturedBannerImageUrl(final HomeFeaturedBannerData bannerData) {
   final String bannerPath = bannerData.banner.banner!.trim();
   final String baseUrl = Get.isRegistered<RemoteConfigService>()
-      ? Get.find<RemoteConfigService>().baseUrl
+      ? Get.find<RemoteConfigService>().imageBaseUrl
       : Endpoints.defaultBaseUrl;
   final String normalizedBaseUrl = baseUrl.endsWith('/')
       ? baseUrl
@@ -37,7 +37,7 @@ String? buildFeaturedBannerThumbIconUrl(final String? iconPath) {
   }
 
   final String baseUrl = Get.isRegistered<RemoteConfigService>()
-      ? Get.find<RemoteConfigService>().baseUrl
+      ? Get.find<RemoteConfigService>().imageBaseUrl
       : Endpoints.defaultBaseUrl;
   final String normalizedBaseUrl = baseUrl.endsWith('/')
       ? baseUrl
