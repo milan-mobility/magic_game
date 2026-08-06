@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -815,11 +816,15 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
     _bannerAd = null;
     update();
 
-    final AnchoredAdaptiveBannerAdSize? size =
-        await AdSize.getLargeAnchoredAdaptiveBannerAdSizeWithOrientation(
-          bannerOrientation,
-          bannerWidth,
-        );
+    final AdSize? size;
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      size = AdSize.banner;
+    } else {
+      size = await AdSize.getLargeAnchoredAdaptiveBannerAdSizeWithOrientation(
+        bannerOrientation,
+        bannerWidth,
+      );
+    }
 
     if (!_isBannerRequestedVisible) {
       _isBannerLoading = false;

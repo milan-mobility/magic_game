@@ -58,6 +58,11 @@ class GameDetailScreen extends StatelessWidget {
                 top: false,
                 bottom: false,
                 left: false,
+                right: isLandscape
+                    ? GetPlatform.isIOS
+                          ? false
+                          : true
+                    : true,
                 child: LayoutBuilder(
                   builder:
                       (
@@ -141,13 +146,11 @@ class GameDetailScreen extends StatelessWidget {
                                 top: 0,
                                 left: 0,
                                 right: 0,
-                                child: Center(
-                                  child: SizedBox(
-                                    width: controller.bannerAd!.size.width
-                                        .toDouble(),
-                                    height: controller.bannerHeight,
-                                    child: AdWidget(ad: controller.bannerAd!),
-                                  ),
+                                child: SizedBox(
+                                  width: controller.bannerAd!.size.width
+                                      .toDouble(),
+                                  height: controller.bannerHeight,
+                                  child: AdWidget(ad: controller.bannerAd!),
                                 ),
                               ),
                             if (shouldShowBottomBanner)
@@ -181,7 +184,7 @@ class GameDetailScreen extends StatelessWidget {
                                           alignment: Alignment.topCenter,
                                           child: Padding(
                                             padding: const EdgeInsets.only(
-                                              top: 8,
+                                              top: 20,
                                             ),
                                             child: _ExitButton(
                                               isLandscape: true,
@@ -204,11 +207,19 @@ class GameDetailScreen extends StatelessWidget {
                                     topBannerHeight +
                                     (shouldShowExitButton
                                         ? exitStripHeight -
-                                              (shouldShowTopBanner ? 20 : -5)
+                                              (shouldShowTopBanner
+                                                  ? GetPlatform.isIOS
+                                                        ? -10
+                                                        : 20
+                                                  : -5)
                                         : 0),
                                 bottom:
                                     bottomBannerHeight -
-                                    (shouldShowBottomBanner ? 40 : 0),
+                                    (shouldShowBottomBanner
+                                        ? GetPlatform.isIOS
+                                              ? -30
+                                              : 40
+                                        : 0),
                                 child: webViewContent,
                               ),
                               if (shouldShowTopBanner)
@@ -227,12 +238,16 @@ class GameDetailScreen extends StatelessWidget {
                                 Positioned(
                                   top:
                                       topBannerHeight -
-                                      (shouldShowTopBanner ? 25 : 0),
+                                      (shouldShowTopBanner
+                                          ? GetPlatform.isIOS
+                                                ? -5
+                                                : 20
+                                          : 0),
                                   left: 0,
                                   right: 0,
                                   height: exitStripHeight,
                                   child: Padding(
-                                    padding: const EdgeInsets.only(right: 13),
+                                    padding: const EdgeInsets.only(right: 20),
                                     child: Align(
                                       alignment: Alignment.topRight,
                                       child: _ExitButton(
@@ -246,7 +261,7 @@ class GameDetailScreen extends StatelessWidget {
                                 Positioned(
                                   left: 0,
                                   right: 0,
-                                  bottom: -20,
+                                  bottom: GetPlatform.isIOS ? 20 : -20,
                                   child: SizedBox(
                                     width: controller.bannerAd!.size.width
                                         .toDouble(),
