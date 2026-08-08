@@ -44,6 +44,8 @@ class ProfileController extends GetxController {
 
   String get languageLabel => _currentLanguage.nativeTitle;
 
+  bool get canUsePlatformSignIn => _authService.isPlatformSignInAvailable;
+
   AppLanguages get _currentLanguage {
     final Locale? locale = Get.locale;
     if (locale == null) {
@@ -176,7 +178,13 @@ class ProfileController extends GetxController {
     if (isAuthActionInProgress) {
       return isLoggedIn ? 'Logging out...'.tr : 'Signing in...'.tr;
     }
-    return isLoggedIn ? 'Log out'.tr : 'Log in with Google'.tr;
+    if (isLoggedIn) {
+      return 'Log out'.tr;
+    }
+
+    return _authService.isAppleSignInAvailable
+        ? 'Log in with Apple'.tr
+        : 'Log in with Google'.tr;
   }
 
   Future<void> onLoginTap() async {
@@ -188,7 +196,7 @@ class ProfileController extends GetxController {
     update();
 
     try {
-      await _authService.signInWithGoogle();
+      await _authService.signInWithPlatform();
       _syncAuthState();
       showSuccessSnackBar(message: 'Signed in successfully.'.tr);
     } on GoogleSignInException catch (e) {
@@ -208,8 +216,7 @@ class ProfileController extends GetxController {
     } catch (_) {
       showErrorSnackBar(
         message:
-            'Unable to sign in right now. Please verify your Firebase Google Sign-In setup.'
-                .tr,
+            'Unable to sign in right now. Please verify your sign-in setup.'.tr,
       );
     } finally {
       isAuthActionInProgress = false;

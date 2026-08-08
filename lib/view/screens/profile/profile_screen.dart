@@ -49,6 +49,7 @@ class ProfileScreen extends StatelessWidget {
                         description: controller.description,
                         stats: controller.stats,
                         isLoggedIn: controller.isLoggedIn,
+                        showAuthAction: controller.canUsePlatformSignIn,
                         actionLabel: controller.actionButtonLabel,
                         avatarAssetPath: controller.avatarAssetPath,
                         avatarFilePath: controller.avatarFilePath,

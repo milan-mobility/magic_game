@@ -7,14 +7,28 @@ class GoogleLeaderboardService {
   static final GoogleLeaderboardService instance = GoogleLeaderboardService._();
 
   static const String leaderboardId = 'CgkImLX9nZ8YEAIQAQ';
+  static const String iosLeaderboardId = 'onegamehighscore';
+
+  bool get _isSupportedPlatform =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS);
+
+  bool get _hasLeaderboardId =>
+      defaultTargetPlatform != TargetPlatform.iOS ||
+      iosLeaderboardId.isNotEmpty;
 
   Future<bool> signIn() async {
+    if (!_isSupportedPlatform) {
+      return false;
+    }
+
     try {
       await GameAuth.signIn();
 
       final bool isSignedIn = await GameAuth.isSignedIn;
 
-      debugPrint('Google Play Games signed in: $isSignedIn');
+      debugPrint('Game services signed in: $isSignedIn');
 
       return isSignedIn;
     } catch (error, stackTrace) {
@@ -25,6 +39,10 @@ class GoogleLeaderboardService {
   }
 
   Future<bool> ensureSignedIn() async {
+    if (!_isSupportedPlatform) {
+      return false;
+    }
+
     try {
       final bool isSignedIn = await GameAuth.isSignedIn;
 
@@ -40,6 +58,11 @@ class GoogleLeaderboardService {
   }
 
   Future<void> submitScore(int score) async {
+    if (!_hasLeaderboardId) {
+      _logMissingIosLeaderboardId();
+      return;
+    }
+
     try {
       final bool isSignedIn = await ensureSignedIn();
 
@@ -49,7 +72,15 @@ class GoogleLeaderboardService {
       }
 
       final result = await Leaderboards.submitScore(
-        score: Score(androidLeaderboardID: leaderboardId, value: score),
+        score: Score(
+          androidLeaderboardID: defaultTargetPlatform == TargetPlatform.android
+              ? leaderboardId
+              : '',
+          iOSLeaderboardID: defaultTargetPlatform == TargetPlatform.iOS
+              ? iosLeaderboardId
+              : '',
+          value: score,
+        ),
       );
 
       debugPrint('Leaderboard score submitted: $result');
@@ -60,6 +91,11 @@ class GoogleLeaderboardService {
   }
 
   Future<void> showLeaderboard() async {
+    if (!_hasLeaderboardId) {
+      _logMissingIosLeaderboardId();
+      return;
+    }
+
     try {
       final bool isSignedIn = await ensureSignedIn();
 
@@ -68,7 +104,14 @@ class GoogleLeaderboardService {
         return;
       }
 
-      await Leaderboards.showLeaderboards(androidLeaderboardID: leaderboardId);
+      await Leaderboards.showLeaderboards(
+        androidLeaderboardID: defaultTargetPlatform == TargetPlatform.android
+            ? leaderboardId
+            : '',
+        iOSLeaderboardID: defaultTargetPlatform == TargetPlatform.iOS
+            ? iosLeaderboardId
+            : '',
+      );
     } catch (error, stackTrace) {
       debugPrint('Show leaderboard error: $error');
       debugPrintStack(stackTrace: stackTrace);
@@ -76,6 +119,11 @@ class GoogleLeaderboardService {
   }
 
   Future<Object?> loadTopScores({int maxResults = 20}) async {
+    if (!_hasLeaderboardId) {
+      _logMissingIosLeaderboardId();
+      return null;
+    }
+
     try {
       final bool isSignedIn = await ensureSignedIn();
 
@@ -84,7 +132,12 @@ class GoogleLeaderboardService {
       }
 
       final scores = await Leaderboards.loadLeaderboardScores(
-        androidLeaderboardID: leaderboardId,
+        androidLeaderboardID: defaultTargetPlatform == TargetPlatform.android
+            ? leaderboardId
+            : '',
+        iOSLeaderboardID: defaultTargetPlatform == TargetPlatform.iOS
+            ? iosLeaderboardId
+            : '',
         scope: PlayerScope.global,
         timeScope: TimeScope.allTime,
         maxResults: maxResults,
@@ -97,6 +150,13 @@ class GoogleLeaderboardService {
       debugPrint('Load leaderboard scores error: $error');
       debugPrintStack(stackTrace: stackTrace);
       return null;
+    }
+  }
+
+  void _logMissingIosLeaderboardId() {
+    if (defaultTargetPlatform == TargetPlatform.iOS &&
+        iosLeaderboardId.isEmpty) {
+      debugPrint('Game Center leaderboard is not configured.');
     }
   }
 }

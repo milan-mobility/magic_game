@@ -142,7 +142,10 @@ class NetworkController extends GetxController
 
   Future<bool> _hasInternetAccess() async {
     try {
-      return await _internetConnection.hasInternetAccess;
+      return await _internetConnection.hasInternetAccess.timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => false,
+      );
     } catch (error, stackTrace) {
       debugPrint('Internet connection check failed: $error');
       debugPrintStack(stackTrace: stackTrace);

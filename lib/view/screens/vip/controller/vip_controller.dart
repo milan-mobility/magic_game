@@ -12,7 +12,11 @@ import 'package:magic_games/view/base/custom_snack_bar.dart';
 class VipController extends GetxController with WidgetsBindingObserver {
   VipController(this.sharedPreferenceHelper);
 
-  static const String subscriptionProductId = 'onegame_plus_premium';
+  static const String androidSubscriptionProductId = 'onegame_plus_premium';
+  static const String iosMonthlySubscriptionProductId =
+      'onegame_plus_premium_monthly';
+  static const String iosYearlySubscriptionProductId =
+      'onegame_plus_premium_yearly';
   static const String monthlyPlanKey = 'trial3days';
   static const String yearlyPlanKey = 'trial3daysyearly';
 
@@ -153,7 +157,7 @@ class VipController extends GetxController with WidgetsBindingObserver {
       }
 
       final ProductDetailsResponse response = await _inAppPurchase
-          .queryProductDetails(<String>{subscriptionProductId});
+          .queryProductDetails(_subscriptionProductIds);
 
       if (response.error != null) {
         plans = <VipPlanData>[];
@@ -165,7 +169,9 @@ class VipController extends GetxController with WidgetsBindingObserver {
         plans = <VipPlanData>[];
         storeMessage =
             'No plans were returned for Check the product setup in the store console.'
-                .trParams(<String, String>{'productId': subscriptionProductId});
+                .trParams(<String, String>{
+                  'productId': _subscriptionProductIds.join(', '),
+                });
         return;
       }
 
@@ -303,7 +309,7 @@ class VipController extends GetxController with WidgetsBindingObserver {
     final List<PurchaseDetails> purchaseDetailsList,
   ) async {
     for (final PurchaseDetails purchaseDetails in purchaseDetailsList) {
-      if (purchaseDetails.productID != subscriptionProductId) {
+      if (!_subscriptionProductIds.contains(purchaseDetails.productID)) {
         if (purchaseDetails.pendingCompletePurchase) {
           await _inAppPurchase.completePurchase(purchaseDetails);
         }
@@ -358,7 +364,7 @@ class VipController extends GetxController with WidgetsBindingObserver {
     final String? purchasedPlanKey =
         purchaseDetails is GooglePlayPurchaseDetails
         ? purchaseDetails.billingClientPurchase.obfuscatedAccountId
-        : _selectionKeyForPlan(selectedPlan);
+        : purchaseDetails.productID;
 
     await _premiumAccessService.grantPremiumAccess(
       productId: purchaseDetails.productID,
@@ -401,6 +407,17 @@ class VipController extends GetxController with WidgetsBindingObserver {
     return plan.storePlanKey ?? plan.planId;
   }
 
+  Set<String> get _subscriptionProductIds {
+    if (GetPlatform.isIOS) {
+      return <String>{
+        iosMonthlySubscriptionProductId,
+        iosYearlySubscriptionProductId,
+      };
+    }
+
+    return <String>{androidSubscriptionProductId};
+  }
+
   List<VipPlanData> _buildPlans(final List<ProductDetails> productDetailsList) {
     final List<VipPlanData> builtPlans =
         productDetailsList.map(_mapProductToPlan).toList()..sort(
@@ -419,13 +436,6 @@ class VipController extends GetxController with WidgetsBindingObserver {
       return plansToDisplay;
     }
 
-    double highestNormalizedPrice = 0;
-    for (final VipPlanData plan in plansToDisplay) {
-      if (plan.normalizedYearlyPrice > highestNormalizedPrice) {
-        highestNormalizedPrice = plan.normalizedYearlyPrice;
-      }
-    }
-
     int cheapestIndex = 0;
     double cheapestPrice = plansToDisplay.first.normalizedYearlyPrice;
     for (int index = 1; index < plansToDisplay.length; index++) {
@@ -440,48 +450,57 @@ class VipController extends GetxController with WidgetsBindingObserver {
     ) {
       final int index = entry.key;
       final VipPlanData plan = entry.value;
-      final int savingsPercent = highestNormalizedPrice > 0
-          ? ((1 - (plan.normalizedYearlyPrice / highestNormalizedPrice)) * 100)
-                .round()
-          : 0;
+      final bool isYearlyPlan = plan.title.toLowerCase().contains('year');
 
       return plan.copyWith(
         badgeName:
             plan.badgeName ?? (index == cheapestIndex ? 'Best Value'.tr : null),
-        discountLabel: savingsPercent >= 5
-            ? 'save_discount'.trParams(<String, String>{
-                'discount': '$savingsPercent%',
-              })
+        discountLabel: isYearlyPlan
+            ? 'save_discount'.trParams(<String, String>{'discount': '50%'})
             : null,
       );
     }).toList();
   }
 
   List<VipPlanData> _configuredPlansForPlatform(final List<VipPlanData> plans) {
-    if (!GetPlatform.isAndroid) {
-      return <VipPlanData>[];
-    }
-
-    final List<_ConfiguredPlan> configuredPlans = <_ConfiguredPlan>[
-      const _ConfiguredPlan(
-        key: monthlyPlanKey,
-        title: 'Monthly',
-        sortOrder: 30,
-      ),
-      const _ConfiguredPlan(
-        key: yearlyPlanKey,
-        title: 'Yearly',
-        sortOrder: 365,
-      ),
-    ];
+    final List<_ConfiguredPlan> configuredPlans = GetPlatform.isIOS
+        ? const <_ConfiguredPlan>[
+            _ConfiguredPlan(
+              key: iosMonthlySubscriptionProductId,
+              title: 'Monthly',
+              sortOrder: 30,
+            ),
+            _ConfiguredPlan(
+              key: iosYearlySubscriptionProductId,
+              title: 'Yearly',
+              sortOrder: 365,
+            ),
+          ]
+        : const <_ConfiguredPlan>[
+            _ConfiguredPlan(
+              key: monthlyPlanKey,
+              title: 'Monthly',
+              sortOrder: 30,
+            ),
+            _ConfiguredPlan(
+              key: yearlyPlanKey,
+              title: 'Yearly',
+              sortOrder: 365,
+            ),
+          ];
 
     final List<VipPlanData> matchedPlans = <VipPlanData>[];
     for (final _ConfiguredPlan configuredPlan in configuredPlans) {
       for (final VipPlanData plan in plans) {
-        if (plan.storePlanKey == configuredPlan.key) {
+        if (plan.storePlanKey == configuredPlan.key ||
+            plan.productDetails.id == configuredPlan.key) {
           matchedPlans.add(
             plan.copyWith(
               title: configuredPlan.title,
+              periodSuffix: '/ ${configuredPlan.title}',
+              billedLabel: 'billed_unit'.trParams(<String, String>{
+                'unit': configuredPlan.title,
+              }),
               sortOrder: configuredPlan.sortOrder,
             ),
           );
@@ -712,19 +731,19 @@ class VipController extends GetxController with WidgetsBindingObserver {
         parts.months == 0 &&
         parts.weeks == 0 &&
         parts.days == 0) {
-      return 'year';
+      return 'yearly';
     }
     if (parts.months == 1 &&
         parts.years == 0 &&
         parts.weeks == 0 &&
         parts.days == 0) {
-      return 'month';
+      return 'monthly';
     }
     if (parts.weeks == 1 &&
         parts.years == 0 &&
         parts.months == 0 &&
         parts.days == 0) {
-      return 'week';
+      return 'weekly';
     }
     if (parts.days == 7 &&
         parts.years == 0 &&
@@ -846,6 +865,8 @@ class VipPlanData {
 
   VipPlanData copyWith({
     String? title,
+    String? periodSuffix,
+    String? billedLabel,
     int? sortOrder,
     String? badgeName,
     String? discountLabel,
@@ -856,8 +877,8 @@ class VipPlanData {
       storePlanKey: storePlanKey,
       title: title ?? this.title,
       displayPrice: displayPrice,
-      periodSuffix: periodSuffix,
-      billedLabel: billedLabel,
+      periodSuffix: periodSuffix ?? this.periodSuffix,
+      billedLabel: billedLabel ?? this.billedLabel,
       description: description,
       badgeName: badgeName ?? this.badgeName,
       discountLabel: discountLabel ?? this.discountLabel,
