@@ -33,7 +33,9 @@ class GameDetailScreen extends StatelessWidget {
                 shouldShowBanner && controller.isBannerAlignedTop;
             final bool shouldShowBottomBanner =
                 shouldShowBanner && !controller.isBannerAlignedTop;
-            final bool shouldShowExitButton = !controller.isExitOverlayVisible;
+            final bool shouldShowExitButton =
+                controller.isExitButtonVisible &&
+                !controller.isExitOverlayVisible;
             final double exitStripHeight = isLandscape ? 52 : 32;
             final double landscapeExitRailWidth = 52;
 
@@ -74,8 +76,8 @@ class GameDetailScreen extends StatelessWidget {
                           context,
                         ).orientation;
                         // controller.syncBannerViewport(
-                        //   width: constraints.maxWidth,
-                        //   orientation: MediaQuery.of(context).orientation,
+                        //   width: viewportWidth,
+                        //   orientation: viewportOrientation,
                         // );
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           if (!context.mounted) {
@@ -88,8 +90,8 @@ class GameDetailScreen extends StatelessWidget {
                           );
                         });
                         final double landscapePreviewWidth =
-                            (constraints.maxHeight * 0.5)
-                                .clamp(180.0, 420.0)
+                            (constraints.maxHeight * 0.7)
+                                .clamp(260.0, 560.0)
                                 .toDouble();
 
                         final Widget webViewContent = Stack(
@@ -114,12 +116,12 @@ class GameDetailScreen extends StatelessWidget {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           (isLandscape
-                                                  ? Assets.png.icGamePreview
+                                                  ? Assets.png.landscapeGameLogo
                                                   : Assets.png.icLoadingScreen)
                                               .image(
                                                 width: isLandscape
                                                     ? landscapePreviewWidth
-                                                    : AppResponsive.space(220),
+                                                    : AppResponsive.space(300),
                                                 fit: BoxFit.contain,
                                               ),
                                           Gap(AppResponsive.space(28)),

@@ -200,13 +200,15 @@ class _PortraitHeroSection extends StatelessWidget {
       children: [
         Center(child: _HeroArtwork(imageUrl: heroImageUrl)),
         Gap(AppResponsive.space(20)),
-        _GameMetaBlock(title: title, description: description, tags: tags),
-        Gap(AppResponsive.space(18)),
         _ActionRow(
           canDownload: canDownload,
           onContinuePlaying: onContinuePlaying,
           onDownload: onDownload,
         ),
+        Gap(AppResponsive.space(18)),
+        _GameMetaBlock(title: title, description: description, tags: tags),
+        Gap(AppResponsive.space(18)),
+
         if (recommendedGames.isNotEmpty) ...[
           Gap(AppResponsive.space(24)),
           _RecommendedGamesSection(
