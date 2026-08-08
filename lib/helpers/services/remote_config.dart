@@ -49,6 +49,17 @@ class RemoteConfigService {
     }
   }
 
+  /// Refreshes the values used by API requests after connectivity is restored.
+  Future<void> refresh() async {
+    try {
+      await _remoteConfig.fetchAndActivate();
+      _activeBaseUrlOverride = null;
+    } catch (error, stackTrace) {
+      debugPrint('Failed to refresh Remote Config: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+
   void _setupRealTimeUpdates() {
     _remoteConfig.onConfigUpdated.listen((_) async {
       await _remoteConfig.activate();

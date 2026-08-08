@@ -4,8 +4,10 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:magic_games/routes/route_helper.dart';
 import 'package:magic_games/view/base/offline_retry_dialog.dart';
+import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 
 class NetworkController extends GetxController
     with WidgetsBindingObserver
@@ -175,17 +177,35 @@ class NetworkController extends GetxController
       return;
     }
 
+    final bool wasConnected = isConnected.value;
     isConnected.value = connected;
 
     if (connected) {
       _removeOfflineDialogImmediately();
 
+      if (!wasConnected) {
+        // The initial Remote Config fetch can fail while the app starts
+        // offline. Refresh it before Home fetches its API data on reconnect.
+        if (Get.isRegistered<RemoteConfigService>()) {
+          await Get.find<RemoteConfigService>().refresh();
+        }
+      }
+
+      bool navigatedToHome = false;
       if (_shouldRouteToHomeOnReconnect) {
         _shouldRouteToHomeOnReconnect = false;
 
         if (Get.currentRoute != RouteHelper.home) {
           await Get.offAllNamed(RouteHelper.home);
+          navigatedToHome = true;
         }
+      }
+
+      if (!wasConnected &&
+          !navigatedToHome &&
+          Get.currentRoute == RouteHelper.home &&
+          Get.isRegistered<HomeController>()) {
+        await Get.find<HomeController>().fetchGames();
       }
 
       return;

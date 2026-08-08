@@ -36,6 +36,7 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   bool _isShowingRewarded = false;
   bool _isBannerRequestedVisible = false;
   bool _isBannerLoading = false;
+  bool _isRestoringGameFromExitOverlay = false;
   int? _bannerWidth;
   Orientation? _bannerOrientation;
   int? _loadedBannerWidth;
@@ -48,6 +49,10 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   _BannerAlignment _bannerAlignment = _BannerAlignment.top;
 
   final RemoteConfigService _remoteConfigService = RemoteConfigService();
+
+  int _webViewGeneration = 0;
+
+  int get webViewGeneration => _webViewGeneration;
 
   String? get _currentInterstitialAdUnitId =>
       _normalizedAdUnitId(games?.interstitialid);
@@ -254,13 +259,25 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> hideExitOverlay() async {
-    if (!isExitOverlayVisible) {
+    if (!isExitOverlayVisible || _isRestoringGameFromExitOverlay) {
       return;
     }
 
-    isExitOverlayVisible = false;
-    update();
-    await _applyPreferredOrientation();
+    _isRestoringGameFromExitOverlay = true;
+
+    // The WebView stays mounted behind the preview while the device rotates.
+    // This avoids detaching its native surface and preserves the loaded game.
+    try {
+      await _enterGameMode();
+    } catch (error) {
+      debugPrint('Failed to restore game mode from exit preview: $error');
+    } finally {
+      _isRestoringGameFromExitOverlay = false;
+      isExitOverlayVisible = false;
+      update();
+    }
+
+    await WidgetsBinding.instance.endOfFrame;
     await _sendCallbackToJs('GameResume');
   }
 
@@ -302,12 +319,18 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
       return;
     }
 
-    _setGameLoading(true);
+    // Replace the controller before removing the preview. The old WebView can
+    // then never flash while the next game is loading.
+    isGameLoading = true;
     games = game;
     isExitOverlayVisible = false;
     _isShowingInterstitial = false;
     _isShowingRewarded = false;
     _hideBanner(resetAlignment: true);
+
+    _webViewGeneration++;
+    webViewController = WebViewController();
+    _configureWebView();
     update();
 
     _preloadGameAds();
@@ -713,7 +736,6 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
         },
         onPageFinished: (String url) async {
           debugPrint('Page finished: $url — notifying JS');
-          _setGameLoading(false);
           _scheduleImmersiveModeRestore();
           try {
             await webViewController.runJavaScript(

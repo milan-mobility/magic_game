@@ -638,7 +638,7 @@ class HomeController extends GetxController implements GetxService {
   }
 
   bool _canShowSection(final Sections section) {
-    if (_normalizeText(section.type) != '203') {
+    if (_normalizeText(section.type) != '208') {
       return true;
     }
 
