@@ -20,6 +20,7 @@ class ProfileSummaryCardWidget extends StatelessWidget {
     required this.description,
     required this.stats,
     required this.isLoggedIn,
+    required this.showAuthAction,
     required this.actionLabel,
     this.avatarAssetPath,
     this.avatarFilePath,
@@ -34,6 +35,7 @@ class ProfileSummaryCardWidget extends StatelessWidget {
   final String description;
   final List<ProfileStatData> stats;
   final bool isLoggedIn;
+  final bool showAuthAction;
   final String actionLabel;
   final String? avatarAssetPath;
   final String? avatarFilePath;
@@ -121,31 +123,33 @@ class ProfileSummaryCardWidget extends StatelessWidget {
                           ),
                         ],
                       ),
-                      Gap(AppResponsive.space(14)),
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: AppResponsive.value(220, tablet: 260),
-                          maxHeight: AppResponsive.value(44, tablet: 55),
-                        ),
-                        child: isLoggedIn
-                            ? ProfileActionButton(
-                                label: actionLabel,
-                                iconAsset: Assets.svg.icLogout,
-                                onTap: onLogoutTap,
-                              )
-                            : CommonButton(
-                                btnText: actionLabel,
-                                onPressed: onLoginTap,
-                                height: AppResponsive.space(40),
-                                borderRadius: 12,
-                                btnBgColor: AppColors.white,
-                                btnTxtColor: AppColors.color040120,
-                                style: poppinsW600.copyWith(
-                                  fontSize: AppResponsive.font(14),
-                                  color: AppColors.color040120,
+                      if (showAuthAction) ...<Widget>[
+                        Gap(AppResponsive.space(14)),
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: AppResponsive.value(220, tablet: 260),
+                            maxHeight: AppResponsive.value(44, tablet: 55),
+                          ),
+                          child: isLoggedIn
+                              ? ProfileActionButton(
+                                  label: actionLabel,
+                                  iconAsset: Assets.svg.icLogout,
+                                  onTap: onLogoutTap,
+                                )
+                              : CommonButton(
+                                  btnText: actionLabel,
+                                  onPressed: onLoginTap,
+                                  height: AppResponsive.space(40),
+                                  borderRadius: 12,
+                                  btnBgColor: AppColors.white,
+                                  btnTxtColor: AppColors.color040120,
+                                  style: poppinsW600.copyWith(
+                                    fontSize: AppResponsive.font(14),
+                                    color: AppColors.color040120,
+                                  ),
                                 ),
-                              ),
-                      ),
+                        ),
+                      ],
                     ],
                   ),
                 ),

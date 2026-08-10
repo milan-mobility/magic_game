@@ -13,6 +13,7 @@ import 'package:magic_games/helpers/services/premium_access_service.dart';
 import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:magic_games/routes/route_helper.dart';
 import 'package:magic_games/utils/connection.dart';
+import 'package:magic_games/utils/utility.dart';
 import 'package:magic_games/view/base/app_update_dialog.dart';
 import 'package:magic_games/view/base/appupgrader/upgrader/upgrade_messages.dart';
 import 'package:magic_games/view/base/appupgrader/upgrader/upgrader.dart';
@@ -65,7 +66,7 @@ class HomeController extends GetxController implements GetxService {
       _syncSignedInUserEmail();
     });
 
-    if (GetPlatform.isAndroid) {
+    if (GetPlatform.isAndroid || GetPlatform.isIOS) {
       GoogleLeaderboardService.instance.signIn();
     }
     _syncPremiumAccess();
@@ -239,18 +240,13 @@ class HomeController extends GetxController implements GetxService {
       return;
     }
 
-    final Uri? uri = Uri.tryParse(
-      'https://play.google.com/store/apps/details?id=${storeUrl!}',
-    );
-    if (uri == null) {
+    final bool launched = await Utility.openGameStoreListing(storeUrl!);
+    if (!launched) {
       showErrorSnackBar(
         title: 'Invalid store URL'.tr,
         message: 'This game has an invalid store redirect link.'.tr,
       );
-      return;
     }
-
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   void openGame(final Games game) {
@@ -521,12 +517,6 @@ class HomeController extends GetxController implements GetxService {
   String? _platformStoreUrl(final Games game) {
     if (GetPlatform.isAndroid) {
       return _normalizeText(game.storeurl);
-    }
-
-    if (GetPlatform.isIOS) {
-      // TODO(milan): replace this with the dedicated iOS store field once it is
-      // added to the game model and API response.
-      return null;
     }
 
     return _normalizeText(game.storeurl);

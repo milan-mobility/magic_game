@@ -8,7 +8,11 @@ class PremiumAccessService extends GetxService {
   PremiumAccessService(this._sharedPreferenceHelper)
     : _hasPremiumAccess = RxBool(_sharedPreferenceHelper.hasPremiumAccess);
 
-  static const String subscriptionProductId = 'onegame_plus_premium';
+  static const String androidSubscriptionProductId = 'onegame_plus_premium';
+  static const String iosMonthlySubscriptionProductId =
+      'onegame_plus_premium_monthly';
+  static const String iosYearlySubscriptionProductId =
+      'onegame_plus_premium_yearly';
 
   final SharedPreferenceHelper _sharedPreferenceHelper;
   final InAppPurchase _inAppPurchase = InAppPurchase.instance;
@@ -48,7 +52,7 @@ class PremiumAccessService extends GetxService {
 
       if (activePurchase != null) {
         await grantPremiumAccess(
-          productId: subscriptionProductId,
+          productId: androidSubscriptionProductId,
           planKey: activePurchase.billingClientPurchase.obfuscatedAccountId,
         );
         return;
@@ -63,7 +67,7 @@ class PremiumAccessService extends GetxService {
   Future<void> grantPremiumAccess({String? productId, String? planKey}) async {
     await _sharedPreferenceHelper.savePremiumAccess(true);
     await _sharedPreferenceHelper.savePremiumProductId(
-      productId ?? subscriptionProductId,
+      productId ?? androidSubscriptionProductId,
     );
     await _sharedPreferenceHelper.savePremiumPlanKey(planKey);
     _hasPremiumAccess.value = true;
@@ -77,7 +81,7 @@ class PremiumAccessService extends GetxService {
   }
 
   bool _isOwnedPremiumPurchase(final GooglePlayPurchaseDetails purchase) {
-    return purchase.productID == subscriptionProductId &&
+    return purchase.productID == androidSubscriptionProductId &&
         purchase.billingClientPurchase.purchaseState ==
             PurchaseStateWrapper.purchased;
   }

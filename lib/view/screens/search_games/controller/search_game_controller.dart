@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/helpers/services/premium_access_service.dart';
 import 'package:magic_games/routes/route_helper.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:magic_games/utils/utility.dart';
 import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 
 class SearchGameController extends GetxController {
@@ -130,14 +130,7 @@ class SearchGameController extends GetxController {
       return;
     }
 
-    final Uri? uri = Uri.tryParse(
-      'https://play.google.com/store/apps/details?id=${storeUrl!}',
-    );
-    if (uri == null) {
-      return;
-    }
-
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+    await Utility.openGameStoreListing(storeUrl!);
   }
 
   void _applyFilters() {
@@ -216,10 +209,6 @@ class SearchGameController extends GetxController {
   String? _platformStoreUrl(final Games game) {
     if (GetPlatform.isAndroid) {
       return _normalizeText(game.storeurl);
-    }
-
-    if (GetPlatform.isIOS) {
-      return null;
     }
 
     return _normalizeText(game.storeurl);

@@ -175,18 +175,6 @@ class PlanPriceRow extends StatelessWidget {
                 ),
               ],
             ),
-            if (description != null && description!.isNotEmpty) ...[
-              Gap(AppResponsive.space(8)),
-              Text(
-                description!,
-                style: poppinsW300.copyWith(
-                  fontSize: AppResponsive.font(12),
-                  color: AppColors.colorA29DBD,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
           ],
         ),
       ),

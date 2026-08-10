@@ -219,6 +219,36 @@ class Utility {
     }
   }
 
+  /// Opens a game's listing from either a complete store URL or its store ID.
+  /// iOS game records contain the numeric App Store ID; Android records contain
+  /// the Google Play package ID.
+  static Future<bool> openGameStoreListing(final String storeUrl) async {
+    final String value = storeUrl.trim();
+    if (value.isEmpty) {
+      return false;
+    }
+
+    final Uri? uri;
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      uri = Uri.tryParse(value);
+    } else if (GetPlatform.isIOS) {
+      final String appStoreId = value.startsWith('id')
+          ? value.substring(2)
+          : value;
+      uri = Uri.tryParse('https://apps.apple.com/app/id$appStoreId');
+    } else {
+      uri = Uri.tryParse(
+        'https://play.google.com/store/apps/details?id=$value',
+      );
+    }
+
+    if (uri == null) {
+      return false;
+    }
+
+    return launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
   static Future<void> sendFeedbackEmail({
     String? gameName,
     String userId = '',
@@ -430,7 +460,7 @@ class Utility {
         appStoreId: 'com.oneup.onegameplus',
       );
     } else if (Platform.isIOS) {
-      await InAppReview.instance.openStoreListing(appStoreId: '1622599607');
+      await InAppReview.instance.openStoreListing(appStoreId: '6788318469');
     }
   }
 

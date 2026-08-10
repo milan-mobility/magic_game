@@ -1,17 +1,18 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:math';
 
+import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthService extends GetxService {
   static const String _androidServerClientId =
       '833018092184-jmqs352l0fmplvudvdnnq7bpt7e2d42u.apps.googleusercontent.com';
-  static const String _iosClientId =
-      '833018092184-bl2qn1srqds6h3us3ec2pohqqnnlbj57.apps.googleusercontent.com';
-
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
   final SharedPreferenceHelper _sharedPreferenceHelper =
@@ -25,6 +26,15 @@ class AuthService extends GetxService {
   User? get currentUser => _firebaseAuth.currentUser;
 
   bool get isLoggedIn => currentUser != null;
+
+  bool get isGoogleSignInAvailable =>
+      kIsWeb || defaultTargetPlatform == TargetPlatform.android;
+
+  bool get isAppleSignInAvailable =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+
+  bool get isPlatformSignInAvailable =>
+      isGoogleSignInAvailable || isAppleSignInAvailable;
 
   String? get currentDisplayName {
     final List<String?> candidates = <String?>[
@@ -85,6 +95,10 @@ class AuthService extends GetxService {
   }
 
   Future<UserCredential> signInWithGoogle() async {
+    if (!isGoogleSignInAvailable) {
+      throw const AuthException('Google Sign-In is available on Android only.');
+    }
+
     if (kIsWeb) {
       return _firebaseAuth.signInWithPopup(GoogleAuthProvider());
     }
@@ -133,9 +147,76 @@ class AuthService extends GetxService {
     return userCredential;
   }
 
+  Future<UserCredential> signInWithApple() async {
+    if (!isAppleSignInAvailable) {
+      throw const AuthException('Sign in with Apple is available on iOS only.');
+    }
+
+    final String rawNonce = _createAppleNonce();
+    final String hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+    final AuthorizationCredentialAppleID appleCredential =
+        await SignInWithApple.getAppleIDCredential(
+          scopes: <AppleIDAuthorizationScopes>[
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName,
+          ],
+          nonce: hashedNonce,
+        );
+    final String? identityToken = appleCredential.identityToken;
+    if (identityToken == null || identityToken.isEmpty) {
+      throw const AuthException(
+        'Sign in with Apple did not return an identity token.',
+      );
+    }
+
+    final String? appleDisplayName = _appleDisplayName(appleCredential);
+    final OAuthCredential credential = AppleAuthProvider.credentialWithIDToken(
+      identityToken,
+      rawNonce,
+      AppleFullPersonName(
+        givenName: appleCredential.givenName,
+        familyName: appleCredential.familyName,
+      ),
+    );
+    final UserCredential userCredential = await _firebaseAuth
+        .signInWithCredential(credential);
+    if (appleDisplayName != null) {
+      await userCredential.user?.updateDisplayName(appleDisplayName);
+    }
+    await userCredential.user?.reload();
+
+    _lastGooglePhotoUrl = _normalizeValue(
+      _firebaseAuth.currentUser?.photoURL ?? userCredential.user?.photoURL,
+    );
+    _lastGoogleDisplayName =
+        appleDisplayName ??
+        _normalizeValue(
+          _firebaseAuth.currentUser?.displayName ??
+              userCredential.user?.displayName,
+        );
+    await _sharedPreferenceHelper.saveGoogleProfilePhotoUrl(
+      _lastGooglePhotoUrl,
+    );
+    await _sharedPreferenceHelper.saveGoogleProfileDisplayName(
+      _lastGoogleDisplayName,
+    );
+    await _sharedPreferenceHelper.saveGoogleProfileUpdatedAt(
+      DateTime.now().millisecondsSinceEpoch,
+    );
+    return userCredential;
+  }
+
+  Future<UserCredential> signInWithPlatform() {
+    if (isAppleSignInAvailable) {
+      return signInWithApple();
+    }
+
+    return signInWithGoogle();
+  }
+
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
-    if (!kIsWeb) {
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
       await _googleSignIn.signOut();
     }
     _lastGooglePhotoUrl = null;
@@ -147,16 +228,11 @@ class AuthService extends GetxService {
   }
 
   Future<void> _initializeGoogleSignIn() async {
-    if (_isGoogleInitialized || kIsWeb) {
+    if (_isGoogleInitialized || !isGoogleSignInAvailable) {
       return;
     }
 
-    await _googleSignIn.initialize(
-      clientId: defaultTargetPlatform == TargetPlatform.iOS
-          ? _iosClientId
-          : null,
-      serverClientId: _androidServerClientId,
-    );
+    await _googleSignIn.initialize(serverClientId: _androidServerClientId);
     _isGoogleInitialized = true;
   }
 
@@ -282,6 +358,24 @@ class AuthService extends GetxService {
 
     final String trimmedValue = value.trim();
     return trimmedValue.isEmpty ? null : trimmedValue;
+  }
+
+  String _createAppleNonce([final int length = 32]) {
+    const String charset =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final Random random = Random.secure();
+    return List<String>.generate(
+      length,
+      (_) => charset[random.nextInt(charset.length)],
+    ).join();
+  }
+
+  String? _appleDisplayName(final AuthorizationCredentialAppleID credential) {
+    final List<String> parts = <String>[
+      credential.givenName?.trim() ?? '',
+      credential.familyName?.trim() ?? '',
+    ].where((final String value) => value.isNotEmpty).toList();
+    return parts.isEmpty ? null : parts.join(' ');
   }
 }
 

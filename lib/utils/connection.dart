@@ -29,7 +29,16 @@ class ConnectionUtils {
       );
 
   static Future<bool> isNetworkConnected() async {
-    return _accessChecker.hasInternetAccess;
+    final InternetConnection checker = InternetConnection.createInstance(
+      useDefaultOptions: false,
+      customCheckOptions: <InternetCheckOption>[
+        InternetCheckOption(
+          uri: Uri.parse('https://captive.apple.com/hotspot-detect.html'),
+          timeout: const Duration(seconds: 5),
+        ),
+      ],
+    );
+    return checker.hasInternetAccess;
   }
 
   static Stream<InternetStatus> get onStatusChange =>

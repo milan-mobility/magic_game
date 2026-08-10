@@ -572,17 +572,10 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
       return;
     }
 
-    if (GetPlatform.isIOS) {
-      _showToastMessage(
-        'Add the iOS store URL key for this game to enable redirection.'.tr,
-      );
-      return;
+    final bool launched = await Utility.openGameStoreListing(storeUrl);
+    if (!launched) {
+      _showToastMessage('This game has an invalid store redirect link.'.tr);
     }
-
-    final String resolvedUrl = storeUrl.startsWith('http')
-        ? storeUrl
-        : 'https://play.google.com/store/apps/details?id=$storeUrl';
-    await Utility.openUrl(resolvedUrl);
   }
 
   void _showToastMessage(final String message) {
