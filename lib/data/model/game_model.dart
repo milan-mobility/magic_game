@@ -292,6 +292,7 @@ class Games {
   String? rewardid;
   String? keyword;
   String? shortdesc;
+  Gameconfig? gameconfig;
 
   Games({
     this.id,
@@ -313,6 +314,7 @@ class Games {
     this.rewardid,
     this.keyword,
     this.shortdesc,
+    this.gameconfig,
   });
 
   Games.fromJson(Map<String, dynamic> json) {
@@ -335,6 +337,10 @@ class Games {
     rewardid = json['rewardid'];
     keyword = json['keyword'];
     shortdesc = json['shortdesc'];
+    final dynamic rawGameConfig = json['gameconfig'] ?? json['gameConfig'];
+    gameconfig = rawGameConfig is Map
+        ? Gameconfig.fromJson(Map<String, dynamic>.from(rawGameConfig))
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -358,8 +364,27 @@ class Games {
     data['rewardid'] = rewardid;
     data['keyword'] = keyword;
     data['shortdesc'] = shortdesc;
+    if (gameconfig != null) {
+      data['gameconfig'] = gameconfig!.toJson();
+    }
     return data;
   }
+}
+
+class Gameconfig {
+  Gameconfig({bool? bannerad})
+    : _values = bannerad == null
+          ? <String, dynamic>{}
+          : <String, dynamic>{'bannerad': bannerad};
+
+  Gameconfig.fromJson(Map<String, dynamic> json)
+    : _values = Map<String, dynamic>.from(json);
+
+  final Map<String, dynamic> _values;
+
+  bool? get bannerad => _values['bannerad'] as bool?;
+
+  Map<String, dynamic> toJson() => Map<String, dynamic>.from(_values);
 }
 
 class Sections {

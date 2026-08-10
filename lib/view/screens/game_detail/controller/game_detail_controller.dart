@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
@@ -36,6 +37,7 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   bool _isShowingRewarded = false;
   bool _isBannerRequestedVisible = false;
   bool _isBannerLoading = false;
+  bool _isRestoringGameFromExitOverlay = false;
   int? _bannerWidth;
   Orientation? _bannerOrientation;
   int? _loadedBannerWidth;
@@ -43,11 +45,16 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   bool _isClosingScreen = false;
   bool isGameLoading = true;
   bool isExitOverlayVisible = false;
+  bool isExitButtonVisible = true;
   Games? games;
   BannerAd? _bannerAd;
   _BannerAlignment _bannerAlignment = _BannerAlignment.top;
 
   final RemoteConfigService _remoteConfigService = RemoteConfigService();
+
+  int _webViewGeneration = 0;
+
+  int get webViewGeneration => _webViewGeneration;
 
   String? get _currentInterstitialAdUnitId =>
       _normalizedAdUnitId(games?.interstitialid);
@@ -71,7 +78,13 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
     required final double width,
     required final Orientation orientation,
   }) {
-    final int normalizedWidth = width.truncate();
+    final int viewportWidth = width.truncate();
+    // A full-width adaptive banner on wide landscape devices can become tall
+    // enough to leave the game with a narrow 16:9 viewport. Keep the banner
+    // below the WebView, but request it at the standard wide-banner width.
+    final int normalizedWidth = orientation == Orientation.landscape
+        ? viewportWidth.clamp(0, 728).toInt()
+        : viewportWidth;
     if (normalizedWidth <= 0) {
       return;
     }
@@ -254,13 +267,25 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> hideExitOverlay() async {
-    if (!isExitOverlayVisible) {
+    if (!isExitOverlayVisible || _isRestoringGameFromExitOverlay) {
       return;
     }
 
-    isExitOverlayVisible = false;
-    update();
-    await _applyPreferredOrientation();
+    _isRestoringGameFromExitOverlay = true;
+
+    // The WebView stays mounted behind the preview while the device rotates.
+    // This avoids detaching its native surface and preserves the loaded game.
+    try {
+      await _enterGameMode();
+    } catch (error) {
+      debugPrint('Failed to restore game mode from exit preview: $error');
+    } finally {
+      _isRestoringGameFromExitOverlay = false;
+      isExitOverlayVisible = false;
+      update();
+    }
+
+    await WidgetsBinding.instance.endOfFrame;
     await _sendCallbackToJs('GameResume');
   }
 
@@ -302,12 +327,19 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
       return;
     }
 
-    _setGameLoading(true);
+    // Replace the controller before removing the preview. The old WebView can
+    // then never flash while the next game is loading.
+    isGameLoading = true;
     games = game;
     isExitOverlayVisible = false;
+    isExitButtonVisible = true;
     _isShowingInterstitial = false;
     _isShowingRewarded = false;
     _hideBanner(resetAlignment: true);
+
+    _webViewGeneration++;
+    webViewController = WebViewController();
+    _configureWebView();
     update();
 
     _preloadGameAds();
@@ -440,8 +472,11 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
 
       case 'gameStart':
         _setGameLoading(false);
-        _sendCallbackToJs(
+        await _sendCallbackToJs(
           'appLanguage:${Get.locale?.languageCode.toLowerCase() ?? ''}',
+        );
+        await _sendCallbackToJs(
+          'gameconfig:${jsonEncode(games?.gameconfig?.toJson() ?? <String, dynamic>{})}',
         );
         await _recordCurrentGameAsRecentlyPlayed();
         break;
@@ -452,6 +487,28 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
 
       case 'sendFirebaseEvent':
         fireFirebaseEvent(webMessage.payload);
+        break;
+
+      case 'showExit':
+        if (!isExitButtonVisible) {
+          isExitButtonVisible = true;
+          update();
+        }
+        break;
+
+      case 'hideExit':
+        if (isExitButtonVisible) {
+          isExitButtonVisible = false;
+          update();
+        }
+        break;
+
+      case 'showExitSceen':
+        await showExitOverlay();
+        break;
+
+      case 'closeApp':
+        await closeGameDetailScreen();
         break;
 
       default:
@@ -614,7 +671,8 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
     debugPrint('Flutter → JS: $event');
     try {
       await webViewController.runJavaScript(
-        "if (typeof onFlutterResponse === 'function') onFlutterResponse('$event');",
+        'if (typeof onFlutterResponse === \'function\') '
+        'onFlutterResponse(${jsonEncode(event)});',
       );
     } catch (e) {
       debugPrint('JS callback error [$event]: $e');
@@ -713,7 +771,6 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
         },
         onPageFinished: (String url) async {
           debugPrint('Page finished: $url — notifying JS');
-          _setGameLoading(false);
           _scheduleImmersiveModeRestore();
           try {
             await webViewController.runJavaScript(

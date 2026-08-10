@@ -19,7 +19,7 @@ class GameDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
+      value: SystemUiOverlayStyle.light,
       child: Scaffold(
         backgroundColor: AppColors.themeColor,
         body: GetBuilder<GameDetailController>(
@@ -33,7 +33,9 @@ class GameDetailScreen extends StatelessWidget {
                 shouldShowBanner && controller.isBannerAlignedTop;
             final bool shouldShowBottomBanner =
                 shouldShowBanner && !controller.isBannerAlignedTop;
-            final bool shouldShowExitButton = !controller.isExitOverlayVisible;
+            final bool shouldShowExitButton =
+                controller.isExitButtonVisible &&
+                !controller.isExitOverlayVisible;
             final double exitStripHeight = isLandscape ? 52 : 32;
             final double landscapeExitRailWidth = 52;
 
@@ -69,19 +71,36 @@ class GameDetailScreen extends StatelessWidget {
                         final BuildContext context,
                         final BoxConstraints constraints,
                       ) {
-                        controller.syncBannerViewport(
-                          width: constraints.maxWidth,
-                          orientation: MediaQuery.of(context).orientation,
-                        );
+                        final double viewportWidth = constraints.maxWidth;
+                        final Orientation viewportOrientation = MediaQuery.of(
+                          context,
+                        ).orientation;
+                        // controller.syncBannerViewport(
+                        //   width: viewportWidth,
+                        //   orientation: viewportOrientation,
+                        // );
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (!context.mounted) {
+                            return;
+                          }
+
+                          controller.syncBannerViewport(
+                            width: viewportWidth,
+                            orientation: viewportOrientation,
+                          );
+                        });
                         final double landscapePreviewWidth =
-                            (constraints.maxHeight * 0.5)
-                                .clamp(180.0, 420.0)
+                            (constraints.maxHeight * 0.7)
+                                .clamp(260.0, 560.0)
                                 .toDouble();
 
                         final Widget webViewContent = Stack(
                           fit: StackFit.expand,
                           children: [
                             WebViewWidget(
+                              key: ValueKey(
+                                'game_webview_${controller.webViewGeneration}',
+                              ),
                               controller: controller.webViewController,
                             ),
                             if (controller.shouldShowLoadingOverlay)
@@ -97,12 +116,12 @@ class GameDetailScreen extends StatelessWidget {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           (isLandscape
-                                                  ? Assets.png.icGamePreview
+                                                  ? Assets.png.landscapeGameLogo
                                                   : Assets.png.icLoadingScreen)
                                               .image(
                                                 width: isLandscape
                                                     ? landscapePreviewWidth
-                                                    : AppResponsive.space(220),
+                                                    : AppResponsive.space(300),
                                                 fit: BoxFit.contain,
                                               ),
                                           Gap(AppResponsive.space(28)),
@@ -133,12 +152,31 @@ class GameDetailScreen extends StatelessWidget {
                         final double bottomBannerHeight = shouldShowBottomBanner
                             ? controller.bannerHeight
                             : 0;
+                        final double gameContentTop = isLandscape
+                            ? topBannerHeight
+                            : topBannerHeight +
+                                  (shouldShowExitButton
+                                      ? exitStripHeight -
+                                            (shouldShowTopBanner
+                                                ? GetPlatform.isIOS
+                                                      ? -10
+                                                      : 20
+                                                : -5)
+                                      : 0);
+                        final double gameContentBottom = isLandscape
+                            ? bottomBannerHeight
+                            : bottomBannerHeight -
+                                  (shouldShowBottomBanner
+                                      ? GetPlatform.isIOS
+                                            ? -30
+                                            : 40
+                                      : 0);
                         final Widget gameContent = Stack(
                           fit: StackFit.expand,
                           children: [
                             Positioned.fill(
-                              top: topBannerHeight,
-                              bottom: bottomBannerHeight,
+                              top: gameContentTop,
+                              bottom: gameContentBottom,
                               child: webViewContent,
                             ),
                             if (shouldShowTopBanner)
@@ -157,7 +195,9 @@ class GameDetailScreen extends StatelessWidget {
                               Positioned(
                                 left: 0,
                                 right: 0,
-                                bottom: 0,
+                                bottom: isLandscape
+                                    ? 0
+                                    : (GetPlatform.isIOS ? 20 : -20),
                                 child: SizedBox(
                                   width: controller.bannerAd!.size.width
                                       .toDouble(),
@@ -171,105 +211,55 @@ class GameDetailScreen extends StatelessWidget {
                         return Stack(
                           fit: StackFit.expand,
                           children: [
-                            if (isLandscape)
-                              Row(
-                                children: [
-                                  Expanded(child: gameContent),
-                                  if (shouldShowExitButton)
-                                    SizedBox(
-                                      width: landscapeExitRailWidth,
-                                      child: ColoredBox(
-                                        color: Colors.black,
-                                        child: Align(
-                                          alignment: Alignment.topCenter,
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                              top: 20,
-                                            ),
-                                            child: _ExitButton(
-                                              isLandscape: true,
-                                              onTap: controller.showExitOverlay,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              )
-                            else ...[
-                              Positioned.fill(
-                                // top:
-                                //     topBannerHeight +
-                                //     (shouldShowExitButton
-                                //         ? exitStripHeight
-                                //         : 0),
-                                top:
-                                    topBannerHeight +
-                                    (shouldShowExitButton
-                                        ? exitStripHeight -
-                                              (shouldShowTopBanner
-                                                  ? GetPlatform.isIOS
-                                                        ? -10
-                                                        : 20
-                                                  : -5)
-                                        : 0),
-                                bottom:
-                                    bottomBannerHeight -
-                                    (shouldShowBottomBanner
-                                        ? GetPlatform.isIOS
-                                              ? -30
-                                              : 40
-                                        : 0),
-                                child: webViewContent,
-                              ),
-                              if (shouldShowTopBanner)
-                                Positioned(
-                                  top: 0,
-                                  left: 0,
-                                  right: 0,
-                                  child: SizedBox(
-                                    width: controller.bannerAd!.size.width
-                                        .toDouble(),
-                                    height: controller.bannerHeight,
-                                    child: AdWidget(ad: controller.bannerAd!),
-                                  ),
-                                ),
-                              if (shouldShowExitButton)
-                                Positioned(
-                                  top:
-                                      topBannerHeight -
-                                      (shouldShowTopBanner
-                                          ? GetPlatform.isIOS
-                                                ? -5
-                                                : 20
-                                          : 0),
-                                  left: 0,
-                                  right: 0,
-                                  height: exitStripHeight,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 20),
-                                    child: Align(
-                                      alignment: Alignment.topRight,
+                            Positioned.fill(
+                              right: isLandscape && shouldShowExitButton
+                                  ? landscapeExitRailWidth
+                                  : 0,
+                              child: gameContent,
+                            ),
+                            if (isLandscape && shouldShowExitButton)
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                bottom: 0,
+                                width: landscapeExitRailWidth,
+                                child: ColoredBox(
+                                  color: Colors.black,
+                                  child: Align(
+                                    alignment: Alignment.topCenter,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 20),
                                       child: _ExitButton(
-                                        isLandscape: false,
+                                        isLandscape: true,
                                         onTap: controller.showExitOverlay,
                                       ),
                                     ),
                                   ),
                                 ),
-                              if (shouldShowBottomBanner)
-                                Positioned(
-                                  left: 0,
-                                  right: 0,
-                                  bottom: GetPlatform.isIOS ? 20 : -20,
-                                  child: SizedBox(
-                                    width: controller.bannerAd!.size.width
-                                        .toDouble(),
-                                    height: controller.bannerHeight,
-                                    child: AdWidget(ad: controller.bannerAd!),
+                              ),
+                            if (!isLandscape && shouldShowExitButton)
+                              Positioned(
+                                top:
+                                    topBannerHeight -
+                                    (shouldShowTopBanner
+                                        ? GetPlatform.isIOS
+                                              ? -5
+                                              : 20
+                                        : 0),
+                                left: 0,
+                                right: 0,
+                                height: exitStripHeight,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 20),
+                                  child: Align(
+                                    alignment: Alignment.topRight,
+                                    child: _ExitButton(
+                                      isLandscape: false,
+                                      onTap: controller.showExitOverlay,
+                                    ),
                                   ),
                                 ),
-                            ],
+                              ),
                             if (controller.isExitOverlayVisible)
                               Positioned.fill(
                                 child: GameExitOverlay(

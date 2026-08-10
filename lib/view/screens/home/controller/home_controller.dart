@@ -65,7 +65,9 @@ class HomeController extends GetxController implements GetxService {
       _syncSignedInUserEmail();
     });
 
-    GoogleLeaderboardService.instance.signIn();
+    if (GetPlatform.isAndroid) {
+      GoogleLeaderboardService.instance.signIn();
+    }
     _syncPremiumAccess();
     fetchGames();
   }
@@ -446,6 +448,7 @@ class HomeController extends GetxController implements GetxService {
       rewardid: game.rewardid,
       keyword: game.keyword,
       shortdesc: game.shortdesc,
+      gameconfig: game.gameconfig,
     );
   }
 
@@ -638,7 +641,7 @@ class HomeController extends GetxController implements GetxService {
   }
 
   bool _canShowSection(final Sections section) {
-    if (_normalizeText(section.type) != '203') {
+    if (_normalizeText(section.type) != '208') {
       return true;
     }
 
