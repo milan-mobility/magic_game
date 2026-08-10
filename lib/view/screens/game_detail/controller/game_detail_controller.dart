@@ -14,8 +14,10 @@ import 'package:magic_games/helpers/ads/ads_services.dart';
 import 'package:magic_games/helpers/ads/consent_manager.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
+import 'package:magic_games/helpers/extensions/parsing.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
 import 'package:magic_games/helpers/services/google_leaderboard_service.dart';
+import 'package:magic_games/helpers/services/premium_access_service.dart';
 import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:magic_games/helpers/styles.dart';
 import 'package:magic_games/routes/route_helper.dart';
@@ -30,6 +32,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 class GameDetailController extends GetxController with WidgetsBindingObserver {
   final SharedPreferenceHelper _sharedPreferenceHelper =
       Get.find<SharedPreferenceHelper>();
+  final PremiumAccessService _premiumAccessService =
+      Get.find<PremiumAccessService>();
   final Set<String> _preloadedExitPreviewImageUrls = <String>{};
 
   late WebViewController webViewController;
@@ -478,7 +482,42 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
         await _sendCallbackToJs(
           'gameconfig:${jsonEncode(games?.gameconfig?.toJson() ?? <String, dynamic>{})}',
         );
+        if (_premiumAccessService.hasPremiumAccess) {
+          await _sendCallbackToJs('subscriptionEnable');
+        }
+        if (_sharedPreferenceHelper.isLoggedIn) {
+          await _sendCallbackToJs(
+            'loginUser:${_sharedPreferenceHelper.isLoggedIn}',
+          );
+        }
         await _recordCurrentGameAsRecentlyPlayed();
+        break;
+
+      case 'saveData':
+        break;
+
+      case 'getCoin':
+        await _sendCallbackToJs(
+          'gamecoins:${_sharedPreferenceHelper.getCoins}',
+        );
+        break;
+
+      case 'updateCoin':
+        _sharedPreferenceHelper.saveCoins(
+          value: SafeParse.toIntValue(webMessage.payload) ?? 100,
+        );
+        break;
+
+      case 'getDiamond':
+        await _sendCallbackToJs(
+          'gamediamonds:${_sharedPreferenceHelper.getDiamonds}',
+        );
+        break;
+
+      case 'updateDiamond':
+        _sharedPreferenceHelper.saveDiamonds(
+          value: SafeParse.toIntValue(webMessage.payload) ?? 100,
+        );
         break;
 
       case 'googleLeaderBoard':

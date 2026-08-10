@@ -59,90 +59,28 @@ class HomeScreen extends GetView<HomeController> {
                   ],
                   const SizedBox(height: 20),
                   Expanded(
-                    child: ScrollConfiguration(
-                      behavior: const _HomeScrollBehavior(),
-                      child: ListView(
-                        physics: const BouncingScrollPhysics(
-                          parent: AlwaysScrollableScrollPhysics(),
-                        ),
-                        dragStartBehavior: DragStartBehavior.down,
-                        keyboardDismissBehavior:
-                            ScrollViewKeyboardDismissBehavior.onDrag,
-                        cacheExtent: homeCacheExtent,
-                        padding: const EdgeInsets.only(bottom: 12),
-                        children: [
-                          if (featuredBanners.isNotEmpty) ...[
-                            FeaturedBannerWidget(
-                              banners: featuredBanners,
-                              refreshToken:
-                                  controller.featuredBannerRefreshToken.value,
-                              requiresSubscriptionForGame:
-                                  controller.requiresSubscriptionForGame,
-                              onBannerTap: (game, isSubscribe) {
-                                if (isSubscribe) {
-                                  Get.offAllNamed(RouteHelper.vip);
-                                } else {
-                                  Get.toNamed(
-                                    RouteHelper.gameDetail,
-                                    arguments: <String, dynamic>{'game': game},
-                                  );
-                                }
-                              },
-                            ),
-                            const SizedBox(height: 24),
-                          ],
-                          if (recentPlayedGames.isNotEmpty) ...[
-                            ContinuePlayingSection(
-                              games: recentPlayedGames,
-                              requiresSubscriptionForGame:
-                                  controller.requiresSubscriptionForGame,
-                              onGameTap:
-                                  (final Games game, final bool isSubscribe) {
-                                    if (isSubscribe) {
-                                      Get.offAllNamed(RouteHelper.vip);
-                                    } else {
-                                      Get.toNamed(
-                                        RouteHelper.gameDetail,
-                                        arguments: <String, dynamic>{
-                                          'game': game,
-                                        },
-                                      );
-                                    }
-                                  },
-                            ),
-                          ],
-                          if (sections.isEmpty && recentPlayedGames.isEmpty)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 48,
-                              ),
-                              child: Text(
-                                'No sections available right now.'.tr,
-                                style: poppinsW500.copyWith(
-                                  fontSize: AppResponsive.font(16),
-                                  color: AppColors.white,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            )
-                          else
-                            ...sections.map(
-                              (final homeSection) => SectionWidget(
-                                key: ValueKey<String>(homeSection.id),
-                                title: homeSection.title,
-                                subtitle: homeSection.subtitle,
-                                layoutType: homeSection.layoutType,
-                                showHourglassIndicator:
-                                    homeSection.showHourglassIndicator,
-                                showViewAll: homeSection.showViewAll,
-                                games: homeSection.games,
-                                collections: homeSection.collections,
+                    child: RefreshIndicator(
+                      onRefresh: controller.fetchGames,
+                      child: ScrollConfiguration(
+                        behavior: const _HomeScrollBehavior(),
+                        child: ListView(
+                          physics: const BouncingScrollPhysics(
+                            parent: AlwaysScrollableScrollPhysics(),
+                          ),
+                          dragStartBehavior: DragStartBehavior.down,
+                          keyboardDismissBehavior:
+                              ScrollViewKeyboardDismissBehavior.onDrag,
+                          cacheExtent: homeCacheExtent,
+                          padding: const EdgeInsets.only(bottom: 12),
+                          children: [
+                            if (featuredBanners.isNotEmpty) ...[
+                              FeaturedBannerWidget(
+                                banners: featuredBanners,
+                                refreshToken:
+                                    controller.featuredBannerRefreshToken.value,
                                 requiresSubscriptionForGame:
-                                    (final Games game) =>
-                                        (game.subscription ?? false) &&
-                                        !hasPremiumAccess,
-                                onGameTap: (Games game, bool isSubscribe) {
+                                    controller.requiresSubscriptionForGame,
+                                onBannerTap: (game, isSubscribe) {
                                   if (isSubscribe) {
                                     Get.offAllNamed(RouteHelper.vip);
                                   } else {
@@ -154,12 +92,79 @@ class HomeScreen extends GetView<HomeController> {
                                     );
                                   }
                                 },
-                                onGameStoreTap: controller.openStoreForGame,
-                                onCollectionTap:
-                                    controller.openCollectionSearch,
                               ),
-                            ),
-                        ],
+                              const SizedBox(height: 24),
+                            ],
+                            if (recentPlayedGames.isNotEmpty) ...[
+                              ContinuePlayingSection(
+                                games: recentPlayedGames,
+                                requiresSubscriptionForGame:
+                                    controller.requiresSubscriptionForGame,
+                                onGameTap:
+                                    (final Games game, final bool isSubscribe) {
+                                      if (isSubscribe) {
+                                        Get.offAllNamed(RouteHelper.vip);
+                                      } else {
+                                        Get.toNamed(
+                                          RouteHelper.gameDetail,
+                                          arguments: <String, dynamic>{
+                                            'game': game,
+                                          },
+                                        );
+                                      }
+                                    },
+                              ),
+                            ],
+                            if (sections.isEmpty && recentPlayedGames.isEmpty)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 48,
+                                ),
+                                child: Text(
+                                  'No sections available right now.'.tr,
+                                  style: poppinsW500.copyWith(
+                                    fontSize: AppResponsive.font(16),
+                                    color: AppColors.white,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              )
+                            else
+                              ...sections.map(
+                                (final homeSection) => SectionWidget(
+                                  key: ValueKey<String>(homeSection.id),
+                                  title: homeSection.title,
+                                  subtitle: homeSection.subtitle,
+                                  layoutType: homeSection.layoutType,
+                                  showHourglassIndicator:
+                                      homeSection.showHourglassIndicator,
+                                  showViewAll: homeSection.showViewAll,
+                                  games: homeSection.games,
+                                  collections: homeSection.collections,
+                                  requiresSubscriptionForGame:
+                                      (final Games game) =>
+                                          (game.subscription ?? false) &&
+                                          !hasPremiumAccess,
+                                  onGameTap: (Games game, bool isSubscribe) {
+                                    if (isSubscribe) {
+                                      Get.offAllNamed(RouteHelper.vip);
+                                    } else {
+                                      Get.toNamed(
+                                        RouteHelper.gameDetail,
+                                        arguments: <String, dynamic>{
+                                          'game': game,
+                                        },
+                                      );
+                                    }
+                                  },
+                                  onGameStoreTap: controller.openStoreForGame,
+                                  onCollectionTap:
+                                      controller.openCollectionSearch,
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -178,8 +183,6 @@ class _HomeScrollBehavior extends MaterialScrollBehavior {
 
   @override
   ScrollPhysics getScrollPhysics(BuildContext context) {
-    return const BouncingScrollPhysics(
-      parent: AlwaysScrollableScrollPhysics(),
-    );
+    return const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics());
   }
 }

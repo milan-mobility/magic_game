@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/billing_client_wrappers.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
+import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
+import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 import 'package:magic_games/data/pref_helper/shared_pref_helper.dart';
 import 'package:magic_games/helpers/services/premium_access_service.dart';
 import 'package:magic_games/view/base/custom_snack_bar.dart';
@@ -87,7 +89,7 @@ class VipController extends GetxController with WidgetsBindingObserver {
     }
 
     if (plan.trialLabel != null) {
-      return 'Start'.trParams(<String, String>{'trial': plan.trialLabel!.tr});
+      return '${'Start'.tr} ${plan.trialLabel!}';
     }
 
     return 'Subscribe for'.trParams(<String, String>{
@@ -436,25 +438,14 @@ class VipController extends GetxController with WidgetsBindingObserver {
       return plansToDisplay;
     }
 
-    int cheapestIndex = 0;
-    double cheapestPrice = plansToDisplay.first.normalizedYearlyPrice;
-    for (int index = 1; index < plansToDisplay.length; index++) {
-      if (plansToDisplay[index].normalizedYearlyPrice < cheapestPrice) {
-        cheapestPrice = plansToDisplay[index].normalizedYearlyPrice;
-        cheapestIndex = index;
-      }
-    }
-
     return plansToDisplay.asMap().entries.map((
       final MapEntry<int, VipPlanData> entry,
     ) {
-      final int index = entry.key;
       final VipPlanData plan = entry.value;
       final bool isYearlyPlan = plan.title.toLowerCase().contains('year');
 
       return plan.copyWith(
-        badgeName:
-            plan.badgeName ?? (index == cheapestIndex ? 'Best Value'.tr : null),
+        badgeName: isYearlyPlan ? 'Best Value'.tr : null,
         discountLabel: isYearlyPlan
             ? 'save_discount'.trParams(<String, String>{'discount': '50%'})
             : null,
@@ -518,6 +509,9 @@ class VipController extends GetxController with WidgetsBindingObserver {
     }
 
     final String fallbackPeriod = _periodLabelFromTitle(productDetails.title);
+    final String? trialLabel = productDetails is AppStoreProductDetails
+        ? _appStoreTrialLabel(productDetails)
+        : null;
     return VipPlanData(
       planId: productDetails.id,
       productDetails: productDetails,
@@ -528,12 +522,20 @@ class VipController extends GetxController with WidgetsBindingObserver {
         'unit': fallbackPeriod.toLowerCase(),
       }),
       description: productDetails.description,
+      trialLabel: trialLabel,
       sortOrder: _sortOrderFromLabel(fallbackPeriod),
       normalizedYearlyPrice: productDetails.rawPrice,
-      noteLabel: 'Renews at each Cancel anytime.'.trParams(<String, String>{
-        'price': productDetails.price,
-        'period': fallbackPeriod.toLowerCase(),
-      }),
+      badgeName: trialLabel == null ? null : 'Free Trial'.tr,
+      noteLabel: trialLabel == null
+          ? 'Renews at each Cancel anytime.'.trParams(<String, String>{
+              'price': productDetails.price,
+              'period': fallbackPeriod.toLowerCase(),
+            })
+          : 'trial_then_price_period'.trParams(<String, String>{
+              'trial': trialLabel,
+              'price': productDetails.price,
+              'period': fallbackPeriod.toLowerCase(),
+            }),
     );
   }
 
@@ -567,7 +569,10 @@ class VipController extends GetxController with WidgetsBindingObserver {
 
     final String? trialLabel = trialPhase == null
         ? null
-        : _trialLabelFromPeriod(trialPhase.billingPeriod);
+        : _trialLabelFromPeriod(
+            trialPhase.billingPeriod,
+            cycleCount: trialPhase.billingCycleCount,
+          );
     final String noteLabel = trialLabel == null
         ? 'Renews at each Cancel anytime.'.trParams(<String, String>{
             'price': recurringPhase.formattedPrice,
@@ -782,26 +787,75 @@ class VipController extends GetxController with WidgetsBindingObserver {
     return null;
   }
 
-  String _trialLabelFromPeriod(final String billingPeriod) {
+  String _trialLabelFromPeriod(
+    final String billingPeriod, {
+    final int cycleCount = 1,
+  }) {
     final _IsoPeriodParts parts = _parseBillingPeriod(billingPeriod);
+    final int normalizedCycleCount = cycleCount <= 0 ? 1 : cycleCount;
     if (parts.days > 0) {
       return 'count_day_free_trial'.trParams(<String, String>{
-        'count': '${parts.days}',
+        'count': '${parts.days * normalizedCycleCount}',
       });
     }
     if (parts.weeks > 0) {
       return 'count_day_free_trial'.trParams(<String, String>{
-        'count': '${parts.weeks * 7}',
+        'count': '${parts.weeks * 7 * normalizedCycleCount}',
       });
     }
     if (parts.months > 0) {
       return 'count_month_free_trial'.trParams(<String, String>{
-        'count': '${parts.months}',
+        'count': '${parts.months * normalizedCycleCount}',
       });
     }
     if (parts.years > 0) {
       return 'count_year_free_trial'.trParams(<String, String>{
-        'count': '${parts.years}',
+        'count': '${parts.years * normalizedCycleCount}',
+      });
+    }
+    return 'Free trial'.tr;
+  }
+
+  String? _appStoreTrialLabel(final AppStoreProductDetails productDetails) {
+    final SKProductDiscountWrapper? trial =
+        productDetails.skProduct.introductoryPrice;
+    if (trial == null ||
+        trial.paymentMode != SKProductDiscountPaymentMode.freeTrail) {
+      return null;
+    }
+
+    final int unitCount =
+        trial.subscriptionPeriod.numberOfUnits * trial.numberOfPeriods;
+    switch (trial.subscriptionPeriod.unit) {
+      case SKSubscriptionPeriodUnit.day:
+        return _trialLabelFromUnits(days: unitCount);
+      case SKSubscriptionPeriodUnit.week:
+        return _trialLabelFromUnits(days: unitCount * 7);
+      case SKSubscriptionPeriodUnit.month:
+        return _trialLabelFromUnits(months: unitCount);
+      case SKSubscriptionPeriodUnit.year:
+        return _trialLabelFromUnits(years: unitCount);
+    }
+  }
+
+  String _trialLabelFromUnits({
+    final int days = 0,
+    final int months = 0,
+    final int years = 0,
+  }) {
+    if (days > 0) {
+      return 'count_day_free_trial'.trParams(<String, String>{
+        'count': '$days',
+      });
+    }
+    if (months > 0) {
+      return 'count_month_free_trial'.trParams(<String, String>{
+        'count': '$months',
+      });
+    }
+    if (years > 0) {
+      return 'count_year_free_trial'.trParams(<String, String>{
+        'count': '$years',
       });
     }
     return 'Free trial'.tr;

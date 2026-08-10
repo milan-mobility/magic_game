@@ -61,21 +61,22 @@ class ProfileOptionTileWidget extends StatelessWidget {
                 _OptionValue(item: item),
                 SizedBox(width: AppResponsive.space(10)),
               ],
-              isRtl
-                  ? Transform(
-                      alignment: Alignment.center,
-                      transform: Matrix4.rotationY(3.1416),
-                      child: SvgPicture.asset(
+              if (item.onTap != null)
+                isRtl
+                    ? Transform(
+                        alignment: Alignment.center,
+                        transform: Matrix4.rotationY(3.1416),
+                        child: SvgPicture.asset(
+                          Assets.svg.icNext,
+                          width: AppResponsive.space(9),
+                          height: AppResponsive.space(14),
+                        ),
+                      )
+                    : SvgPicture.asset(
                         Assets.svg.icNext,
                         width: AppResponsive.space(9),
                         height: AppResponsive.space(14),
                       ),
-                    )
-                  : SvgPicture.asset(
-                      Assets.svg.icNext,
-                      width: AppResponsive.space(9),
-                      height: AppResponsive.space(14),
-                    ),
             ],
           ),
         ),

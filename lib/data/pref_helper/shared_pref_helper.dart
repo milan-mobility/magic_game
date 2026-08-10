@@ -38,6 +38,22 @@ class SharedPreferenceHelper {
     return _sharedPreference.getBool(PrefKeys.hasPremiumAccess) ?? false;
   }
 
+  Future<void> saveCoins({final int value = 100}) async {
+    await _sharedPreference.setInt(PrefKeys.coins, value);
+  }
+
+  int get getCoins {
+    return _sharedPreference.getInt(PrefKeys.coins) ?? 100;
+  }
+
+  Future<void> saveDiamonds({final int value = 100}) async {
+    await _sharedPreference.setInt(PrefKeys.diamonds, value);
+  }
+
+  int get getDiamonds {
+    return _sharedPreference.getInt(PrefKeys.diamonds) ?? 100;
+  }
+
   Future<void> savePremiumProductId(final String? value) async {
     if (value == null || value.isEmpty) {
       await _sharedPreference.remove(PrefKeys.premiumProductId);

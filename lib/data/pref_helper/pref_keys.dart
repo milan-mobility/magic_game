@@ -16,4 +16,6 @@ class PrefKeys {
   static const String googleProfileUpdatedAt = 'googleProfileUpdatedAt';
   static const String favoriteEventCount = 'favoriteEventCount';
   static const String recentlyPlayedGameKeys = 'recentlyPlayedGameKeys';
+  static const String coins = 'coins';
+  static const String diamonds = 'diamonds';
 }
