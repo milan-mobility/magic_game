@@ -6,6 +6,7 @@ import 'package:magic_games/view/screens/home/home_screen.dart';
 import 'package:magic_games/view/screens/language/language_screen.dart';
 import 'package:magic_games/view/screens/profile/profile_screen.dart';
 import 'package:magic_games/view/screens/search_games/search_game_screen.dart';
+import 'package:magic_games/view/screens/shop/shop_screen.dart';
 import 'package:magic_games/view/screens/splash/splash_screen.dart';
 import 'package:magic_games/view/screens/vip/vip_screen.dart';
 import 'package:magic_games/view/screens/welcome_screen/welcome_screen.dart';
@@ -19,6 +20,7 @@ class RouteHelper {
   static const String profile = '/profile';
   static const String language = '/language';
   static const String vip = '/vip';
+  static const String shop = '/shop';
   static const String commonWebView = '/commonWebView';
 
   static List<GetPage<dynamic>> routes = <GetPage<dynamic>>[
@@ -39,6 +41,7 @@ class RouteHelper {
     GetPage<dynamic>(name: profile, page: () => getRoute(ProfileScreen())),
     GetPage<dynamic>(name: language, page: () => getRoute(LanguageScreen())),
     GetPage<dynamic>(name: vip, page: () => getRoute(VipScreen())),
+    GetPage<dynamic>(name: shop, page: () => getRoute(ShopScreen())),
     GetPage<dynamic>(
       name: commonWebView,
       page: () => getRoute(CommonWebview()),

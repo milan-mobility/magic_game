@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/extensions/parsing.dart';
 import 'package:magic_games/helpers/extensions/string_ext.dart';
+import 'package:magic_games/helpers/services/auth_service.dart';
 import 'package:magic_games/helpers/services/google_leaderboard_service.dart';
 import 'package:magic_games/helpers/services/premium_access_service.dart';
 import 'package:magic_games/helpers/services/remote_config.dart';
@@ -34,6 +36,7 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
       Get.find<SharedPreferenceHelper>();
   final PremiumAccessService _premiumAccessService =
       Get.find<PremiumAccessService>();
+  final AuthService _authService = Get.find<AuthService>();
   final Set<String> _preloadedExitPreviewImageUrls = <String>{};
 
   late WebViewController webViewController;
@@ -493,9 +496,6 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
         await _recordCurrentGameAsRecentlyPlayed();
         break;
 
-      case 'saveData':
-        break;
-
       case 'getCoin':
         await _sendCallbackToJs(
           'gamecoins:${_sharedPreferenceHelper.getCoins}',
@@ -503,8 +503,12 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
         break;
 
       case 'updateCoin':
-        _sharedPreferenceHelper.saveCoins(
+        debugPrint("updateCoinTushar${webMessage.payload}");
+        await _sharedPreferenceHelper.saveCoins(
           value: SafeParse.toIntValue(webMessage.payload) ?? 100,
+        );
+        await _sendCallbackToJs(
+          'gamecoins:${_sharedPreferenceHelper.getCoins}',
         );
         break;
 
@@ -515,8 +519,11 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
         break;
 
       case 'updateDiamond':
-        _sharedPreferenceHelper.saveDiamonds(
+        await _sharedPreferenceHelper.saveDiamonds(
           value: SafeParse.toIntValue(webMessage.payload) ?? 100,
+        );
+        await _sendCallbackToJs(
+          'gamediamonds:${_sharedPreferenceHelper.getDiamonds}',
         );
         break;
 
@@ -548,6 +555,76 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
 
       case 'closeApp':
         await closeGameDetailScreen();
+        break;
+
+      case 'saveData':
+        debugPrint('saveData: ${webMessage.payload}');
+        if (!_authService.isLoggedIn) {
+          debugPrint('Skipping saveData: User is not logged in.');
+          break;
+        }
+        try {
+          final Map<String, dynamic> data = jsonDecode(webMessage.payload);
+          final String userId = _authService.currentUser!.uid;
+          unawaited(saveGameData(userId: userId, json: data));
+        } catch (e) {
+          debugPrint('Error saving game data: $e');
+        }
+        break;
+
+      case 'readData':
+        debugPrint('readData: ${webMessage.payload}');
+        if (!_authService.isLoggedIn) {
+          debugPrint('Skipping readData: User is not logged in.');
+          await _sendCallbackToJs('readData:{}');
+          break;
+        }
+        try {
+          final Map<String, dynamic> payload = jsonDecode(webMessage.payload);
+          final String userId = _authService.currentUser!.uid;
+          final String appName = payload['appname'] as String;
+          final String documentName = payload['documentname'] as String;
+          final Map<String, dynamic>? data = await readGameData(
+            userId: userId,
+            appName: appName,
+            documentName: documentName,
+          );
+          await _sendCallbackToJs(
+            'readData:${jsonEncode(data ?? <String, dynamic>{})}',
+          );
+        } catch (e) {
+          debugPrint('Error reading game data: $e');
+        }
+        break;
+
+      case 'readAllDocuments':
+        debugPrint('readAllDocuments: ${webMessage.payload}');
+        if (!_authService.isLoggedIn) {
+          debugPrint('Skipping readAllDocuments: User is not logged in.');
+          await _sendCallbackToJs('readAllDocuments:{}');
+          break;
+        }
+        try {
+          final Map<String, dynamic> payload = jsonDecode(webMessage.payload);
+          final String userId = _authService.currentUser!.uid;
+          final String appName = payload['appname'] as String;
+          final Map<String, dynamic> data = await getAllGameData(
+            userId: userId,
+            appName: appName,
+          );
+          await _sendCallbackToJs('readAllDocuments:${jsonEncode(data)}');
+        } catch (e) {
+          debugPrint('Error reading all game data: $e');
+        }
+        break;
+      case "openShop":
+        Get.toNamed(RouteHelper.shop);
+        break;
+
+      case "closeShop":
+        if (Get.currentRoute == RouteHelper.shop) {
+          Get.back();
+        }
         break;
 
       default:
@@ -662,6 +739,61 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
     await FirebaseAnalytics.instance.logEvent(name: name);
   }
 
+  Future<void> saveGameData({
+    required String userId,
+    required Map<String, dynamic> json,
+  }) async {
+    final appName = json['appname'] as String;
+    final documentName = json['documentname'] as String;
+    final data = Map<String, dynamic>.from(json['data']);
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('games')
+        .doc(appName)
+        .collection('documents')
+        .doc(documentName)
+        .set(data, SetOptions(merge: true));
+  }
+
+  Future<Map<String, dynamic>?> readGameData({
+    required String userId,
+    required String appName,
+    required String documentName,
+  }) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('games')
+        .doc(appName)
+        .collection('documents')
+        .doc(documentName)
+        .get();
+    return doc.exists ? doc.data() : null;
+  }
+
+  Future<Map<String, dynamic>> getAllGameData({
+    required String userId,
+    required String appName,
+  }) async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('games')
+        .doc(appName)
+        .collection('documents')
+        .get();
+
+    final result = <String, dynamic>{};
+
+    for (final doc in snapshot.docs) {
+      result[doc.id] = doc.data();
+    }
+
+    return result;
+  }
+
   Future<void> _recordCurrentGameAsRecentlyPlayed() async {
     if (games == null) {
       return;
@@ -697,6 +829,13 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
     }
 
     return null;
+  }
+
+  Future<void> sendBalanceUpdateToJs() async {
+    await _sendCallbackToJs('gamecoins:${_sharedPreferenceHelper.getCoins}');
+    await _sendCallbackToJs(
+      'gamediamonds:${_sharedPreferenceHelper.getDiamonds}',
+    );
   }
 
   Future<void> _sendCallbackToJs(final String event) async {
