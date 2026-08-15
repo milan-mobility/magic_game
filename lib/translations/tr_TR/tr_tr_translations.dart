@@ -162,5 +162,10 @@ final Map<String, String> trTr = <String, String>{
   'About This Game': 'Bu Oyun Hakkında',
   'You May Like This': 'Bunları da Beğenebilirsiniz',
   'Rate Us': 'Bizi Değerlendir',
+  'Coin Pack': 'Jeton Paketi',
+  'Diamond Pack': 'Elmas Paketi',
+  'Shop': 'Mağaza',
+  'Buy coins and diamonds': 'Jeton ve elmas satın al',
+  'Loading...': 'Yükleniyor...',
   'Support us with 5 stars!': 'Bizi 5 yıldızla destekleyin! ⭐',
 };

@@ -163,5 +163,10 @@ final Map<String, String> nlNl = <String, String>{
   'About This Game': 'Over dit spel',
   'You May Like This': 'Misschien vind je dit ook leuk',
   'Rate Us': 'Beoordeel ons',
+  'Coin Pack': 'Muntenpakket',
+  'Diamond Pack': 'Diamantenpakket',
+  'Shop': 'Winkel',
+  'Buy coins and diamonds': 'Koop munten en diamanten',
+  'Loading...': 'Laden...',
   'Support us with 5 stars!': 'Steun ons met 5 sterren! ⭐',
 };

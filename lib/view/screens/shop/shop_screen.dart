@@ -38,7 +38,11 @@ class ShopScreen extends StatelessWidget {
                               child: _buildShopItem(
                                 icon: Assets.png.shop.icCoin1,
                                 amount: '500',
-                                price: _getPrice(controller, ShopController.coinPack1, '\$ 0.99'),
+                                price: _getPrice(
+                                  controller,
+                                  ShopController.coinPack1,
+                                  '\$ 0.99',
+                                ),
                                 onTap: () => controller.buyCoins(500),
                               ),
                             ),
@@ -47,7 +51,11 @@ class ShopScreen extends StatelessWidget {
                               child: _buildShopItem(
                                 icon: Assets.png.shop.icCoin2,
                                 amount: '4000',
-                                price: _getPrice(controller, ShopController.coinPack2, '\$ 4.99'),
+                                price: _getPrice(
+                                  controller,
+                                  ShopController.coinPack2,
+                                  '\$ 4.99',
+                                ),
                                 onTap: () => controller.buyCoins(4000),
                               ),
                             ),
@@ -62,7 +70,11 @@ class ShopScreen extends StatelessWidget {
                               child: _buildShopItem(
                                 icon: Assets.png.shop.icDiamond1,
                                 amount: '100',
-                                price: _getPrice(controller, ShopController.diamondPack1, '\$ 0.99'),
+                                price: _getPrice(
+                                  controller,
+                                  ShopController.diamondPack1,
+                                  '\$ 0.99',
+                                ),
                                 onTap: () => controller.buyDiamonds(100),
                               ),
                             ),
@@ -71,7 +83,11 @@ class ShopScreen extends StatelessWidget {
                               child: _buildShopItem(
                                 icon: Assets.png.shop.icDiamond2,
                                 amount: '800',
-                                price: _getPrice(controller, ShopController.diamondPack2, '\$ 4.99'),
+                                price: _getPrice(
+                                  controller,
+                                  ShopController.diamondPack2,
+                                  '\$ 4.99',
+                                ),
                                 onTap: () => controller.buyDiamonds(800),
                               ),
                             ),
@@ -90,8 +106,14 @@ class ShopScreen extends StatelessWidget {
     );
   }
 
-  String _getPrice(ShopController controller, String productId, String fallback) {
-    final ProductDetails? product = controller.products.firstWhereOrNull((p) => p.id == productId);
+  String _getPrice(
+    ShopController controller,
+    String productId,
+    String fallback,
+  ) {
+    final ProductDetails? product = controller.products.firstWhereOrNull(
+      (p) => p.id == productId,
+    );
     return product?.price ?? fallback;
   }
 
@@ -132,14 +154,19 @@ class ShopScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBalanceItem({required AssetGenImage icon, required RxInt value}) {
+  Widget _buildBalanceItem({
+    required AssetGenImage icon,
+    required RxInt value,
+  }) {
     return Container(
       height: 36,
       padding: const EdgeInsets.only(left: 4, right: 12),
       decoration: BoxDecoration(
         color: const Color(0xFF1C153F),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF7433F9).withValues(alpha: 0.3)),
+        border: Border.all(
+          color: const Color(0xFF7433F9).withValues(alpha: 0.3),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -171,7 +198,7 @@ class ShopScreen extends StatelessWidget {
                 style: TextStyle(color: AppColors.colorED2EAA, fontSize: 16),
               ),
               Text(
-                title,
+                title.tr,
                 style: poppinsW700.copyWith(
                   fontSize: 18,
                   color: AppColors.colorED2EAA,
@@ -215,10 +242,7 @@ class ShopScreen extends StatelessWidget {
               color: const Color(0xFF140B3B),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Text(
-              amount,
-              style: poppinsW700.copyWith(fontSize: 15),
-            ),
+            child: Text(amount, style: poppinsW700.copyWith(fontSize: 15)),
           ),
           const Gap(15),
           GestureDetector(
@@ -231,10 +255,7 @@ class ShopScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Center(
-                child: Text(
-                  price,
-                  style: poppinsW700.copyWith(fontSize: 16),
-                ),
+                child: Text(price, style: poppinsW700.copyWith(fontSize: 16)),
               ),
             ),
           ),

@@ -168,5 +168,10 @@ final Map<String, String> frFr = <String, String>{
   'About This Game': 'À propos de ce jeu',
   'You May Like This': 'Vous pourriez aimer ceci',
   'Rate Us': 'Notez-nous',
+  'Coin Pack': 'Pack de pièces',
+  'Diamond Pack': 'Pack de diamants',
+  'Shop': 'Boutique',
+  'Buy coins and diamonds': 'Achetez des pièces et des diamants',
+  'Loading...': 'Chargement...',
   'Support us with 5 stars!': 'Soutenez-nous avec 5 étoiles ! ⭐',
 };

@@ -167,5 +167,10 @@ final Map<String, String> deDe = <String, String>{
   'About This Game': 'Über dieses Spiel',
   'You May Like This': 'Das könnte dir gefallen',
   'Rate Us': 'Bewerte uns',
+  'Coin Pack': 'Münzpaket',
+  'Diamond Pack': 'Diamantpaket',
+  'Shop': 'Shop',
+  'Buy coins and diamonds': 'Münzen und Diamanten kaufen',
+  'Loading...': 'Wird geladen...',
   'Support us with 5 stars!': 'Unterstütze uns mit 5 Sternen! ⭐',
 };

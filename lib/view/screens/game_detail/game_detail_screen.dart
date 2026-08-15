@@ -126,7 +126,7 @@ class GameDetailScreen extends StatelessWidget {
                                               ),
                                           Gap(AppResponsive.space(28)),
                                           Text(
-                                            'Loading...',
+                                            'Loading...'.tr,
                                             style: poppinsW700.copyWith(
                                               fontSize: AppResponsive.space(26),
                                               color: AppColors.white,

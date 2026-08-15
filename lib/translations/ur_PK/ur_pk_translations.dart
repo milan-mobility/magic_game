@@ -163,5 +163,10 @@ final Map<String, String> urPk = <String, String>{
   'About This Game': 'اس گیم کے بارے میں',
   'You May Like This': 'آپ کو یہ پسند آ سکتا ہے',
   'Rate Us': 'ہمیں ریٹ کریں',
+  'Coin Pack': 'سکے پیک',
+  'Diamond Pack': 'ہیروں کا پیک',
+  'Shop': 'دکان',
+  'Buy coins and diamonds': 'سکے اور ہیرے خریدیں',
+  'Loading...': 'لوڈ ہو رہا ہے...',
   'Support us with 5 stars!': 'ہماری 5 ستاروں کے ساتھ حمایت کریں! ⭐',
 };

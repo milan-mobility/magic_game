@@ -151,5 +151,10 @@ final Map<String, String> jaJp = <String, String>{
   'About This Game': 'このゲームについて',
   'You May Like This': 'あなたへのおすすめ',
   'Rate Us': '評価してください',
+  'Coin Pack': 'コインパック',
+  'Diamond Pack': 'ダイヤモンドパック',
+  'Shop': 'ショップ',
+  'Buy coins and diamonds': 'コインとダイヤモンドを購入',
+  'Loading...': '読み込み中...',
   'Support us with 5 stars!': '星5つで応援してください！ ⭐',
 };

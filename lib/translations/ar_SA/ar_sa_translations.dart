@@ -160,5 +160,10 @@ final Map<String, String> arSa = <String, String>{
   'About This Game': 'حول هذه اللعبة',
   'You May Like This': 'قد يعجبك هذا',
   'Rate Us': 'قيّمنا',
+  'Coin Pack': 'حزمة العملات',
+  'Diamond Pack': 'حزمة الألماس',
+  'Shop': 'المتجر',
+  'Buy coins and diamonds': 'اشترِ العملات والألماس',
+  'Loading...': 'جارٍ التحميل...',
   'Support us with 5 stars!': 'ادعمنا بـ 5 نجوم! ⭐',
 };

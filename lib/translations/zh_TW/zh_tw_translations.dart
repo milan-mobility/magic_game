@@ -145,5 +145,10 @@ final Map<String, String> zhTw = <String, String>{
   'About This Game': '關於這款遊戲',
   'You May Like This': '你可能會喜歡這個',
   'Rate Us': '為我們評分',
+  'Coin Pack': '金幣包',
+  'Diamond Pack': '鑽石包',
+  'Shop': '商店',
+  'Buy coins and diamonds': '購買金幣和鑽石',
+  'Loading...': '載入中...',
   'Support us with 5 stars!': '用 5 星支持我們！ ⭐',
 };

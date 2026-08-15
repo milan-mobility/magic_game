@@ -92,20 +92,18 @@ class ProfileController extends GetxController {
         ProfileOptionSectionData(
           title: 'Preferences',
           items: <ProfileOptionItemData>[
-            // ProfileOptionItemData(
-            //   title: 'Appearance',
-            //   subtitle: 'Choose your theme',
-            //   iconAsset: 'assets/svg/ic_star.svg',
-            //   valueText: appearanceLabel,
-            //   valueStyle: ProfileOptionValueStyle.badge,
-            //   onTap: onAppearanceTap,
-            // ),
             ProfileOptionItemData(
               title: 'Language',
               subtitle: 'Change app language',
               iconAsset: Assets.svg.icLanguage,
               valueText: languageLabel,
               onTap: onLanguageTap,
+            ),
+            ProfileOptionItemData(
+              title: 'Shop',
+              subtitle: 'Buy coins and diamonds',
+              iconAsset: 'assets/svg/ic_shop.svg',
+              onTap: onShopTap,
             ),
           ],
         ),
@@ -252,14 +250,8 @@ class ProfileController extends GetxController {
     }
   }
 
-  void onAppearanceTap() {
-    appearanceLabel = appearanceLabel == 'Dark' ? 'Light' : 'Dark';
-    update();
-    showSuccessSnackBar(
-      message: 'Appearance switched to'.trParams(<String, String>{
-        'value': appearanceLabel.tr,
-      }),
-    );
+  void onShopTap() {
+    Get.toNamed(RouteHelper.shop);
   }
 
   Future<void> onLanguageTap() async {

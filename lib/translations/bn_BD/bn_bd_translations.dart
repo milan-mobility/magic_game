@@ -160,5 +160,10 @@ final Map<String, String> bnBd = <String, String>{
   'About This Game': 'এই গেম সম্পর্কে',
   'You May Like This': 'আপনার এটি ভালো লাগতে পারে',
   'Rate Us': 'আমাদের রেট দিন',
+  'Coin Pack': 'কয়েন প্যাক',
+  'Diamond Pack': 'ডায়মন্ড প্যাক',
+  'Shop': 'দোকান',
+  'Buy coins and diamonds': 'কয়েন ও ডায়মন্ড কিনুন',
+  'Loading...': 'লোড হচ্ছে...',
   'Support us with 5 stars!': '৫ তারকা দিয়ে আমাদের সমর্থন করুন! ⭐',
 };

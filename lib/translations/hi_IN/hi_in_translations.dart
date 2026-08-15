@@ -160,5 +160,10 @@ final Map<String, String> hiIn = <String, String>{
   'About This Game': 'इस गेम के बारे में',
   'You May Like This': 'आपको यह पसंद आ सकता है',
   'Rate Us': 'हमें रेट करें',
+  'Coin Pack': 'कॉइन पैक',
+  'Diamond Pack': 'डायमंड पैक',
+  'Shop': 'दुकान',
+  'Buy coins and diamonds': 'सिक्के और हीरे खरीदें',
+  'Loading...': 'लोड हो रहा है...',
   'Support us with 5 stars!': 'हमें 5 स्टार देकर समर्थन करें! ⭐',
 };

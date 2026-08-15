@@ -162,5 +162,10 @@ final Map<String, String> ruRu = <String, String>{
   'About This Game': 'Об этой игре',
   'You May Like This': 'Вам может понравиться',
   'Rate Us': 'Оцените нас',
+  'Coin Pack': 'Набор монет',
+  'Diamond Pack': 'Набор алмазов',
+  'Shop': 'Магазин',
+  'Buy coins and diamonds': 'Купить монеты и алмазы',
+  'Loading...': 'Загрузка...',
   'Support us with 5 stars!': 'Поддержите нас 5 звездами! ⭐',
 };

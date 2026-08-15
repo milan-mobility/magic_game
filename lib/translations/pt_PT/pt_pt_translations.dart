@@ -166,5 +166,10 @@ final Map<String, String> ptPt = <String, String>{
   'About This Game': 'Sobre este jogo',
   'You May Like This': 'Também poderá gostar disto',
   'Rate Us': 'Avalie-nos',
+  'Coin Pack': 'Pacote de moedas',
+  'Diamond Pack': 'Pacote de diamantes',
+  'Shop': 'Loja',
+  'Buy coins and diamonds': 'Compre moedas e diamantes',
+  'Loading...': 'A carregar...',
   'Support us with 5 stars!': 'Apoie-nos com 5 estrelas! ⭐',
 };

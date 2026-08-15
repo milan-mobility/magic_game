@@ -145,5 +145,10 @@ final Map<String, String> zhCn = <String, String>{
   'About This Game': '关于这款游戏',
   'You May Like This': '你可能会喜欢这个',
   'Rate Us': '给我们评分',
+  'Coin Pack': '金币包',
+  'Diamond Pack': '钻石包',
+  'Shop': '商店',
+  'Buy coins and diamonds': '购买金币和钻石',
+  'Loading...': '加载中...',
   'Support us with 5 stars!': '用 5 星支持我们！ ⭐',
 };
