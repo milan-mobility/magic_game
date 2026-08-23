@@ -116,104 +116,74 @@ class GameDetailPortraitScreen extends StatelessWidget {
                         ],
                       );
 
-                      final double topBannerHeight = shouldShowTopBanner
-                          ? controller.bannerHeight
-                          : 0;
-                      final double bottomBannerHeight = shouldShowBottomBanner
-                          ? controller.bannerHeight
-                          : 0;
-                      final double portraitExitTop = 0;
-                      final double gameContentTop =
-                          topBannerHeight +
-                          (shouldShowExitButton
-                              ? exitStripHeight -
-                                    (shouldShowTopBanner
-                                        ? GetPlatform.isIOS
-                                              ? -10
-                                              : 20
-                                        : -5)
-                              : 0);
-                      // In portrait, keep the interactive elements in a
-                      // strict vertical order: exit strip, WebView, then ad.
-                      // This prevents either native overlay from covering the
-                      // game on Android or iOS.
-                      final double portraitWebViewTop = shouldShowExitButton
-                          ? portraitExitTop + exitStripHeight
-                          : safeArea.top;
-                      final double minimumWebViewTop =
-                          gameContentTop > portraitWebViewTop
-                          ? gameContentTop
-                          : portraitWebViewTop;
-                      final double webViewTop = minimumWebViewTop > safeArea.top
-                          ? minimumWebViewTop
-                          : safeArea.top;
-                      final double webViewBottom = controller.isBannerVisible
-                          ? safeArea.bottom +
-                                (GetPlatform.isAndroid
-                                    ? AppResponsive.value(70)
-                                    : AppResponsive.value(30))
-                          : safeArea.bottom +
-                                bottomBannerHeight; //TODO safeArea.bottom +
-                      final Widget gameContent = Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Positioned.fill(
-                            top: webViewTop,
-                            right: safeArea.right,
-                            bottom: webViewBottom,
-                            left: safeArea.left,
-                            child: webViewContent,
-                          ),
-                          if (shouldShowTopBanner)
-                            Positioned(
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              child: SizedBox(
-                                width: controller.bannerAd!.size.width
-                                    .toDouble(),
-                                height: controller.bannerHeight,
-                                child: AdWidget(ad: controller.bannerAd!),
-                              ),
-                            ),
-                          if (shouldShowBottomBanner)
-                            Positioned(
-                              left: 0,
-                              right: 0,
-                              // Portrait system navigation bars can overlay
-                              // the window (for example Vivo's three-button
-                              // mode). Keep the ad above that inset.
-                              bottom: 20, //TODO safeArea.bottom
-                              child: SizedBox(
-                                width: controller.bannerAd!.size.width
-                                    .toDouble(),
-                                height: controller.bannerHeight,
-                                child: AdWidget(ad: controller.bannerAd!),
-                              ),
-                            ),
-                        ],
-                      );
-
                       return Stack(
                         fit: StackFit.expand,
                         children: [
-                          Positioned.fill(child: gameContent),
-                          if (shouldShowExitButton)
-                            Positioned(
-                              top: portraitExitTop,
-                              left: 0,
-                              right: 0,
-                              height: exitStripHeight,
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 20),
-                                child: Align(
-                                  alignment: Alignment.topRight,
-                                  child: _ExitButton(
-                                    onTap: controller.showExitOverlay,
+                          Column(
+                            children: [
+                              Gap(AppResponsive.value(10)),
+                              if (shouldShowExitButton)
+                                SizedBox(
+                                  height: exitStripHeight,
+                                  width: double.infinity,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 20),
+                                    child: Align(
+                                      alignment: Alignment.topRight,
+                                      child: _ExitButton(
+                                        onTap: controller.showExitOverlay,
+                                      ),
+                                    ),
                                   ),
                                 ),
+                              if (shouldShowTopBanner)
+                                Center(
+                                  child: SizedBox(
+                                    width: controller.bannerAd!.size.width
+                                        .toDouble(),
+                                    height: controller.bannerHeight,
+                                    child: AdWidget(ad: controller.bannerAd!),
+                                  ),
+                                ),
+                              Gap(AppResponsive.value(10)),
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                    top: shouldShowExitButton
+                                        ? 0
+                                        : safeArea.top,
+                                    right: safeArea.right,
+                                    bottom: shouldShowBottomBanner
+                                        ? AppResponsive.value(
+                                            5,
+                                            tablet: 8,
+                                            largeTablet: 12,
+                                          )
+                                        : safeArea.bottom,
+                                    left: safeArea.left,
+                                  ),
+                                  child: webViewContent,
+                                ),
                               ),
-                            ),
+                              if (shouldShowBottomBanner)
+                                Padding(
+                                  // Portrait system navigation bars can overlay
+                                  // the window (for example Vivo's three-button
+                                  // mode). Keep the ad above that inset.
+                                  padding: EdgeInsets.only(
+                                    bottom: safeArea.bottom,
+                                  ),
+                                  child: Center(
+                                    child: SizedBox(
+                                      width: controller.bannerAd!.size.width
+                                          .toDouble(),
+                                      height: controller.bannerHeight,
+                                      child: AdWidget(ad: controller.bannerAd!),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                           if (controller.isExitOverlayVisible)
                             Positioned.fill(
                               child: GameExitOverlay(
