@@ -32,6 +32,8 @@ import 'package:magic_games/view/screens/profile/controller/profile_controller.d
 import 'package:webview_flutter/webview_flutter.dart';
 
 class GameDetailController extends GetxController with WidgetsBindingObserver {
+  static const int _maxBannerLoadAttempts = 3;
+
   final SharedPreferenceHelper _sharedPreferenceHelper =
       Get.find<SharedPreferenceHelper>();
   final PremiumAccessService _premiumAccessService =
@@ -49,6 +51,8 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   Orientation? _bannerOrientation;
   int? _loadedBannerWidth;
   Orientation? _loadedBannerOrientation;
+  int _bannerLoadGeneration = 0;
+  int _bannerLoadAttempts = 0;
   bool _isClosingScreen = false;
   bool isGameLoading = true;
   bool isExitOverlayVisible = false;
@@ -427,9 +431,11 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
         break;
 
       case 'showBanner':
+        debugPrint('MILAN => showBanner()');
         await _showBanner();
         break;
       case 'hideBanner':
+        debugPrint('MILAN => hideBanner()');
         _hideBanner();
         break;
 
@@ -866,7 +872,12 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> _restoreImmersiveMode() async {
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    // Keep Android system-bar insets available while a game is open. Some
+    // devices (notably Vivo/Oppo in three-button navigation mode) overlay the
+    // navigation bar after immersive mode has reported a zero bottom inset.
+    // The screen positions only the WebView inside those insets; ads and game
+    // controls can still render edge-to-edge.
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   }
 
   void _scheduleImmersiveModeRestore() {
@@ -1011,6 +1022,9 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
       return;
     }
 
+    if (!_isBannerRequestedVisible) {
+      _bannerLoadAttempts = 0;
+    }
     _isBannerRequestedVisible = true;
 
     if (_hasBannerForCurrentViewport) {
@@ -1037,6 +1051,8 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
       return;
     }
 
+    final int bannerLoadGeneration = ++_bannerLoadGeneration;
+    _bannerLoadAttempts++;
     _isBannerLoading = true;
     _loadedBannerWidth = null;
     _loadedBannerOrientation = null;
@@ -1054,6 +1070,10 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
       );
     }
 
+    if (bannerLoadGeneration != _bannerLoadGeneration) {
+      return;
+    }
+
     if (!_isBannerRequestedVisible) {
       _isBannerLoading = false;
       update();
@@ -1068,6 +1088,10 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
       return;
     }
 
+    if (bannerLoadGeneration != _bannerLoadGeneration) {
+      return;
+    }
+
     if (_bannerWidth != bannerWidth ||
         _bannerOrientation != bannerOrientation) {
       _isBannerLoading = false;
@@ -1077,6 +1101,10 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
     }
 
     final AdRequest request = await ConsentManager.instance.getAdRequest();
+
+    if (bannerLoadGeneration != _bannerLoadGeneration) {
+      return;
+    }
 
     if (!_isBannerRequestedVisible) {
       _isBannerLoading = false;
@@ -1091,6 +1119,11 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
       listener: BannerAdListener(
         onAdLoaded: (final Ad ad) {
           final BannerAd loadedBanner = ad as BannerAd;
+
+          if (bannerLoadGeneration != _bannerLoadGeneration) {
+            loadedBanner.dispose();
+            return;
+          }
 
           if (!_isBannerRequestedVisible ||
               _bannerWidth != bannerWidth ||
@@ -1108,15 +1141,36 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
           _bannerAd = loadedBanner;
           _loadedBannerWidth = bannerWidth;
           _loadedBannerOrientation = bannerOrientation;
+          _bannerLoadAttempts = 0;
           update();
         },
         onAdFailedToLoad: (final Ad ad, final LoadAdError error) {
+          if (bannerLoadGeneration != _bannerLoadGeneration) {
+            ad.dispose();
+            return;
+          }
+
           _isBannerLoading = false;
           ad.dispose();
           _bannerAd = null;
-          _isBannerRequestedVisible = false;
           debugPrint('Banner ad failed to load: $error');
           update();
+
+          if (_bannerLoadAttempts >= _maxBannerLoadAttempts) {
+            _isBannerRequestedVisible = false;
+            update();
+            return;
+          }
+
+          unawaited(
+            Future<void>.delayed(const Duration(seconds: 2), () {
+              if (!_isBannerRequestedVisible ||
+                  bannerLoadGeneration != _bannerLoadGeneration) {
+                return;
+              }
+              unawaited(_loadAdaptiveBanner());
+            }),
+          );
         },
       ),
     );
@@ -1125,7 +1179,7 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   }
 
   void _hideBanner({bool resetAlignment = false}) {
-    _isBannerRequestedVisible = false;
+    _disposeBannerAd();
     if (resetAlignment) {
       _bannerAlignment = _BannerAlignment.top;
     }
@@ -1143,10 +1197,14 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   }
 
   void _disposeBannerAd() {
+    _bannerLoadGeneration++;
     _bannerAd?.dispose();
     _bannerAd = null;
     _isBannerLoading = false;
     _isBannerRequestedVisible = false;
+    _bannerLoadAttempts = 0;
+    _loadedBannerWidth = null;
+    _loadedBannerOrientation = null;
   }
 
   Set<String> _tokenizeCategoryValues(final String? value) {
