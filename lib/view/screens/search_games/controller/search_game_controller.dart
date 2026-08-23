@@ -64,7 +64,7 @@ class SearchGameController extends GetxController {
 
   void openGame(final Games game) {
     Get.toNamed(
-      RouteHelper.gameDetail,
+      RouteHelper.gameDetailRoute(game),
       arguments: <String, dynamic>{'game': game},
     );
   }
