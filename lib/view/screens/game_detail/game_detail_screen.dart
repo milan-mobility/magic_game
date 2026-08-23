@@ -56,21 +56,15 @@ class GameDetailScreen extends StatelessWidget {
 
                     await controller.handleSystemBack();
                   },
-              child: SafeArea(
-                top: false,
-                bottom: false,
-                left: false,
-                right: isLandscape
-                    ? GetPlatform.isIOS
-                          ? false
-                          : true
-                    : true,
-                child: LayoutBuilder(
+              child: LayoutBuilder(
                   builder:
                       (
                         final BuildContext context,
                         final BoxConstraints constraints,
                       ) {
+                        final EdgeInsets safeArea = MediaQuery.paddingOf(
+                          context,
+                        );
                         final double viewportWidth = constraints.maxWidth;
                         final Orientation viewportOrientation = MediaQuery.of(
                           context,
@@ -171,12 +165,25 @@ class GameDetailScreen extends StatelessWidget {
                                             ? -30
                                             : 40
                                       : 0);
+                        // Keep the WebView clear of every system inset without
+                        // adding extra space when the banner or exit control
+                        // already reserves that edge. Ads and controls remain
+                        // free to extend into the inset.
+                        final double webViewTop = gameContentTop > safeArea.top
+                            ? gameContentTop
+                            : safeArea.top;
+                        final double webViewBottom =
+                            gameContentBottom > safeArea.bottom
+                            ? gameContentBottom
+                            : safeArea.bottom;
                         final Widget gameContent = Stack(
                           fit: StackFit.expand,
                           children: [
                             Positioned.fill(
-                              top: gameContentTop,
-                              bottom: gameContentBottom,
+                              top: webViewTop,
+                              right: safeArea.right,
+                              bottom: webViewBottom,
+                              left: safeArea.left,
                               child: webViewContent,
                             ),
                             if (shouldShowTopBanner)
@@ -287,7 +294,6 @@ class GameDetailScreen extends StatelessWidget {
                         );
                       },
                 ),
-              ),
             );
           },
         ),
