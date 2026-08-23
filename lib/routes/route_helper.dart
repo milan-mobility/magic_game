@@ -16,6 +16,7 @@ class RouteHelper {
   static const String welcomeScreen = '/welcomeScreen';
   static const String home = '/home';
   static const String gameDetail = '/gameDetail';
+  static const String gameDetailPortrait = '/gameDetailPortrait';
   static const String searchGames = '/searchGames';
   static const String profile = '/profile';
   static const String language = '/language';
