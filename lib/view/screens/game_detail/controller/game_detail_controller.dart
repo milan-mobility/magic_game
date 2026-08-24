@@ -386,6 +386,7 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
 
         if (_isShowingInterstitial) return;
         _isShowingInterstitial = true;
+        await _lockLandscapeForFullscreenAd();
         _sendCallbackToJs('GamePause');
         final shownI = AdService.showInterstitial(
           adUnitId: _currentInterstitialAdUnitId,
@@ -410,6 +411,7 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
 
         if (_isShowingRewarded) return;
         _isShowingRewarded = true;
+        await _lockLandscapeForFullscreenAd();
         _sendCallbackToJs('GamePause');
         final shownR = AdService.showRewardedAd(
           adUnitId: _currentRewardedAdUnitId,
@@ -878,6 +880,14 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
       SystemUiMode.manual,
       overlays: <SystemUiOverlay>[SystemUiOverlay.bottom],
     );
+  }
+
+  Future<void> _lockLandscapeForFullscreenAd() async {
+    await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    await _restoreImmersiveMode();
   }
 
   void _scheduleImmersiveModeRestore() {

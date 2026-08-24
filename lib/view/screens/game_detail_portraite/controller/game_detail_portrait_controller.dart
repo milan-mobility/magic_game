@@ -52,6 +52,7 @@ class GameDetailPortraitController extends GetxController
   Orientation? _bannerOrientation;
   int? _loadedBannerWidth;
   Orientation? _loadedBannerOrientation;
+  int? _loadedBannerHeight;
   int _bannerLoadGeneration = 0;
   int _bannerLoadAttempts = 0;
   bool _isClosingScreen = false;
@@ -84,7 +85,8 @@ class GameDetailPortraitController extends GetxController
 
   bool get shouldShowLoadingOverlay => isGameLoading && !_isClosingScreen;
 
-  double get bannerHeight => bannerAd?.size.height.toDouble() ?? 0;
+  double get bannerHeight =>
+      _loadedBannerHeight?.toDouble() ?? bannerAd?.size.height.toDouble() ?? 0;
 
   void syncBannerViewport({required final double width}) {
     final int viewportWidth = width.truncate();
@@ -1039,6 +1041,7 @@ class GameDetailPortraitController extends GetxController
     _isBannerLoading = true;
     _loadedBannerWidth = null;
     _loadedBannerOrientation = null;
+    _loadedBannerHeight = null;
     _bannerAd?.dispose();
     _bannerAd = null;
     update();
@@ -1126,6 +1129,7 @@ class GameDetailPortraitController extends GetxController
           _loadedBannerOrientation = bannerOrientation;
           _bannerLoadAttempts = 0;
           update();
+          unawaited(_updateLoadedBannerHeight(loadedBanner));
         },
         onAdFailedToLoad: (final Ad ad, final LoadAdError error) {
           if (bannerLoadGeneration != _bannerLoadGeneration) {
@@ -1161,6 +1165,18 @@ class GameDetailPortraitController extends GetxController
     banner.load();
   }
 
+  Future<void> _updateLoadedBannerHeight(final BannerAd banner) async {
+    final AdSize? platformSize = await banner.getPlatformAdSize();
+    if (!identical(_bannerAd, banner) ||
+        platformSize == null ||
+        platformSize.height <= 0) {
+      return;
+    }
+
+    _loadedBannerHeight = platformSize.height;
+    update();
+  }
+
   void _hideBanner({bool resetAlignment = false}) {
     _disposeBannerAd();
     if (resetAlignment) {
@@ -1188,6 +1204,7 @@ class GameDetailPortraitController extends GetxController
     _bannerLoadAttempts = 0;
     _loadedBannerWidth = null;
     _loadedBannerOrientation = null;
+    _loadedBannerHeight = null;
   }
 
   Set<String> _tokenizeCategoryValues(final String? value) {
