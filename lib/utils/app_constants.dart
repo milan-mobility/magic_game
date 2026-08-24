@@ -1,5 +1,5 @@
 class AppConstants {
-  static String appName = 'Magic Game Plus';
+  static String appName = 'OneGame+';
 
   static const String interstitialAndroid =
       'ca-app-pub-3940256099942544/1033173712';
@@ -8,4 +8,7 @@ class AppConstants {
 
   static const String rewardAndroid = 'ca-app-pub-3940256099942544/5224354917';
   static const String rewardIOS = 'ca-app-pub-3940256099942544/1712485313';
+
+  static const String bannerAndroid = 'ca-app-pub-7707412763556101/1222154699';
+  static const String bannerIOS = 'ca-app-pub-3940256099942544/2934735716';
 }

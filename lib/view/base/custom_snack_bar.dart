@@ -13,14 +13,14 @@ void showSuccessSnackBar({final String? title, required final String message}) {
         backgroundColor: AppColors.themeColor,
         titleText: Text(
           title ?? AppConstants.appName,
-          style: dmSansW600.copyWith(
+          style: poppinsW400.copyWith(
             fontSize: AppResponsive.font(18),
             color: AppColors.white,
           ),
         ),
         messageText: Text(
           message,
-          style: dmSansW400.copyWith(
+          style: poppinsW400.copyWith(
             fontSize: AppResponsive.font(15),
             color: AppColors.white,
           ),
@@ -54,14 +54,14 @@ void showErrorSnackBar({
         backgroundColor: Colors.red,
         titleText: Text(
           title ?? AppConstants.appName,
-          style: dmSansW600.copyWith(
+          style: poppinsW400.copyWith(
             fontSize: AppResponsive.font(18),
             color: AppColors.white,
           ),
         ),
         messageText: Text(
           message,
-          style: dmSansW400.copyWith(
+          style: poppinsW400.copyWith(
             fontSize: AppResponsive.font(15),
             color: AppColors.white,
           ),

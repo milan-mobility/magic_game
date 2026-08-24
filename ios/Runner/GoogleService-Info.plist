@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>833018092184-bl2qn1srqds6h3us3ec2pohqqnnlbj57.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.833018092184-bl2qn1srqds6h3us3ec2pohqqnnlbj57</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>833018092184-3mlodma5kc5379oelqhhigbpiqggrs31.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBNIJhVwgx7y-nIsrpKk2EMP5TiMaKgjJ8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>833018092184</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.oneup.onegameplus</string>
+	<key>PROJECT_ID</key>
+	<string>onegameplus-7f2ef</string>
+	<key>STORAGE_BUCKET</key>
+	<string>onegameplus-7f2ef.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:833018092184:ios:451446c7fd51c21f0b0eed</string>
+</dict>
+</plist>
