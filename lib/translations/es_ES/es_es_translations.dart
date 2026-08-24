@@ -166,5 +166,10 @@ final Map<String, String> esEs = <String, String>{
   'About This Game': 'Acerca de este juego',
   'You May Like This': 'También te puede gustar',
   'Rate Us': 'Califícanos',
+  'Coin Pack': 'Paquete de monedas',
+  'Diamond Pack': 'Paquete de diamantes',
+  'Shop': 'Tienda',
+  'Buy coins and diamonds': 'Compra monedas y diamantes',
+  'Loading...': 'Cargando...',
   'Support us with 5 stars!': '¡Apóyanos con 5 estrellas! ⭐',
 };

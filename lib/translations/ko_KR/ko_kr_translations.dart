@@ -152,5 +152,10 @@ final Map<String, String> koKr = <String, String>{
   'About This Game': '이 게임 정보',
   'You May Like This': '이것도 좋아할 수 있어요',
   'Rate Us': '평가해 주세요',
+  'Coin Pack': '코인 패키지',
+  'Diamond Pack': '다이아몬드 패키지',
+  'Shop': '상점',
+  'Buy coins and diamonds': '코인과 다이아몬드 구매',
+  'Loading...': '로딩 중...',
   'Support us with 5 stars!': '별 5개로 응원해 주세요! ⭐',
 };

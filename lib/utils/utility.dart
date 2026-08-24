@@ -138,21 +138,35 @@ class Utility {
   static void shareApp() {
     try {
       String appUrl = '';
+
       if (Platform.isAndroid) {
         appUrl =
             'https://play.google.com/store/apps/details?id=com.oneup.onegameplus&hl=en_IN';
       } else if (Platform.isIOS) {
-        appUrl = 'https://apps.apple.com/app/id';
+        appUrl = 'https://apps.apple.com/app/idYOUR_APP_ID';
       }
+
       final ShareParams params = ShareParams(
-        title: 'Take control of your money with AccountPundit!'.tr,
+        title: 'One Game+ – Multiple Games, Endless Fun!'.tr,
         text:
-            'Take control of your money with AccountPundit! Track income, expenses & budgets — all in one place. Download it free: @url'
-                .trParams(<String, String>{'url': appUrl}),
+            '''
+🎮 One Game+, endless fun!
+
+Play a collection of fun and exciting games all in one app. Challenge yourself, beat your high scores, and discover your next favorite game!
+
+🔥 Multiple games in one app
+🏆 Challenge yourself & score higher
+🎯 Quick, fun and easy to play
+🎮 Something for everyone
+
+Download One Game+ and start playing now:
+$appUrl
+''',
       );
+
       SharePlus.instance.share(params);
     } catch (e) {
-      debugPrint("EXCEPTION=>${e.toString()}");
+      debugPrint('EXCEPTION=>${e.toString()}');
     }
   }
 

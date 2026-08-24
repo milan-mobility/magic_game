@@ -166,5 +166,10 @@ final Map<String, String> itIt = <String, String>{
   'About This Game': 'Informazioni su questo gioco',
   'You May Like This': 'Ti potrebbe piacere',
   'Rate Us': 'Valutaci',
+  'Coin Pack': 'Pacchetto monete',
+  'Diamond Pack': 'Pacchetto diamanti',
+  'Shop': 'Negozio',
+  'Buy coins and diamonds': 'Acquista monete e diamanti',
+  'Loading...': 'Caricamento...',
   'Support us with 5 stars!': 'Supportaci con 5 stelle! ⭐',
 };

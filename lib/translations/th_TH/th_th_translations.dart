@@ -161,5 +161,10 @@ final Map<String, String> thTh = <String, String>{
   'About This Game': 'เกี่ยวกับเกมนี้',
   'You May Like This': 'คุณอาจชอบสิ่งนี้',
   'Rate Us': 'ให้คะแนนเรา',
+  'Coin Pack': 'แพ็กเหรียญ',
+  'Diamond Pack': 'แพ็กเพชร',
+  'Shop': 'ร้านค้า',
+  'Buy coins and diamonds': 'ซื้อเหรียญและเพชร',
+  'Loading...': 'กำลังโหลด...',
   'Support us with 5 stars!': 'สนับสนุนเราด้วย 5 ดาว! ⭐',
 };

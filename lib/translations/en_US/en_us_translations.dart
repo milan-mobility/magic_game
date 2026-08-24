@@ -161,4 +161,10 @@ final Map<String, String> enUs = <String, String>{
   'You May Like This': 'You May Like This',
   'Rate Us': 'Rate Us',
   'Support us with 5 stars!': 'Support us with 5 stars! ⭐',
+
+  'Loading...': 'Loading...',
+  'Coin Pack': 'Coin Pack',
+  'Diamond Pack': 'Diamond Pack',
+  'Shop': 'Shop',
+  'Buy coins and diamonds': 'Buy coins and diamonds',
 };

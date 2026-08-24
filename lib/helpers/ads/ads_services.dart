@@ -29,7 +29,7 @@ class AdService {
   static bool get shouldSuppressAds => _shouldSuppressAds;
 
   static Future<void> preloadInterstitial({String? adUnitId}) async {
-    debugPrint("MILAN ADD UNIT ID=> $adUnitId");
+    debugPrint("MILAN ADD UNIT ID INTERSTIAL=> $adUnitId");
     if (_shouldSuppressAds) {
       _disposeInterstitial();
       return;

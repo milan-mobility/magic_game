@@ -163,5 +163,10 @@ final Map<String, String> idId = <String, String>{
   'About This Game': 'Tentang Game Ini',
   'You May Like This': 'Anda Mungkin Menyukai Ini',
   'Rate Us': 'Beri Kami Nilai',
+  'Coin Pack': 'Paket Koin',
+  'Diamond Pack': 'Paket Berlian',
+  'Shop': 'Toko',
+  'Buy coins and diamonds': 'Beli koin dan berlian',
+  'Loading...': 'Memuat...',
   'Support us with 5 stars!': 'Dukung kami dengan 5 bintang! ⭐',
 };

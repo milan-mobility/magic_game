@@ -34,76 +34,83 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
             const _WelcomeOverlayGradient(),
-            LayoutBuilder(
-              builder: (final BuildContext context, final constraints) {
-                return ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(
-                          horizontal: AppResponsive.space(24),
-                        ).copyWith(
-                          top: AppResponsive.space(24),
-                          bottom: AppResponsive.space(22),
-                        ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        SizedBox(height: AppResponsive.value(360, tablet: 240)),
-                        Assets.png.icHomeHeader.image(
-                          width: AppResponsive.value(292, tablet: 500),
-                          fit: BoxFit.contain,
-                        ),
-                        Gap(AppResponsive.space(44)),
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxWidth: AppResponsive.value(360, tablet: 560),
-                          ),
-                          child: Text(
-                            'Your New Happy Place with\n100+ Games for Pure Playtime\nBliss'
-                                .tr,
-                            textAlign: TextAlign.center,
-                            style: poppinsW700.copyWith(
-                              fontSize: AppResponsive.font(16),
-                              height: 1.45,
-                              color: AppColors.white,
-                            ),
-                          ),
-                        ),
-                        Gap(AppResponsive.space(24)),
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxWidth: AppResponsive.value(330, tablet: 520),
-                          ),
-                          child: Text(
-                            'Plus, new games monthly- tailored variety\nis the spice of play'
-                                .tr,
-                            textAlign: TextAlign.center,
-                            style: poppinsW400.copyWith(
-                              fontSize: AppResponsive.font(14),
-                              height: 1.65,
-                              color: AppColors.white,
-                            ),
-                          ),
-                        ),
-                        Gap(AppResponsive.value(70, tablet: 64)),
-                        _WelcomeStartButton(
-                          onTap: () {
-                            showPrivacyConsentDialog(
-                              onAccepted: () {
-                                final sharedPref =
-                                    Get.find<SharedPreferenceHelper>();
-                                sharedPref.saveIntroDone(true);
-                                Get.offNamed(RouteHelper.home);
-                              },
-                            );
-                          },
-                        ),
-                      ],
+            SafeArea(
+              top: false,
+              child: LayoutBuilder(
+                builder: (final BuildContext context, final constraints) {
+                  return ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
                     ),
-                  ),
-                );
-              },
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(
+                            horizontal: AppResponsive.space(24),
+                          ).copyWith(
+                            top: AppResponsive.space(24),
+                            bottom: AppResponsive.space(22),
+                          ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          SizedBox(
+                            height: AppResponsive.value(360, tablet: 240),
+                          ),
+                          Assets.png.icHomeHeader.image(
+                            width: AppResponsive.value(292, tablet: 500),
+                            fit: BoxFit.contain,
+                          ),
+                          Gap(AppResponsive.space(44)),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: AppResponsive.value(360, tablet: 560),
+                            ),
+                            child: Text(
+                              'Your New Happy Place with\n100+ Games for Pure Playtime\nBliss'
+                                  .tr,
+                              textAlign: TextAlign.center,
+                              style: poppinsW700.copyWith(
+                                fontSize: AppResponsive.font(16),
+                                height: 1.45,
+                                color: AppColors.white,
+                              ),
+                            ),
+                          ),
+                          Gap(AppResponsive.space(24)),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: AppResponsive.value(330, tablet: 520),
+                            ),
+                            child: Text(
+                              'Plus, new games monthly- tailored variety\nis the spice of play'
+                                  .tr,
+                              textAlign: TextAlign.center,
+                              style: poppinsW400.copyWith(
+                                fontSize: AppResponsive.font(14),
+                                height: 1.65,
+                                color: AppColors.white,
+                              ),
+                            ),
+                          ),
+                          Gap(AppResponsive.value(70, tablet: 64)),
+                          _WelcomeStartButton(
+                            onTap: () {
+                              showPrivacyConsentDialog(
+                                onAccepted: () {
+                                  final sharedPref =
+                                      Get.find<SharedPreferenceHelper>();
+                                  sharedPref.saveIntroDone(true);
+                                  Get.offNamed(RouteHelper.home);
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
