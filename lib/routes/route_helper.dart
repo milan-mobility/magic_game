@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:magic_games/data/model/game_model.dart';
 import 'package:magic_games/view/screens/common_webview/common_webview.dart';
 import 'package:magic_games/view/screens/game_detail/game_detail_screen.dart';
+import 'package:magic_games/view/screens/game_detail_portraite/game_detail_portrait_screen.dart';
 import 'package:magic_games/view/screens/home/home_screen.dart';
 import 'package:magic_games/view/screens/language/language_screen.dart';
 import 'package:magic_games/view/screens/profile/profile_screen.dart';
@@ -24,6 +26,12 @@ class RouteHelper {
   static const String shop = '/shop';
   static const String commonWebView = '/commonWebView';
 
+  static String gameDetailRoute(final Games game) {
+    return game.orientation?.trim().toLowerCase() == 'landscape'
+        ? gameDetail
+        : gameDetailPortrait;
+  }
+
   static List<GetPage<dynamic>> routes = <GetPage<dynamic>>[
     GetPage<dynamic>(name: splash, page: () => getRoute(SplashScreen())),
     GetPage<dynamic>(
@@ -34,6 +42,10 @@ class RouteHelper {
     GetPage<dynamic>(
       name: gameDetail,
       page: () => getRoute(GameDetailScreen()),
+    ),
+    GetPage<dynamic>(
+      name: gameDetailPortrait,
+      page: () => getRoute(GameDetailPortraitScreen()),
     ),
     GetPage<dynamic>(
       name: searchGames,

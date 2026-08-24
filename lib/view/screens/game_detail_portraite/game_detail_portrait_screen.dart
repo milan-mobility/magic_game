@@ -9,12 +9,12 @@ import 'package:magic_games/gen/assets.gen.dart';
 import 'package:magic_games/helpers/app_colors.dart';
 import 'package:magic_games/helpers/app_responsive.dart';
 import 'package:magic_games/helpers/styles.dart';
-import 'package:magic_games/view/screens/game_detail/controller/game_detail_controller.dart';
 import 'package:magic_games/view/screens/game_detail/widgets/game_exit_overlay.dart';
+import 'package:magic_games/view/screens/game_detail_portraite/controller/game_detail_portrait_controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class GameDetailScreen extends StatelessWidget {
-  const GameDetailScreen({super.key});
+class GameDetailPortraitScreen extends StatelessWidget {
+  const GameDetailPortraitScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +22,9 @@ class GameDetailScreen extends StatelessWidget {
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         backgroundColor: AppColors.themeColor,
-        body: GetBuilder<GameDetailController>(
-          init: GameDetailController(),
-          builder: (final GameDetailController controller) {
-            final bool isLandscape =
-                MediaQuery.of(context).orientation == Orientation.landscape;
+        body: GetBuilder<GameDetailPortraitController>(
+          init: GameDetailPortraitController(),
+          builder: (final GameDetailPortraitController controller) {
             final bool shouldShowBanner =
                 controller.isBannerVisible && !controller.isExitOverlayVisible;
             final bool shouldShowTopBanner =
@@ -36,8 +34,7 @@ class GameDetailScreen extends StatelessWidget {
             final bool shouldShowExitButton =
                 controller.isExitButtonVisible &&
                 !controller.isExitOverlayVisible;
-            final double exitStripHeight = isLandscape ? 52 : 32;
-            final double landscapeExitRailWidth = 52;
+            const double exitStripHeight = 32;
 
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!context.mounted) {
@@ -64,23 +61,13 @@ class GameDetailScreen extends StatelessWidget {
                     ) {
                       final EdgeInsets safeArea = MediaQuery.paddingOf(context);
                       final double viewportWidth = constraints.maxWidth;
-                      final Orientation viewportOrientation = MediaQuery.of(
-                        context,
-                      ).orientation;
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         if (!context.mounted) {
                           return;
                         }
 
-                        controller.syncBannerViewport(
-                          width: viewportWidth,
-                          orientation: viewportOrientation,
-                        );
+                        controller.syncBannerViewport(width: viewportWidth);
                       });
-                      final double landscapePreviewWidth =
-                          (constraints.maxHeight * 0.7)
-                              .clamp(260.0, 560.0)
-                              .toDouble();
 
                       final Widget webViewContent = Stack(
                         fit: StackFit.expand,
@@ -103,15 +90,10 @@ class GameDetailScreen extends StatelessWidget {
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        (isLandscape
-                                                ? Assets.png.landscapeGameLogo
-                                                : Assets.png.icLoadingScreen)
-                                            .image(
-                                              width: isLandscape
-                                                  ? landscapePreviewWidth
-                                                  : AppResponsive.space(300),
-                                              fit: BoxFit.contain,
-                                            ),
+                                        Assets.png.icLoadingScreen.image(
+                                          width: AppResponsive.space(300),
+                                          fit: BoxFit.contain,
+                                        ),
                                         Gap(AppResponsive.space(28)),
                                         Text(
                                           'Loading...'.tr,
@@ -141,40 +123,31 @@ class GameDetailScreen extends StatelessWidget {
                           ? controller.bannerHeight
                           : 0;
                       final double portraitExitTop = 0;
-                      final double gameContentTop = isLandscape
-                          ? topBannerHeight
-                          : topBannerHeight +
-                                (shouldShowExitButton
-                                    ? exitStripHeight -
-                                          (shouldShowTopBanner
-                                              ? GetPlatform.isIOS
-                                                    ? -10
-                                                    : 20
-                                              : -5)
-                                    : 0);
+                      final double gameContentTop =
+                          topBannerHeight +
+                          (shouldShowExitButton
+                              ? exitStripHeight -
+                                    (shouldShowTopBanner
+                                        ? GetPlatform.isIOS
+                                              ? -10
+                                              : 20
+                                        : -5)
+                              : 0);
                       // In portrait, keep the interactive elements in a
                       // strict vertical order: exit strip, WebView, then ad.
                       // This prevents either native overlay from covering the
-                      // game on Android or iOS. Landscape retains its current
-                      // layout because it uses the right-side exit rail.
+                      // game on Android or iOS.
                       final double portraitWebViewTop = shouldShowExitButton
                           ? portraitExitTop + exitStripHeight
                           : safeArea.top;
-                      final double minimumWebViewTop = isLandscape
+                      final double minimumWebViewTop =
+                          gameContentTop > portraitWebViewTop
                           ? gameContentTop
-                          : (gameContentTop > portraitWebViewTop
-                                ? gameContentTop
-                                : portraitWebViewTop);
+                          : portraitWebViewTop;
                       final double webViewTop = minimumWebViewTop > safeArea.top
                           ? minimumWebViewTop
                           : safeArea.top;
-                      final double landscapeWebViewBottom =
-                          bottomBannerHeight > safeArea.bottom
-                          ? bottomBannerHeight
-                          : safeArea.bottom;
-                      final double webViewBottom = isLandscape
-                          ? landscapeWebViewBottom
-                          : controller.isBannerVisible
+                      final double webViewBottom = controller.isBannerVisible
                           ? safeArea.bottom +
                                 (GetPlatform.isAndroid
                                     ? AppResponsive.value(70)
@@ -210,9 +183,7 @@ class GameDetailScreen extends StatelessWidget {
                               // Portrait system navigation bars can overlay
                               // the window (for example Vivo's three-button
                               // mode). Keep the ad above that inset.
-                              bottom: isLandscape
-                                  ? 0
-                                  : 20, //TODO safeArea.bottom
+                              bottom: 20, //TODO safeArea.bottom
                               child: SizedBox(
                                 width: controller.bannerAd!.size.width
                                     .toDouble(),
@@ -226,36 +197,8 @@ class GameDetailScreen extends StatelessWidget {
                       return Stack(
                         fit: StackFit.expand,
                         children: [
-                          Positioned.fill(
-                            right: isLandscape && shouldShowExitButton
-                                ? landscapeExitRailWidth
-                                : 0,
-                            child: gameContent,
-                          ),
-                          if (isLandscape && shouldShowExitButton)
-                            Positioned(
-                              top: 0,
-                              // Keep the exit action out of a landscape
-                              // navigation bar or iPhone safe-area inset.
-                              // The WebView's bounds stay unchanged.
-                              right: safeArea.right,
-                              bottom: 0,
-                              width: landscapeExitRailWidth,
-                              child: ColoredBox(
-                                color: Colors.black,
-                                child: Align(
-                                  alignment: Alignment.topCenter,
-                                  child: Padding(
-                                    padding: EdgeInsets.zero,
-                                    child: _ExitButton(
-                                      isLandscape: true,
-                                      onTap: controller.showExitOverlay,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          if (!isLandscape && shouldShowExitButton)
+                          Positioned.fill(child: gameContent),
+                          if (shouldShowExitButton)
                             Positioned(
                               top: portraitExitTop,
                               left: 0,
@@ -266,7 +209,6 @@ class GameDetailScreen extends StatelessWidget {
                                 child: Align(
                                   alignment: Alignment.topRight,
                                   child: _ExitButton(
-                                    isLandscape: false,
                                     onTap: controller.showExitOverlay,
                                   ),
                                 ),
@@ -307,9 +249,8 @@ class GameDetailScreen extends StatelessWidget {
 }
 
 class _ExitButton extends StatelessWidget {
-  const _ExitButton({required this.isLandscape, required this.onTap});
+  const _ExitButton({required this.onTap});
 
-  final bool isLandscape;
   final VoidCallback onTap;
 
   @override
@@ -317,54 +258,23 @@ class _ExitButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(
-          vertical: isLandscape ? 12 : 5,
-          horizontal: 5,
-        ),
+        padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
         decoration: BoxDecoration(
           color: AppColors.color5820CB,
           borderRadius: BorderRadius.circular(5),
           border: Border.all(color: AppColors.color7433F9, width: 1.0),
         ),
-        child: isLandscape
-            ? RotatedBox(
-                quarterTurns: 1,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Exit'.tr,
-                      style: poppinsW500.copyWith(
-                        fontSize: 15,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const Gap(4),
-                    RotatedBox(
-                      quarterTurns: 1,
-                      child: SvgPicture.asset(
-                        Assets.svg.icExit,
-                        height: 10,
-                        width: 10,
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            : Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SvgPicture.asset(Assets.svg.icExit, height: 20, width: 20),
-                  const Gap(5),
-                  Text(
-                    'Exit'.tr,
-                    style: poppinsW500.copyWith(
-                      fontSize: 15,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SvgPicture.asset(Assets.svg.icExit, height: 20, width: 20),
+            const Gap(5),
+            Text(
+              'Exit'.tr,
+              style: poppinsW500.copyWith(fontSize: 15, color: Colors.white),
+            ),
+          ],
+        ),
       ),
     );
   }

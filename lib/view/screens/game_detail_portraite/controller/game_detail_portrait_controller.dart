@@ -31,7 +31,8 @@ import 'package:magic_games/view/screens/home/controller/home_controller.dart';
 import 'package:magic_games/view/screens/profile/controller/profile_controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class GameDetailController extends GetxController with WidgetsBindingObserver {
+class GameDetailPortraitController extends GetxController
+    with WidgetsBindingObserver {
   static const int _maxBannerLoadAttempts = 3;
 
   final SharedPreferenceHelper _sharedPreferenceHelper =
@@ -85,17 +86,10 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
 
   double get bannerHeight => bannerAd?.size.height.toDouble() ?? 0;
 
-  void syncBannerViewport({
-    required final double width,
-    required final Orientation orientation,
-  }) {
+  void syncBannerViewport({required final double width}) {
     final int viewportWidth = width.truncate();
-    // A full-width adaptive banner on wide landscape devices can become tall
-    // enough to leave the game with a narrow 16:9 viewport. Keep the banner
-    // below the WebView, but request it at the standard wide-banner width.
-    final int normalizedWidth = orientation == Orientation.landscape
-        ? viewportWidth.clamp(0, 728).toInt()
-        : viewportWidth;
+    const Orientation orientation = Orientation.portrait;
+    final int normalizedWidth = viewportWidth;
     if (normalizedWidth <= 0) {
       return;
     }
@@ -906,17 +900,6 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> _applyPreferredOrientation() async {
-    final String orientation = games?.orientation?.trim().toLowerCase() ?? '';
-
-    if (orientation == 'landscape') {
-      await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]);
-      await _restoreImmersiveMode();
-      return;
-    }
-
     await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
       DeviceOrientation.portraitUp,
     ]);

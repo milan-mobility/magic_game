@@ -85,7 +85,7 @@ class HomeScreen extends GetView<HomeController> {
                                     Get.offAllNamed(RouteHelper.vip);
                                   } else {
                                     Get.toNamed(
-                                      RouteHelper.gameDetail,
+                                      RouteHelper.gameDetailRoute(game),
                                       arguments: <String, dynamic>{
                                         'game': game,
                                       },
@@ -106,7 +106,7 @@ class HomeScreen extends GetView<HomeController> {
                                         Get.offAllNamed(RouteHelper.vip);
                                       } else {
                                         Get.toNamed(
-                                          RouteHelper.gameDetail,
+                                          RouteHelper.gameDetailRoute(game),
                                           arguments: <String, dynamic>{
                                             'game': game,
                                           },
@@ -151,7 +151,7 @@ class HomeScreen extends GetView<HomeController> {
                                       Get.offAllNamed(RouteHelper.vip);
                                     } else {
                                       Get.toNamed(
-                                        RouteHelper.gameDetail,
+                                        RouteHelper.gameDetailRoute(game),
                                         arguments: <String, dynamic>{
                                           'game': game,
                                         },
