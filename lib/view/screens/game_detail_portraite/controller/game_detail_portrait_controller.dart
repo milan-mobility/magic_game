@@ -484,6 +484,11 @@ class GameDetailPortraitController extends GetxController
       case 'openMailComposer':
         Utility.sendHelpSupportEmailFromEvent(gameName: games?.name ?? '');
         break;
+      case 'enable':
+        break;
+
+      case 'disable':
+        break;
       case 'hideLoading':
         _setGameLoading(false);
         break;
