@@ -122,6 +122,15 @@ class GameDetailPortraitScreen extends StatelessWidget {
                           Column(
                             children: [
                               Gap(AppResponsive.value(10)),
+                              if (shouldShowTopBanner)
+                                Center(
+                                  child: SizedBox(
+                                    width: controller.bannerAd!.size.width
+                                        .toDouble(),
+                                    height: controller.bannerHeight,
+                                    child: AdWidget(ad: controller.bannerAd!),
+                                  ),
+                                ),
                               if (shouldShowExitButton)
                                 SizedBox(
                                   height: exitStripHeight,
@@ -134,15 +143,6 @@ class GameDetailPortraitScreen extends StatelessWidget {
                                         onTap: controller.showExitOverlay,
                                       ),
                                     ),
-                                  ),
-                                ),
-                              if (shouldShowTopBanner)
-                                Center(
-                                  child: SizedBox(
-                                    width: controller.bannerAd!.size.width
-                                        .toDouble(),
-                                    height: controller.bannerHeight,
-                                    child: AdWidget(ad: controller.bannerAd!),
                                   ),
                                 ),
                               Gap(AppResponsive.value(10)),

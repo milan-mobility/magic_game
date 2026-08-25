@@ -475,15 +475,20 @@ class _ActionRow extends StatelessWidget {
           isPrimary: true,
         ),
       ),
-      Gap(AppResponsive.space(14)),
-      Expanded(
-        child: _OverlayActionButton(
-          label: 'Download'.tr,
-          icon: Icons.download_rounded,
-          onTap: canDownload ? onDownload : null,
-        ),
-      ),
     ];
+
+    if (canDownload) {
+      buttons.addAll(<Widget>[
+        Gap(AppResponsive.space(14)),
+        Expanded(
+          child: _OverlayActionButton(
+            label: 'Download'.tr,
+            icon: Icons.download_rounded,
+            onTap: onDownload,
+          ),
+        ),
+      ]);
+    }
 
     if (isLandscape) {
       return Row(children: buttons);

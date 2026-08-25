@@ -173,7 +173,7 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
 
   bool get canDownloadCurrentGame {
     final String? storeUrl = games?.storeurl?.trim();
-    return storeUrl != null && storeUrl.isNotEmpty;
+    return games?.install == true && storeUrl != null && storeUrl.isNotEmpty;
   }
 
   List<Games> get recommendedGames {
@@ -235,6 +235,11 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   void didChangeAppLifecycleState(final AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       unawaited(_restoreImmersiveMode());
+      if (isExitOverlayVisible) {
+        _sendCallbackToJs('GamePause');
+      }
+    } else if (state == AppLifecycleState.paused) {
+      _sendCallbackToJs('GamePause');
     }
   }
 
@@ -258,7 +263,7 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
         _showToastMessage('Game URL is not available for this game.'.tr);
         return;
       }
-
+      _showToastMessage(gameUrl);
       debugPrint("GAME URL=>$gameUrl");
       await webViewController.loadRequest(Uri.parse(gameUrl));
     } catch (e) {
@@ -563,6 +568,12 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
         await showExitOverlay();
         break;
 
+      case 'enable':
+        break;
+
+      case 'disable':
+        break;
+
       case 'closeApp':
         await closeGameDetailScreen();
         break;
@@ -748,7 +759,6 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
   Future<void> fireFirebaseEvent(final String name) async {
     await FirebaseAnalytics.instance.logEvent(name: name);
   }
-
 
   Future<void> saveCommonData() async {
     if (!_authService.isLoggedIn) {
@@ -999,9 +1009,27 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
             debugPrint('onFlutterReady JS error: $e');
           }
         },
-        onHttpError: (HttpResponseError error) {},
+        onHttpError: (HttpResponseError error) {
+          debugPrint(
+            'HTTP ERROR: statusCode=${error.response?.statusCode}, '
+            'url=${error.response?.uri}',
+          );
+          // if (error.response?.statusCode == 404) {
+          //   debugPrint('404 ERROR - Closing WebView');
+          //   _setGameLoading(false);
+          //   closeGameDetailScreen();
+          // }
+        },
         onWebResourceError: (WebResourceError error) {
+          debugPrint(
+            'WEB RESOURCE ERROR: '
+            'code=${error.errorCode}, '
+            'description=${error.description}, '
+            'url=${error.url}',
+          );
+          fireFirebaseEvent('GameCrash $gameTitle');
           _setGameLoading(false);
+          closeGameDetailScreen();
         },
         onNavigationRequest: (NavigationRequest request) {
           return NavigationDecision.navigate;

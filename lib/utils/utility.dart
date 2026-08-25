@@ -269,8 +269,7 @@ $appUrl
     String userEmail = '',
     String userName = '',
   }) async {
-    final Locale locale =
-        Get.deviceLocale ?? WidgetsBinding.instance.platformDispatcher.locale;
+    final String country = _deviceCountryCode();
     final String appVersion = await getPackageInfo();
     final _EmailUserContext userContext = _resolveEmailUserContext(
       userId: userId,
@@ -284,7 +283,7 @@ $appUrl
       body: buildFeedbackEmailTemplate(
         gameName: gameName ?? AppConstants.appName,
         appVersion: appVersion,
-        country: locale.countryCode ?? '',
+        country: country,
         userId: userContext.userId,
         userEmail: userContext.userEmail,
         userName: userContext.userName,
@@ -292,13 +291,26 @@ $appUrl
     );
   }
 
+  static String _deviceCountryCode() {
+    final List<Locale> locales =
+        WidgetsBinding.instance.platformDispatcher.locales;
+
+    for (final Locale locale in locales) {
+      final String? countryCode = locale.countryCode;
+      if (countryCode != null && countryCode.isNotEmpty) {
+        return countryCode.toUpperCase();
+      }
+    }
+
+    return '';
+  }
+
   static Future<void> sendHelpSupportEmail({
     String userId = '',
     String userEmail = '',
     String userName = '',
   }) async {
-    final Locale locale =
-        Get.deviceLocale ?? WidgetsBinding.instance.platformDispatcher.locale;
+    final String country = _deviceCountryCode();
     final String deviceModel = await getDeviceModel();
     final String operatingSystem = await getOperatingSystemVersion();
     final _EmailUserContext userContext = _resolveEmailUserContext(
@@ -313,7 +325,7 @@ $appUrl
       body: buildHelpSupportEmailTemplate(
         deviceModel: deviceModel,
         operatingSystem: operatingSystem,
-        country: locale.countryCode ?? '',
+        country: country,
         userId: userContext.userId,
         userEmail: userContext.userEmail,
         userName: userContext.userName,
@@ -327,8 +339,7 @@ $appUrl
     String userName = '',
     String gameName = '',
   }) async {
-    final Locale locale =
-        Get.deviceLocale ?? WidgetsBinding.instance.platformDispatcher.locale;
+    final String country = _deviceCountryCode();
     final String deviceModel = await getDeviceModel();
     final String operatingSystem = await getOperatingSystemVersion();
     final _EmailUserContext userContext = _resolveEmailUserContext(
@@ -345,7 +356,7 @@ $appUrl
       body: buildHelpSupportEmailTemplate(
         deviceModel: deviceModel,
         operatingSystem: operatingSystem,
-        country: locale.countryCode ?? '',
+        country: country,
         userId: userContext.userId,
         userEmail: userContext.userEmail,
         userName: userContext.userName,

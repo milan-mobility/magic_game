@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart' as gett;
 import 'package:magic_games/data/api/dio_interceptor.dart';
 import 'package:magic_games/helpers/services/remote_config.dart';
+import 'package:magic_games/utils/app_toast.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 class DioClient extends gett.GetxController implements gett.GetxService {
@@ -208,6 +209,10 @@ class DioClient extends gett.GetxController implements gett.GetxService {
       try {
         final Response<dynamic> response = await execute();
         _remoteConfigService.markWorkingBaseUrl(baseUrl);
+        if (kDebugMode) {
+            showToast(message: baseUrl);
+        }
+
         return response;
       } on DioException catch (error, stackTrace) {
         lastDioException = error;
