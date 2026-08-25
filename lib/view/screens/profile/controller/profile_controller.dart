@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -323,6 +324,59 @@ class ProfileController extends GetxController {
     avatarFilePath = _resolveStoredAvatarFilePath();
     avatarImageUrl = _resolveAvatarImageUrl();
     update();
+    readCommonData();
+
+  }
+  Future<void> readCommonData() async {
+    if (!_authService.isLoggedIn) {
+      debugPrint('Skipping saveData: User is not logged in.');
+      return;
+    }
+
+    if (_sharedPreferenceHelper.getAppDataReadOnce) {
+      debugPrint('AppData already read once. Skipping Firestore.');
+      return;
+    }
+
+    final String userId = _authService.currentUser!.uid;
+
+    const documentName = "AppData";
+    try {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('documents')
+          .doc(documentName)
+          .get();
+
+      if (!snapshot.exists) {
+        debugPrint('AppData document does not exist');
+        return;
+      }
+
+      final Map<String, dynamic>? data = snapshot.data();
+
+      if (data == null) {
+        debugPrint('AppData is empty');
+        return;
+      }
+
+      final int coin = (data['Coin'] ?? 0) as int;
+      final int diamond = (data['Diamond'] ?? 0) as int;
+
+      debugPrint('Coin: $coin');
+      debugPrint('Diamond: $diamond');
+
+      // Save to local preferences if required
+      _sharedPreferenceHelper.saveCoins(value: coin);
+      _sharedPreferenceHelper.saveDiamonds(value: diamond);
+
+      await _sharedPreferenceHelper.setAppDataReadOnce(true);
+
+    } catch (e) {
+      debugPrint('Error reading AppData: $e');
+    }
   }
 
   String _resolvePlayerName() {

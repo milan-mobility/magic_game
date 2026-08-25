@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:magic_games/helpers/services/remote_config.dart';
 import 'package:magic_games/routes/route_helper.dart';
 import 'package:magic_games/view/base/offline_retry_dialog.dart';
@@ -15,13 +14,9 @@ class NetworkController extends GetxController
   final RxBool isConnected = true.obs;
 
   final Connectivity _connectivity = Connectivity();
-  final InternetConnection _internetConnection = InternetConnection();
-
   final Completer<void> _startupCheckCompleter = Completer<void>();
 
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
-
-  StreamSubscription<InternetStatus>? _internetSubscription;
 
   AppLifecycleState _lifecycleState = AppLifecycleState.resumed;
 
@@ -109,43 +104,25 @@ class NetworkController extends GetxController
         unawaited(_verifyInternetConnection());
       },
     );
-
-    /*
-     * Do not directly trust a potentially buffered status event after
-     * resume. Trigger a fresh internet verification instead.
-     */
-    _internetSubscription = _internetConnection.onStatusChange.listen(
-      (_) {
-        unawaited(_verifyInternetConnection());
-      },
-      onError: (_) {
-        unawaited(_verifyInternetConnection());
-      },
-    );
   }
 
   void _stopNetworkListeners() {
     final connectivitySubscription = _connectivitySubscription;
-    final internetSubscription = _internetSubscription;
 
     _connectivitySubscription = null;
-    _internetSubscription = null;
 
     if (connectivitySubscription != null) {
       unawaited(connectivitySubscription.cancel());
-    }
-
-    if (internetSubscription != null) {
-      unawaited(internetSubscription.cancel());
     }
   }
 
   Future<bool> _hasInternetAccess() async {
     try {
-      return await _internetConnection.hasInternetAccess.timeout(
-        const Duration(seconds: 10),
-        onTimeout: () => false,
-      );
+      final List<ConnectivityResult> connectionTypes = await _connectivity
+          .checkConnectivity();
+
+      return connectionTypes.contains(ConnectivityResult.wifi) ||
+          connectionTypes.contains(ConnectivityResult.mobile);
     } catch (error, stackTrace) {
       debugPrint('Internet connection check failed: $error');
       debugPrintStack(stackTrace: stackTrace);

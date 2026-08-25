@@ -50,6 +50,13 @@ class SharedPreferenceHelper {
     await _sharedPreference.setInt(PrefKeys.diamonds, value);
   }
 
+  bool get getAppDataReadOnce =>
+      _sharedPreference.getBool('AppDataReadOnce') ?? false;
+
+  Future<void> setAppDataReadOnce(bool value) async {
+    await _sharedPreference.setBool('AppDataReadOnce', value);
+  }
+
   int get getDiamonds {
     return _sharedPreference.getInt(PrefKeys.diamonds) ?? 100;
   }

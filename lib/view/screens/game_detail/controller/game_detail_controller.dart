@@ -484,7 +484,9 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
       case 'openMailComposer':
         Utility.sendHelpSupportEmailFromEvent(gameName: games?.name ?? '');
         break;
-
+      case 'hideLoading':
+        _setGameLoading(false);
+        break;
       case 'gameStart':
         _setGameLoading(false);
         await _sendCallbackToJs(
@@ -747,6 +749,30 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
     await FirebaseAnalytics.instance.logEvent(name: name);
   }
 
+
+  Future<void> saveCommonData() async {
+    if (!_authService.isLoggedIn) {
+      debugPrint('Skipping saveData: User is not logged in.');
+      return;
+    }
+
+    final String userId = _authService.currentUser!.uid;
+    debugPrint('Flutter → JS: $userId');
+
+    final documentName = "AppData";
+    final Map<String, dynamic> data = {
+      "Coin": _sharedPreferenceHelper.getCoins,
+      "Diamond": _sharedPreferenceHelper.getDiamonds,
+    };
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('documents')
+        .doc(documentName)
+        .set(data, SetOptions(merge: true));
+  }
+
   Future<void> saveGameData({
     required String userId,
     required Map<String, dynamic> json,
@@ -865,6 +891,7 @@ class GameDetailController extends GetxController with WidgetsBindingObserver {
     unawaited(_restoreDefaultSystemUi());
     unawaited(_resetPreferredOrientation());
     AdService.dispose();
+    saveCommonData();
     super.onClose();
   }
 

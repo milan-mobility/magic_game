@@ -133,6 +133,7 @@ class ShopController extends GetxController {
     coins.value = newTotal;
     if (Get.isRegistered<GameDetailController>()) {
       await Get.find<GameDetailController>().sendBalanceUpdateToJs();
+      await Get.find<GameDetailController>().saveCommonData();
     }
     await _showToastMessage('You got $amount coins!'.tr);
   }
@@ -143,6 +144,7 @@ class ShopController extends GetxController {
     diamonds.value = newTotal;
     if (Get.isRegistered<GameDetailController>()) {
       await Get.find<GameDetailController>().sendBalanceUpdateToJs();
+      await Get.find<GameDetailController>().saveCommonData();
     }
     await _showToastMessage('You got $amount diamonds!'.tr);
   }
